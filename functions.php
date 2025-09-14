@@ -124,7 +124,7 @@ function charlie_enqueue_store_assets() {
         'charlie-geocoding',
         get_template_directory_uri() . '/charlie-stores/js/geocoding.js',
         array('charlie-config'),
-        '1.0.0',
+        '1.0.2',
         true
     );
 
