@@ -108,133 +108,159 @@ if ($full_screen === 'yes') {
 if ($full_screen === 'yes') {
     wp_footer();
     ?>
-    <!-- Emergency geocoding fix for WordPress.com caching -->
+    <!-- NUCLEAR OPTION: Complete bypass of all cached JS -->
     <script>
-    // Override immediately, don't wait for DOMContentLoaded
-    (function() {
-        const accessToken = '<?php echo get_option('charlie_mapbox_token'); ?>';
+    console.log('NUCLEAR BYPASS: Starting complete override...');
 
-        // Direct Mapbox geocoding function
-        async function directMapboxGeocode(postalCode) {
-            const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(postalCode + ', Canada')}.json?access_token=${accessToken}&country=ca&types=postcode&limit=1`;
+    // Direct Mapbox function
+    const MAPBOX_TOKEN = '<?php echo get_option('charlie_mapbox_token'); ?>';
 
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Geocoding failed');
-            }
+    async function nuclearGeocode(postalCode) {
+        console.log('NUCLEAR: Direct Mapbox call for:', postalCode);
 
-            const data = await response.json();
-            if (!data.features || data.features.length === 0) {
-                throw new Error('Please enter a valid Canadian postal code');
-            }
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(postalCode + ', Canada')}.json?access_token=${MAPBOX_TOKEN}&country=ca&types=postcode&limit=1`;
 
-            const feature = data.features[0];
-            const [longitude, latitude] = feature.center;
-
-            return {
-                coordinates: {
-                    latitude,
-                    longitude,
-                    lngLat: [longitude, latitude]
-                },
-                postalCode,
-                location: {
-                    city: null,
-                    province: null,
-                    country: 'Canada'
-                },
-                formattedAddress: feature.place_name
-            };
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Geocoding failed');
         }
 
-        // Override geocoding service as soon as it's available
-        function overrideGeocodingService() {
-            if (window.geocodingService) {
-                console.log('Overriding geocoding service...');
-                window.geocodingService.geocodePostalCode = directMapboxGeocode;
-                return true;
-            }
+        const data = await response.json();
+        if (!data.features || data.features.length === 0) {
+            throw new Error('Please enter a valid Canadian postal code');
+        }
+
+        const feature = data.features[0];
+        const [longitude, latitude] = feature.center;
+
+        return {
+            coordinates: {
+                latitude,
+                longitude,
+                lngLat: [longitude, latitude]
+            },
+            postalCode,
+            location: {
+                city: null,
+                province: null,
+                country: 'Canada'
+            },
+            formattedAddress: feature.place_name
+        };
+    }
+
+    // Complete replacement of modal search functionality
+    function nuclearModalSearch() {
+        console.log('NUCLEAR: Setting up modal search override...');
+
+        const modalSearchBtn = document.getElementById('modalSearchBtn');
+        const modalPostalCode = document.getElementById('modalPostalCode');
+        const modalError = document.getElementById('modalError');
+        const ageModal = document.getElementById('ageModal');
+        const app = document.getElementById('app');
+
+        if (!modalSearchBtn || !modalPostalCode) {
+            console.log('NUCLEAR: Modal elements not found yet, retrying...');
             return false;
         }
 
-        // Override age verification as soon as it's available
-        function overrideAgeVerification() {
-            if (window.ageVerification && window.ageVerification.handlePostalCodeSearch) {
-                console.log('Overriding age verification...');
+        // Remove all existing event listeners by cloning the button
+        const newBtn = modalSearchBtn.cloneNode(true);
+        modalSearchBtn.parentNode.replaceChild(newBtn, modalSearchBtn);
 
-                window.ageVerification.handlePostalCodeSearch = async function() {
-                    const postalCode = this.modalPostalCode?.value?.trim();
+        console.log('NUCLEAR: Modal button replaced, adding new handler...');
 
-                    if (!postalCode) {
-                        this.showModalError('Please enter a postal code');
-                        this.modalPostalCode?.focus();
-                        return;
-                    }
+        // Add our custom handler
+        newBtn.addEventListener('click', async () => {
+            console.log('NUCLEAR: Custom button clicked!');
 
-                    // Simple postal code validation
-                    const cleaned = postalCode.replace(/\s/g, '').toUpperCase();
-                    if (!/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(cleaned)) {
-                        this.showModalError('Please enter a valid Canadian postal code (e.g., M5V 3A8)');
-                        this.modalPostalCode?.focus();
-                        return;
-                    }
+            const postalCode = modalPostalCode.value?.trim();
 
-                    try {
-                        this.setModalLoadingState(true);
-                        this.hideModalError();
+            if (!postalCode) {
+                modalError.textContent = 'Please enter a postal code';
+                modalError.classList.remove('hidden');
+                modalPostalCode.focus();
+                return;
+            }
 
-                        const geocodeResult = await directMapboxGeocode(postalCode);
+            const cleaned = postalCode.replace(/\s/g, '').toUpperCase();
+            if (!/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(cleaned)) {
+                modalError.textContent = 'Please enter a valid Canadian postal code (e.g., M5V 3A8)';
+                modalError.classList.remove('hidden');
+                modalPostalCode.focus();
+                return;
+            }
 
-                        // Dispatch event with search results
-                        const searchData = {
-                            postalCode,
-                            geocodeResult,
-                            nearbyStores: []
-                        };
+            try {
+                newBtn.disabled = true;
+                newBtn.textContent = 'Searching...';
+                modalPostalCode.disabled = true;
+                modalError.classList.add('hidden');
 
-                        document.dispatchEvent(new CustomEvent('modalSearchComplete', {
-                            detail: searchData
-                        }));
+                console.log('NUCLEAR: Calling nuclearGeocode...');
+                const geocodeResult = await nuclearGeocode(postalCode);
+                console.log('NUCLEAR: Geocode success:', geocodeResult);
 
-                        // Hide modal and show app
-                        this.hideModal(() => {
-                            this.showApp();
-                        });
-
-                    } catch (error) {
-                        console.error('Geocoding failed:', error);
-                        this.showModalError(error.message || 'Unable to find location. Please try again.');
-                    } finally {
-                        this.setModalLoadingState(false);
-                    }
+                // Dispatch the event
+                const searchData = {
+                    postalCode,
+                    geocodeResult,
+                    nearbyStores: []
                 };
-                return true;
+
+                document.dispatchEvent(new CustomEvent('modalSearchComplete', {
+                    detail: searchData
+                }));
+
+                // Hide modal and show app
+                ageModal.classList.add('hidden');
+                app.classList.remove('hidden');
+
+                console.log('NUCLEAR: Search complete!');
+
+            } catch (error) {
+                console.error('NUCLEAR: Geocoding failed:', error);
+                modalError.textContent = error.message || 'Unable to find location. Please try again.';
+                modalError.classList.remove('hidden');
+            } finally {
+                newBtn.disabled = false;
+                newBtn.textContent = 'Find Stores';
+                modalPostalCode.disabled = false;
             }
-            return false;
-        }
-
-        // Check immediately and then periodically
-        const checkInterval = setInterval(() => {
-            const geocodingOverridden = overrideGeocodingService();
-            const ageVerificationOverridden = overrideAgeVerification();
-
-            if (geocodingOverridden && ageVerificationOverridden) {
-                console.log('All services overridden successfully');
-                clearInterval(checkInterval);
-            }
-        }, 100);
-
-        // Also try on DOMContentLoaded as fallback
-        document.addEventListener('DOMContentLoaded', function() {
-            overrideGeocodingService();
-            overrideAgeVerification();
         });
 
-        // Clear interval after 10 seconds to avoid infinite checking
-        setTimeout(() => {
-            clearInterval(checkInterval);
-        }, 10000);
-    })();
+        // Also handle Enter key
+        modalPostalCode.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                newBtn.click();
+            }
+        });
+
+        console.log('NUCLEAR: Modal override complete!');
+        return true;
+    }
+
+    // Try immediately and keep trying
+    let attempts = 0;
+    const nuclearInterval = setInterval(() => {
+        attempts++;
+        console.log(`NUCLEAR: Attempt ${attempts} to override modal...`);
+
+        if (nuclearModalSearch()) {
+            console.log('NUCLEAR: Override successful!');
+            clearInterval(nuclearInterval);
+        } else if (attempts > 100) {
+            console.log('NUCLEAR: Giving up after 100 attempts');
+            clearInterval(nuclearInterval);
+        }
+    }, 100);
+
+    // Also try on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('NUCLEAR: DOMContentLoaded - trying modal override...');
+        nuclearModalSearch();
+    });
     </script>
     </body>
     </html>
