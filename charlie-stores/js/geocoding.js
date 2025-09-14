@@ -1,6 +1,6 @@
 /**
- * Geocoding Module
- * 
+ * Geocoding Module - Direct Mapbox API
+ *
  * Handles postal code to coordinates conversion using Mapbox Geocoding API
  * WordPress Migration: Fully compatible with WordPress environment
  */
