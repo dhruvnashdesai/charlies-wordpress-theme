@@ -1,0 +1,48 @@
+name: Deploy WordPress Theme
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  deploy:
+    name: Deploy to WordPress Server
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+
+    - name: PHP Syntax Check
+      run: |
+        find . -name "*.php" -exec php -l {} \; | grep -v "No syntax errors"
+
+    - name: Deploy to server via SFTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_HOST }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        port: ${{ secrets.FTP_PORT || 22 }}
+        protocol: sftp
+        local-dir: ./
+        server-dir: /wp-content/themes/charlies-theme/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/.DS_Store
+          **/README.md
+          **/.github/**
+
+    - name: Deployment Status
+      if: success()
+      run: |
+        echo "✅ Theme deployed successfully!"
+        echo "🌐 Check your WordPress site to verify deployment"
