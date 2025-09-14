@@ -49,7 +49,7 @@ jobs:
         REMOTE_HOST: ${{ secrets.FTP_HOST }}
         REMOTE_USER: ${{ secrets.FTP_USERNAME }}
         REMOTE_PORT: ${{ secrets.FTP_PORT }}
-        TARGET: "charlies-theme/"
+        TARGET: "htdocs/wp-content/themes/charlies-theme/"
         EXCLUDE: "/node_modules/, /.git/, /.github/, /.DS_Store, /README.md"
 
     - name: Deployment Status
