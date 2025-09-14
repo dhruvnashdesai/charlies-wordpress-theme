@@ -21,7 +21,24 @@ jobs:
 
     - name: PHP Syntax Check
       run: |
-        find . -name "*.php" -exec php -l {} \; | grep -v "No syntax errors"
+        echo "=== PHP Syntax Check Started ==="
+        SYNTAX_ERRORS=0
+        for file in $(find . -name "*.php"); do
+          echo "Checking: $file"
+          if ! php -l "$file"; then
+            echo "❌ SYNTAX ERROR in: $file"
+            SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
+          else
+            echo "✅ OK: $file"
+          fi
+        done
+        echo "=== PHP Syntax Check Complete ==="
+        if [ $SYNTAX_ERRORS -gt 0 ]; then
+          echo "❌ Found $SYNTAX_ERRORS PHP syntax errors"
+          exit 1
+        else
+          echo "✅ All PHP files have valid syntax"
+        fi
 
     - name: Deploy to server via SFTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
