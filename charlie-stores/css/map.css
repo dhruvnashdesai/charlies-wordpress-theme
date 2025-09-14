@@ -1,0 +1,422 @@
+/* Full Screen Map Container */
+.fullscreen-map {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: none;
+    border: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+/* GTA-style Crosshair Overlay - Same level as circle vignette */
+.gta-crosshair {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    pointer-events: none;
+    z-index: 600; /* Same level as circle vignette (500) but slightly above */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.gta-crosshair.visible {
+    opacity: 1;
+}
+
+/* Horizontal line with gradient fade */
+.gta-crosshair::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transform: translateY(-50%);
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 10%,
+        rgba(255, 255, 255, 0.9) 30%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(255, 255, 255, 0.9) 70%,
+        rgba(255, 255, 255, 0.3) 90%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.9);
+}
+
+/* Vertical line with gradient fade */
+.gta-crosshair::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    transform: translateX(-50%);
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 10%,
+        rgba(255, 255, 255, 0.9) 30%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(255, 255, 255, 0.9) 70%,
+        rgba(255, 255, 255, 0.3) 90%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.9);
+}
+
+/* Add a center dot for precise targeting */
+.gta-crosshair .center-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(0, 0, 0, 0.8);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+}
+
+/* 10km Radius Vignette Overlay */
+.radius-vignette {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 500;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.radius-vignette.visible {
+    opacity: 1;
+}
+
+/* Create circular mask effect using radial gradient */
+.radius-vignette::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        circle at 50% 50%,
+        transparent 0px,
+        transparent 200px,
+        rgba(0, 0, 0, 0.1) 250px,
+        rgba(0, 0, 0, 0.3) 300px,
+        rgba(0, 0, 0, 0.6) 350px,
+        rgba(0, 0, 0, 0.8) 400px,
+        rgba(0, 0, 0, 0.95) 450px,
+        rgba(0, 0, 0, 1) 500px
+    );
+}
+
+/* Warehouse Marker Pulse Animation */
+@keyframes warehousePulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* Mapbox Custom Styling */
+.mapboxgl-map {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Custom Popup Styling */
+.mapboxgl-popup {
+    max-width: 300px;
+}
+
+.mapboxgl-popup-content {
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border: none;
+}
+
+.mapboxgl-popup-close-button {
+    font-size: 18px;
+    padding: 8px;
+    color: #666;
+    transition: color 0.2s ease;
+}
+
+.mapboxgl-popup-close-button:hover {
+    color: #333;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+/* Custom Popup Content */
+.popup-content {
+    text-align: left;
+}
+
+.popup-content h3 {
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.popup-content p {
+    margin: 4px 0;
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.popup-content .address {
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.popup-content .hours {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.popup-content .distance {
+    color: #007bff;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.popup-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.popup-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.popup-btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.popup-btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.popup-btn-secondary {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.popup-btn-secondary:hover {
+    background-color: #e9ecef;
+}
+
+/* Control Styling */
+.mapboxgl-ctrl {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mapboxgl-ctrl-group {
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.mapboxgl-ctrl button {
+    width: 32px;
+    height: 32px;
+}
+
+/* Attribution */
+.mapboxgl-ctrl-attrib {
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+}
+
+/* Custom Markers */
+.custom-marker {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid #007bff;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.custom-marker:hover {
+    transform: scale(1.1);
+    border-color: #0056b3;
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+.custom-marker::before {
+    content: '🏪';
+    font-size: 18px;
+}
+
+.custom-marker.selected {
+    border-color: #28a745;
+    background-color: #28a745;
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.custom-marker.selected::before {
+    content: '✓';
+    color: white;
+    font-weight: bold;
+}
+
+/* Loading State for Map */
+.map-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(248, 249, 250, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+}
+
+/* Map Error State */
+.map-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 500px;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    color: #6c757d;
+    text-align: center;
+}
+
+.map-error h3 {
+    color: #dc3545;
+    margin-bottom: 1rem;
+}
+
+.map-error p {
+    margin-bottom: 1rem;
+    max-width: 400px;
+}
+
+/* Responsive Map */
+@media (max-width: 768px) {
+    .map-container {
+        height: 400px;
+        border-radius: 8px;
+    }
+    
+    .mapboxgl-popup {
+        max-width: 250px;
+    }
+    
+    .mapboxgl-popup-content {
+        padding: 12px 15px;
+    }
+    
+    .popup-content h3 {
+        font-size: 1.1rem;
+    }
+    
+    .popup-actions {
+        flex-direction: column;
+    }
+    
+    .popup-btn {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .custom-marker {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .custom-marker::before {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .map-container {
+        height: 350px;
+        margin: 0 -15px;
+        border-radius: 0;
+    }
+    
+    .mapboxgl-popup {
+        max-width: 200px;
+    }
+    
+    .custom-marker {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .custom-marker::before {
+        font-size: 14px;
+    }
+}
+
+/* Accessibility Enhancements */
+.mapboxgl-popup-content {
+    color-contrast: high;
+}
+
+.custom-marker:focus {
+    outline: 3px solid #007bff;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .custom-marker,
+    .popup-btn,
+    .mapboxgl-popup-close-button {
+        transition: none;
+    }
+    
+    .custom-marker:hover {
+        transform: none;
+    }
+}

@@ -1,0 +1,50 @@
+# WordPress Theme Git Ignore
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (if using build tools)
+node_modules/
+npm-debug.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Log files
+*.log
+
+# Cache files
+*.cache
+
+# Backup files
+*.bak
+*.backup
+
+# Environment files (if using)
+.env
+.env.local
+.env.production
+
+# Build artifacts (if using build tools)
+dist/
+build/
+
+# WordPress specific
+wp-config-local.php
+
+# MacOS
+*.DS_Store
