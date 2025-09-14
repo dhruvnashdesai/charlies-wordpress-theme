@@ -40,23 +40,17 @@ jobs:
           echo "✅ All PHP files have valid syntax"
         fi
 
-    - name: Deploy to server via SFTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+    - name: Deploy to server via SSH
+      uses: easingthemes/ssh-deploy@main
       with:
-        server: ${{ secrets.FTP_HOST }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        port: ${{ secrets.FTP_PORT || 22 }}
-        protocol: sftp
-        local-dir: ./
-        server-dir: /wp-content/themes/charlies-theme/
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/node_modules/**
-          **/.DS_Store
-          **/README.md
-          **/.github/**
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        ARGS: "-rlgoDzvc -i --delete"
+        SOURCE: "./"
+        REMOTE_HOST: ${{ secrets.FTP_HOST }}
+        REMOTE_USER: ${{ secrets.FTP_USERNAME }}
+        REMOTE_PORT: ${{ secrets.FTP_PORT }}
+        TARGET: "/wp-content/themes/charlies-theme/"
+        EXCLUDE: "/node_modules/, /.git/, /.github/, /.DS_Store, /README.md"
 
     - name: Deployment Status
       if: success()
