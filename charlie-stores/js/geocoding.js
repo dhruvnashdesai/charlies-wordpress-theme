@@ -8,7 +8,7 @@
 class GeocodingService {
     constructor() {
         this.accessToken = getConfig('MAPBOX.ACCESS_TOKEN');
-        this.baseUrl = getConfig('ENDPOINTS.GEOCODING');
+        this.baseUrl = 'https://api.mapbox.com/geocoding/v5/mapbox.places/';
         this.bounds = getConfig('MAPBOX.MAX_BOUNDS');
         this.cache = new Map();
         this.cacheExpiry = 60 * 60 * 1000; // 1 hour in milliseconds
