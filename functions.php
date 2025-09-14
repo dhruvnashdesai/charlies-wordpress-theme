@@ -116,7 +116,7 @@ function charlie_enqueue_store_assets() {
         'charlie-age-verification',
         get_template_directory_uri() . '/charlie-stores/js/ageVerification.js',
         array('charlie-config'),
-        '1.0.0',
+        '1.0.3',
         true
     );
 

@@ -281,7 +281,7 @@ class AgeVerification {
             return;
         }
         
-        if (!window.geocodingService?.validatePostalCode(postalCode)) {
+        if (!this.validatePostalCode(postalCode)) {
             this.showModalError('Please enter a valid Canadian postal code (e.g., M5V 3A8)');
             this.modalPostalCode?.focus();
             return;
@@ -290,27 +290,27 @@ class AgeVerification {
         try {
             this.setModalLoadingState(true);
             this.hideModalError();
-            
-            // Perform geocoding only
-            const geocodeResult = await window.geocodingService.geocodePostalCode(postalCode);
-            
+
+            // Direct Mapbox API call to bypass broken geocoding service
+            const geocodeResult = await this.directMapboxGeocode(postalCode);
+
             // Track successful search
             this.trackEvent('postal_code_search_success', {
                 postal_code: postalCode,
                 location: geocodeResult.location
             });
-            
+
             // Dispatch event with search results
             const searchData = {
                 postalCode,
                 geocodeResult,
                 nearbyStores: [] // No stores needed
             };
-            
+
             document.dispatchEvent(new CustomEvent('modalSearchComplete', {
                 detail: searchData
             }));
-            
+
             // Hide modal and show app
             this.hideModal(() => {
                 this.showApp();
@@ -328,6 +328,89 @@ class AgeVerification {
         } finally {
             this.setModalLoadingState(false);
         }
+    }
+
+    /**
+     * Validate Canadian postal code format
+     * @param {string} postalCode - The postal code to validate
+     * @returns {boolean} True if valid
+     */
+    validatePostalCode(postalCode) {
+        if (!postalCode || typeof postalCode !== 'string') {
+            return false;
+        }
+        const cleaned = postalCode.replace(/\s/g, '').toUpperCase();
+        return /^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(cleaned);
+    }
+
+    /**
+     * Direct Mapbox geocoding to bypass broken service
+     * @param {string} postalCode - The postal code to geocode
+     * @returns {Promise<object>} Geocoding result
+     */
+    async directMapboxGeocode(postalCode) {
+        const accessToken = getConfig('MAPBOX.ACCESS_TOKEN');
+        if (!accessToken) {
+            throw new Error('Mapbox access token not configured');
+        }
+
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(postalCode + ', Canada')}.json?access_token=${accessToken}&country=ca&types=postcode&limit=1`;
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Geocoding failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!data.features || data.features.length === 0) {
+            throw new Error('Please enter a valid Canadian postal code');
+        }
+
+        const feature = data.features[0];
+        const [longitude, latitude] = feature.center;
+
+        return {
+            coordinates: {
+                latitude,
+                longitude,
+                lngLat: [longitude, latitude]
+            },
+            postalCode,
+            location: {
+                city: this.extractCity(feature),
+                province: this.extractProvince(feature),
+                country: 'Canada'
+            },
+            formattedAddress: feature.place_name
+        };
+    }
+
+    /**
+     * Extract city from Mapbox feature
+     */
+    extractCity(feature) {
+        if (feature.context) {
+            for (const context of feature.context) {
+                if (context.id.startsWith('place.')) {
+                    return context.text;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Extract province from Mapbox feature
+     */
+    extractProvince(feature) {
+        if (feature.context) {
+            for (const context of feature.context) {
+                if (context.id.startsWith('region.')) {
+                    return context.text;
+                }
+            }
+        }
+        return null;
     }
 
     /**
