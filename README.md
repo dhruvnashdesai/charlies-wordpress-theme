@@ -93,4 +93,4 @@ GPL v2 or later
 - Full-screen store finder
 - GTA-style interface
 - Age verification system
-- Mapbox integration
+- Mapbox integration# Test deployment after SSH key fix
