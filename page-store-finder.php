@@ -108,6 +108,92 @@ if ($full_screen === 'yes') {
 if ($full_screen === 'yes') {
     wp_footer();
     ?>
+    <!-- Emergency geocoding fix for WordPress.com caching -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Override the broken geocoding service call
+        if (window.ageVerification && window.ageVerification.handlePostalCodeSearch) {
+            const originalMethod = window.ageVerification.handlePostalCodeSearch.bind(window.ageVerification);
+
+            window.ageVerification.handlePostalCodeSearch = async function() {
+                const postalCode = this.modalPostalCode?.value?.trim();
+
+                if (!postalCode) {
+                    this.showModalError('Please enter a postal code');
+                    this.modalPostalCode?.focus();
+                    return;
+                }
+
+                // Simple postal code validation
+                const cleaned = postalCode.replace(/\s/g, '').toUpperCase();
+                if (!/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(cleaned)) {
+                    this.showModalError('Please enter a valid Canadian postal code (e.g., M5V 3A8)');
+                    this.modalPostalCode?.focus();
+                    return;
+                }
+
+                try {
+                    this.setModalLoadingState(true);
+                    this.hideModalError();
+
+                    // Direct Mapbox API call
+                    const accessToken = '<?php echo get_option('charlie_mapbox_token'); ?>';
+                    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(postalCode + ', Canada')}.json?access_token=${accessToken}&country=ca&types=postcode&limit=1`;
+
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error('Geocoding failed');
+                    }
+
+                    const data = await response.json();
+                    if (!data.features || data.features.length === 0) {
+                        throw new Error('Please enter a valid Canadian postal code');
+                    }
+
+                    const feature = data.features[0];
+                    const [longitude, latitude] = feature.center;
+
+                    const geocodeResult = {
+                        coordinates: {
+                            latitude,
+                            longitude,
+                            lngLat: [longitude, latitude]
+                        },
+                        postalCode,
+                        location: {
+                            city: null,
+                            province: null,
+                            country: 'Canada'
+                        },
+                        formattedAddress: feature.place_name
+                    };
+
+                    // Dispatch event with search results
+                    const searchData = {
+                        postalCode,
+                        geocodeResult,
+                        nearbyStores: []
+                    };
+
+                    document.dispatchEvent(new CustomEvent('modalSearchComplete', {
+                        detail: searchData
+                    }));
+
+                    // Hide modal and show app
+                    this.hideModal(() => {
+                        this.showApp();
+                    });
+
+                } catch (error) {
+                    console.error('Geocoding failed:', error);
+                    this.showModalError(error.message || 'Unable to find location. Please try again.');
+                } finally {
+                    this.setModalLoadingState(false);
+                }
+            };
+        }
+    });
+    </script>
     </body>
     </html>
     <?php
