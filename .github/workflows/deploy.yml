@@ -44,12 +44,12 @@ jobs:
       uses: easingthemes/ssh-deploy@main
       with:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        ARGS: "-rlgoDzvc -i --delete"
+        ARGS: "-rlgoDzvc -i"
         SOURCE: "./"
         REMOTE_HOST: ${{ secrets.FTP_HOST }}
         REMOTE_USER: ${{ secrets.FTP_USERNAME }}
         REMOTE_PORT: ${{ secrets.FTP_PORT }}
-        TARGET: "/wp-content/themes/charlies-theme/"
+        TARGET: "wp-content/themes/charlies-theme/"
         EXCLUDE: "/node_modules/, /.git/, /.github/, /.DS_Store, /README.md"
 
     - name: Deployment Status
