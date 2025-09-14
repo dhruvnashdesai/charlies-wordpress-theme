@@ -108,21 +108,28 @@ if ($full_screen === 'yes') {
 if ($full_screen === 'yes') {
     wp_footer();
     ?>
-    <!-- NUCLEAR OPTION: Complete bypass of all cached JS -->
-    <script>
-    console.log('NUCLEAR BYPASS: Starting complete override...');
+    <!-- BYPASS EVERYTHING: Add direct postal code input to page -->
+    <div id="directPostalInput" style="position: fixed; top: 20px; right: 20px; z-index: 10000; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+        <h3 style="margin: 0 0 10px 0; font-size: 16px;">Direct Postal Code Entry</h3>
+        <input type="text" id="directPostalCode" placeholder="e.g., M5V 3A8" style="padding: 8px; margin-right: 8px; border: 1px solid #ddd; border-radius: 4px; width: 120px;" maxlength="7">
+        <button id="directSearchBtn" style="padding: 8px 16px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer;">Search</button>
+        <div id="directError" style="color: red; font-size: 12px; margin-top: 5px; display: none;"></div>
+        <div id="directStatus" style="color: green; font-size: 12px; margin-top: 5px; display: none;"></div>
+    </div>
 
-    // Direct Mapbox function
+    <script>
+    console.log('DIRECT BYPASS: Starting...');
+
     const MAPBOX_TOKEN = '<?php echo get_option('charlie_mapbox_token'); ?>';
 
-    async function nuclearGeocode(postalCode) {
-        console.log('NUCLEAR: Direct Mapbox call for:', postalCode);
+    async function directMapboxCall(postalCode) {
+        console.log('DIRECT: Calling Mapbox for:', postalCode);
 
         const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(postalCode + ', Canada')}.json?access_token=${MAPBOX_TOKEN}&country=ca&types=postcode&limit=1`;
 
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error('Geocoding failed');
+            throw new Error(`Mapbox API error: ${response.status}`);
         }
 
         const data = await response.json();
@@ -149,59 +156,59 @@ if ($full_screen === 'yes') {
         };
     }
 
-    // Complete replacement of modal search functionality
-    function nuclearModalSearch() {
-        console.log('NUCLEAR: Setting up modal search override...');
-
-        const modalSearchBtn = document.getElementById('modalSearchBtn');
-        const modalPostalCode = document.getElementById('modalPostalCode');
-        const modalError = document.getElementById('modalError');
+    function setupDirectInput() {
+        const directInput = document.getElementById('directPostalCode');
+        const directBtn = document.getElementById('directSearchBtn');
+        const directError = document.getElementById('directError');
+        const directStatus = document.getElementById('directStatus');
         const ageModal = document.getElementById('ageModal');
         const app = document.getElementById('app');
 
-        if (!modalSearchBtn || !modalPostalCode) {
-            console.log('NUCLEAR: Modal elements not found yet, retrying...');
+        if (!directInput || !directBtn) {
+            console.log('DIRECT: Elements not found, retrying...');
             return false;
         }
 
-        // Remove all existing event listeners by cloning the button
-        const newBtn = modalSearchBtn.cloneNode(true);
-        modalSearchBtn.parentNode.replaceChild(newBtn, modalSearchBtn);
+        console.log('DIRECT: Setting up handlers...');
 
-        console.log('NUCLEAR: Modal button replaced, adding new handler...');
+        async function handleDirectSearch() {
+            const postalCode = directInput.value?.trim();
 
-        // Add our custom handler
-        newBtn.addEventListener('click', async () => {
-            console.log('NUCLEAR: Custom button clicked!');
-
-            const postalCode = modalPostalCode.value?.trim();
+            directError.style.display = 'none';
+            directStatus.style.display = 'none';
 
             if (!postalCode) {
-                modalError.textContent = 'Please enter a postal code';
-                modalError.classList.remove('hidden');
-                modalPostalCode.focus();
+                directError.textContent = 'Please enter a postal code';
+                directError.style.display = 'block';
+                directInput.focus();
                 return;
             }
 
             const cleaned = postalCode.replace(/\s/g, '').toUpperCase();
             if (!/^[A-Z]\d[A-Z]\d[A-Z]\d$/.test(cleaned)) {
-                modalError.textContent = 'Please enter a valid Canadian postal code (e.g., M5V 3A8)';
-                modalError.classList.remove('hidden');
-                modalPostalCode.focus();
+                directError.textContent = 'Please enter a valid Canadian postal code (e.g., M5V 3A8)';
+                directError.style.display = 'block';
+                directInput.focus();
                 return;
             }
 
             try {
-                newBtn.disabled = true;
-                newBtn.textContent = 'Searching...';
-                modalPostalCode.disabled = true;
-                modalError.classList.add('hidden');
+                directBtn.disabled = true;
+                directBtn.textContent = 'Searching...';
+                directInput.disabled = true;
 
-                console.log('NUCLEAR: Calling nuclearGeocode...');
-                const geocodeResult = await nuclearGeocode(postalCode);
-                console.log('NUCLEAR: Geocode success:', geocodeResult);
+                console.log('DIRECT: Calling directMapboxCall...');
+                const geocodeResult = await directMapboxCall(postalCode);
+                console.log('DIRECT: Success:', geocodeResult);
 
-                // Dispatch the event
+                directStatus.textContent = `Found: ${geocodeResult.formattedAddress}`;
+                directStatus.style.display = 'block';
+
+                // Skip modal completely and go straight to app
+                if (ageModal) ageModal.style.display = 'none';
+                if (app) app.classList.remove('hidden');
+
+                // Dispatch the event for the map
                 const searchData = {
                     postalCode,
                     geocodeResult,
@@ -212,55 +219,49 @@ if ($full_screen === 'yes') {
                     detail: searchData
                 }));
 
-                // Hide modal and show app
-                ageModal.classList.add('hidden');
-                app.classList.remove('hidden');
-
-                console.log('NUCLEAR: Search complete!');
+                console.log('DIRECT: Complete!');
 
             } catch (error) {
-                console.error('NUCLEAR: Geocoding failed:', error);
-                modalError.textContent = error.message || 'Unable to find location. Please try again.';
-                modalError.classList.remove('hidden');
+                console.error('DIRECT: Error:', error);
+                directError.textContent = error.message || 'Geocoding failed';
+                directError.style.display = 'block';
             } finally {
-                newBtn.disabled = false;
-                newBtn.textContent = 'Find Stores';
-                modalPostalCode.disabled = false;
+                directBtn.disabled = false;
+                directBtn.textContent = 'Search';
+                directInput.disabled = false;
             }
-        });
+        }
 
-        // Also handle Enter key
-        modalPostalCode.addEventListener('keydown', (e) => {
+        directBtn.addEventListener('click', handleDirectSearch);
+
+        directInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                newBtn.click();
+                handleDirectSearch();
             }
         });
 
-        console.log('NUCLEAR: Modal override complete!');
+        // Format input as user types
+        directInput.addEventListener('input', (e) => {
+            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (value.length > 3) {
+                value = value.slice(0, 3) + ' ' + value.slice(3, 6);
+            }
+            e.target.value = value;
+        });
+
+        console.log('DIRECT: Setup complete!');
         return true;
     }
 
-    // Try immediately and keep trying
-    let attempts = 0;
-    const nuclearInterval = setInterval(() => {
-        attempts++;
-        console.log(`NUCLEAR: Attempt ${attempts} to override modal...`);
+    // Try immediately
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupDirectInput);
+    } else {
+        setupDirectInput();
+    }
 
-        if (nuclearModalSearch()) {
-            console.log('NUCLEAR: Override successful!');
-            clearInterval(nuclearInterval);
-        } else if (attempts > 100) {
-            console.log('NUCLEAR: Giving up after 100 attempts');
-            clearInterval(nuclearInterval);
-        }
-    }, 100);
-
-    // Also try on DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('NUCLEAR: DOMContentLoaded - trying modal override...');
-        nuclearModalSearch();
-    });
+    console.log('DIRECT: Script loaded');
     </script>
     </body>
     </html>
