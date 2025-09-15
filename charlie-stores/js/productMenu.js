@@ -294,12 +294,17 @@ class ProductMenu {
         } else {
             // Select new brand and filter products
             this.selectedBrand = brand;
-            this.filteredProducts = this.allProducts.filter(product =>
-                product.brand === brand.name
-            );
+            this.filteredProducts = this.allProducts.filter(product => {
+                console.log('ProductMenu: Comparing product brand:', product.brand, 'with selected brand:', brand.name);
+                return product.brand === brand.name;
+            });
         }
 
-        console.log('ProductMenu: Filtered to', this.filteredProducts.length, 'products');
+        console.log('ProductMenu: Brand filter debug:');
+        console.log('Selected brand:', brand.name);
+        console.log('All products:', this.allProducts.length);
+        console.log('All product brands:', this.allProducts.map(p => p.brand));
+        console.log('Filtered to', this.filteredProducts.length, 'products');
         this.updateMenuLayout();
     }
 
@@ -351,7 +356,8 @@ class ProductMenu {
                 url: product.url,
                 add_to_cart_url: product.add_to_cart_url,
                 in_stock: product.in_stock && parseInt(product.store_stock) > 0,
-                raw_price_html: product.price // Keep original price HTML
+                raw_price_html: product.price, // Keep original price HTML
+                brand: product.brand || 'No Brand' // Add brand information
             };
         });
     }
@@ -475,7 +481,7 @@ class ProductMenu {
     hideMenu() {
         if (!this.menuElement) return;
 
-        this.menuElement.style.right = '-400px'; // Slide out to right
+        this.menuElement.style.right = '-800px'; // Slide out to right (matches initial position)
         this.isVisible = false;
 
         setTimeout(() => {

@@ -324,6 +324,10 @@ class Charlie_WooCommerce_Integration {
 
             $store_stock = get_post_meta($product->ID, '_charlie_store_stock', true);
 
+            // Get brand information
+            $brands = wp_get_post_terms($product->ID, 'product_brand', array('fields' => 'names'));
+            $brand_name = !empty($brands) ? $brands[0] : 'No Brand';
+
             $formatted_products[] = array(
                 'id' => $product->ID,
                 'name' => $product->post_title,
@@ -337,6 +341,7 @@ class Charlie_WooCommerce_Integration {
                 'in_stock' => $wc_product->is_in_stock(),
                 'store_stock' => $store_stock ?: 0,
                 'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names')),
+                'brand' => $brand_name,
                 'sku' => $wc_product->get_sku()
             );
 
