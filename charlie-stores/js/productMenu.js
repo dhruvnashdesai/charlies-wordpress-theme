@@ -442,15 +442,7 @@ class ProductMenu {
         this.menuElement.style.display = 'block';
         this.menuElement.style.visibility = 'visible';
 
-        // Check if menu fits on screen
-        setTimeout(() => {
-            const bounds = this.menuElement.getBoundingClientRect();
-            if (bounds.right > window.innerWidth) {
-                console.log('ProductMenu: Menu off-screen, adjusting position');
-                this.menuElement.style.right = 'auto';
-                this.menuElement.style.left = (window.innerWidth - menuWidth - 20) + 'px';
-            }
-        }, 50);
+        console.log('ProductMenu: Menu positioned with right: 20px');
     }
 
     /**
@@ -490,11 +482,17 @@ class ProductMenu {
         console.log('ProductMenu: Current position before hide:', this.menuElement.style.right);
         console.log('ProductMenu: Current computed position before hide:', window.getComputedStyle(this.menuElement).right);
 
-        // Reset to hidden position with animation
+        // Ensure we're using right property consistently
+        this.menuElement.style.left = 'auto';
         this.menuElement.style.right = '-800px';
         this.isVisible = false;
 
         console.log('ProductMenu: Position set to -800px for hiding animation');
+
+        // Check if transition is working
+        setTimeout(() => {
+            console.log('ProductMenu: Computed position after 200ms:', window.getComputedStyle(this.menuElement).right);
+        }, 200);
 
         // Wait for animation to complete, then dispatch close event
         setTimeout(() => {
