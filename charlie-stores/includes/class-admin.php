@@ -222,7 +222,6 @@ class Charlie_Admin {
         $all_post_types = get_post_types(array(), 'names');
         $charlie_store_registered = in_array('charlie_store', $all_post_types);
 
-        <?php
         // Get additional debug info
         $warehouse_id = get_option('charlie_warehouse_store_id', 1);
         $warehouse_post = get_post($warehouse_id);
