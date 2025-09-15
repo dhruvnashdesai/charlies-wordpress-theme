@@ -838,190 +838,85 @@ class MapManager {
         .setLngLat(coordinates)
         .addTo(this.map);
 
-        // Create separate vignette overlay that tracks this marker
-        this.createMarkerVignette();
+        // Show radius vignette effect (using existing DOM element)
+        this.showRadiusVignette();
 
-        // Show crosshair at the center and position it on marker
+        // Show crosshair at the center
         this.showCrosshair();
-
-        // Position crosshair on marker immediately
-        setTimeout(() => {
-            this.positionCrosshairOnMarker();
-        }, 200); // Increased delay to ensure marker is fully rendered
         
         // Vape stores removed for clean map
     }
 
+
     /**
-     * Create vignette overlay that tracks the marker position
+     * Show 10km radius vignette effect
      */
-    createMarkerVignette() {
-        // Remove existing vignette if any
-        if (this.markerVignette) {
-            this.markerVignette.remove();
+    showRadiusVignette() {
+        if (this.radiusVignette && this.userLocationMarker) {
+            this.radiusVignette.classList.add('visible');
+            this.updateRadiusVignette();
+
+            // Set up tracking for map changes (position and zoom)
+            this.setupVignetteTracking();
+        }
+    }
+
+    /**
+     * Hide radius vignette effect
+     */
+    hideRadiusVignette() {
+        if (this.radiusVignette) {
+            this.radiusVignette.classList.remove('visible');
+            this.removeVignetteTracking();
+        }
+    }
+
+    /**
+     * Update radius vignette and crosshair to track marker position
+     */
+    updateRadiusVignette() {
+        if (!this.radiusVignette || !this.userLocationMarker || !this.map) return;
+
+        // Get marker coordinates and project to screen
+        const markerCoords = this.userLocationMarker.getLngLat();
+        const screenPoint = this.map.project(markerCoords);
+
+        // Position vignette center on marker (with anchor offset)
+        const centerX = screenPoint.x;
+        const centerY = screenPoint.y - 20; // Offset for marker anchor
+
+        // Calculate 10km in pixels at current zoom level
+        const earthCircumference = 40075017; // Earth's circumference in meters
+        const currentZoom = this.map.getZoom();
+        const metersPerPixel = earthCircumference * Math.cos(markerCoords.lat * Math.PI / 180) / Math.pow(2, currentZoom + 8);
+        const tenKmInPixels = (10 * 1000) / metersPerPixel; // 10km in pixels
+
+        // Create dynamic gradient based on calculated radius
+        const innerRadius = Math.max(tenKmInPixels * 0.7, 150); // Inner clear area
+        const outerRadius = Math.max(tenKmInPixels * 1.2, 300);  // Outer fade area
+
+        this.radiusVignette.style.background = `radial-gradient(
+            circle at ${centerX}px ${centerY}px,
+            transparent 0px,
+            transparent ${innerRadius}px,
+            rgba(0, 0, 0, 0.1) ${innerRadius + 50}px,
+            rgba(0, 0, 0, 0.3) ${innerRadius + 100}px,
+            rgba(0, 0, 0, 0.6) ${innerRadius + 150}px,
+            rgba(0, 0, 0, 0.8) ${outerRadius}px,
+            rgba(0, 0, 0, 1) ${outerRadius + 100}px
+        )`;
+
+        // Position crosshair at the same center point
+        if (this.crosshair) {
+            this.crosshair.style.position = 'fixed';
+            this.crosshair.style.left = `${centerX - 250}px`; // Center the 500px crosshair
+            this.crosshair.style.top = `${centerY - 250}px`;
+            this.crosshair.style.zIndex = '600';
         }
 
-        // Create vignette overlay
-        const vignetteOverlay = document.createElement('div');
-        vignetteOverlay.className = 'marker-vignette-overlay';
-        vignetteOverlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(
-                circle at 50% 50%,
-                transparent 0px,
-                transparent 200px,
-                rgba(0, 0, 0, 0.1) 250px,
-                rgba(0, 0, 0, 0.3) 300px,
-                rgba(0, 0, 0, 0.6) 350px,
-                rgba(0, 0, 0, 0.8) 400px,
-                rgba(0, 0, 0, 0.95) 450px,
-                rgba(0, 0, 0, 1) 500px
-            );
-            pointer-events: none;
-            z-index: 500;
-            transition: all 0.6s ease-in-out;
-        `;
-
-        // Add to map container
-        this.mapContainer.appendChild(vignetteOverlay);
-        this.markerVignette = vignetteOverlay;
-
-        // Update vignette position to center on marker
-        setTimeout(() => {
-            this.updateVignettePosition();
-        }, 200); // Increased delay to ensure marker is fully rendered
+        console.log('Vignette and crosshair updated to marker position:', { centerX, centerY });
     }
 
-    /**
-     * Position crosshair directly on the marker
-     */
-    positionCrosshairOnMarker() {
-        if (!this.crosshair || !this.userLocationMarker) return;
-
-        // Get marker's position using Mapbox projection for accuracy
-
-        // Use Mapbox's projection system for accurate positioning
-        const markerLngLat = this.userLocationMarker.getLngLat();
-        const projectedPoint = this.map.project(markerLngLat);
-
-        // Mapbox projection gives us the anchor point, but may need fine-tuning
-        // Based on visual feedback: blue dot was slightly too left and lower
-        const centerX = projectedPoint.x + 2; // Adjust slightly right
-        const centerY = projectedPoint.y - 3; // Adjust slightly up
-
-        // Debug logging
-        console.log('Crosshair positioned at marker center:', { centerX, centerY });
-
-        // Position crosshair container so its center dot aligns with marker center
-        // The crosshair is 500x500 with center dot at 50% 50%, so we offset by 250px
-        this.crosshair.style.position = 'fixed';
-        this.crosshair.style.left = `${centerX - 250}px`; // Center the 500px crosshair
-        this.crosshair.style.top = `${centerY - 250}px`;
-        this.crosshair.style.zIndex = '600';
-        this.crosshair.style.transform = 'none'; // Reset any existing transforms
-
-        console.log('Crosshair positioned at:', {
-            left: centerX - 250,
-            top: centerY - 250
-        });
-
-        // Debug: Calculate where the crosshair center dot should appear
-        const crosshairCenterX = (centerX - 250) + 250; // crosshair left + half width
-        const crosshairCenterY = (centerY - 250) + 250; // crosshair top + half height
-        console.log('Crosshair center dot should be at:', {
-            x: crosshairCenterX,
-            y: crosshairCenterY
-        });
-        console.log('Marker is at:', { x: centerX, y: centerY });
-        console.log('Offset:', {
-            x: crosshairCenterX - centerX,
-            y: crosshairCenterY - centerY
-        });
-
-        // Visual debug: Add a red dot at the calculated marker center
-        this.addDebugDot(centerX, centerY);
-    }
-
-    /**
-     * Update vignette position to center on the marker
-     */
-    updateVignettePosition() {
-        if (!this.markerVignette || !this.userLocationMarker) return;
-
-        // Use Mapbox's projection system for accurate positioning
-        const markerLngLat = this.userLocationMarker.getLngLat();
-        const projectedPoint = this.map.project(markerLngLat);
-
-        // Mapbox projection gives us the anchor point, apply same fine-tuning as crosshair
-        const centerX = projectedPoint.x + 2; // Adjust slightly right
-        const centerY = projectedPoint.y - 3; // Adjust slightly up
-
-        // Debug logging
-        console.log('Vignette centered at marker position:', { centerX, centerY });
-
-        // Convert to percentages
-        const centerXPercent = (centerX / window.innerWidth) * 100;
-        const centerYPercent = (centerY / window.innerHeight) * 100;
-
-        console.log('Vignette - Center percentages:', { centerXPercent, centerYPercent });
-
-        // Update gradient center
-        this.markerVignette.style.background = `radial-gradient(
-            circle at ${centerXPercent}% ${centerYPercent}%,
-            transparent 0px,
-            transparent 200px,
-            rgba(0, 0, 0, 0.1) 250px,
-            rgba(0, 0, 0, 0.3) 300px,
-            rgba(0, 0, 0, 0.6) 350px,
-            rgba(0, 0, 0, 0.8) 400px,
-            rgba(0, 0, 0, 0.95) 450px,
-            rgba(0, 0, 0, 1) 500px
-        )`;
-    }
-
-    /**
-     * Synchronize all UI elements (marker, vignette, crosshair) alignment
-     */
-    synchronizeAlignment() {
-        if (!this.userLocationMarker) return;
-
-        // Update both vignette and crosshair positions
-        this.updateVignettePosition();
-        this.positionCrosshairOnMarker();
-
-        console.log('UI elements synchronized');
-    }
-
-    /**
-     * Add a debug dot at specific coordinates (for alignment testing)
-     */
-    addDebugDot(x, y, color = 'red') {
-        // Remove existing debug dot of this color
-        const existing = document.querySelector(`.debug-dot-${color}`);
-        if (existing) existing.remove();
-
-        // Create new debug dot
-        const dot = document.createElement('div');
-        dot.className = `debug-dot debug-dot-${color}`;
-        dot.style.cssText = `
-            position: fixed;
-            left: ${x - 5}px;
-            top: ${y - 5}px;
-            width: 10px;
-            height: 10px;
-            background-color: ${color};
-            border: 2px solid white;
-            border-radius: 50%;
-            z-index: 9999;
-            pointer-events: none;
-        `;
-        document.body.appendChild(dot);
-        console.log(`${color} debug dot added at:`, { x, y });
-    }
 
     /**
      * Add warehouse marker to the map (positioned in black area outside 10km circle)
@@ -1738,10 +1633,6 @@ class MapManager {
 
         this.vignetteUpdateHandler = () => {
             this.updateRadiusVignette();
-            // Also sync marker-based vignette and crosshair if user location marker exists
-            if (this.userLocationMarker) {
-                this.synchronizeAlignment();
-            }
         };
         
         this.map.on('move', this.vignetteUpdateHandler);
@@ -1792,7 +1683,7 @@ class MapManager {
 
         // Update vignette and crosshair positions after map movement
         setTimeout(() => {
-            this.synchronizeAlignment();
+            this.updateRadiusVignette();
         }, 650); // After pan completes
 
         // Don't use transform on crosshair - let positionCrosshairOnMarker handle it
