@@ -7,8 +7,12 @@ class ProductMenu {
     constructor() {
         this.isVisible = false;
         this.currentCategory = null;
+        this.currentBrand = null;
+        this.currentProduct = null;
         this.currentStoreId = null;
+        this.brands = [];
         this.products = [];
+        this.menuLevel = 1; // 1=brands, 2=products, 3=product detail
         this.menuElement = null;
 
         this.init();
@@ -131,29 +135,29 @@ class ProductMenu {
         this.currentStoreId = detail.storeId;
 
         try {
-            console.log('ProductMenu: Loading products for category:', detail.category.id);
-            // Load products for this category
-            await this.loadProducts(detail.category.id, detail.storeId);
+            console.log('ProductMenu: Loading brands for category:', detail.category.id);
+            // Load brands for this category (Level 1)
+            await this.loadBrands(detail.category.id, detail.storeId);
 
-            console.log('ProductMenu: Products loaded, calling showMenu()');
-            // Show the menu
+            console.log('ProductMenu: Brands loaded, showing menu at level 1');
+            this.menuLevel = 1;
             this.showMenu();
 
         } catch (error) {
-            console.error('ProductMenu: Failed to load products:', error);
+            console.error('ProductMenu: Failed to load brands:', error);
             this.showErrorMenu();
         }
     }
 
     /**
-     * Load products from API
+     * Load brands from API (Level 1)
      */
-    async loadProducts(categoryId, storeId) {
+    async loadBrands(categoryId, storeId) {
         try {
-            console.log('ProductMenu: Loading real WooCommerce products for category:', categoryId, 'store:', storeId);
+            console.log('ProductMenu: Loading brands for category:', categoryId, 'store:', storeId);
 
             const formData = new FormData();
-            formData.append('action', 'get_store_products_by_category');
+            formData.append('action', 'get_store_brands_by_category');
             formData.append('store_id', storeId);
             formData.append('category_id', categoryId);
             formData.append('nonce', getConfig('nonce'));
@@ -166,18 +170,97 @@ class ProductMenu {
             const data = await response.json();
 
             if (data.success) {
-                this.products = this.formatWooCommerceProducts(data.data.products);
-                console.log('ProductMenu: Loaded real products:', this.products);
+                this.brands = data.data.brands;
+                console.log('ProductMenu: Loaded brands:', this.brands);
             } else {
-                console.warn('ProductMenu: API returned error, falling back to fake products:', data.data);
-                // Fallback to fake products for now
-                this.products = this.generateFakeProducts(this.currentCategory);
+                console.warn('ProductMenu: API returned error for brands:', data.data);
+                this.brands = [];
             }
         } catch (error) {
-            console.error('ProductMenu: Error loading products, falling back to fake products:', error);
-            // Fallback to fake products
-            this.products = this.generateFakeProducts(this.currentCategory);
+            console.error('ProductMenu: Error loading brands:', error);
+            this.brands = [];
         }
+    }
+
+    /**
+     * Load products from API (Level 2)
+     */
+    async loadProducts(categoryId, storeId, brandId) {
+        try {
+            console.log('ProductMenu: Loading products for category:', categoryId, 'store:', storeId, 'brand:', brandId);
+
+            const formData = new FormData();
+            formData.append('action', 'get_store_products_by_brand');
+            formData.append('store_id', storeId);
+            formData.append('category_id', categoryId);
+            formData.append('brand_id', brandId);
+            formData.append('nonce', getConfig('nonce'));
+
+            const response = await fetch(getConfig('ajax_url'), {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                this.products = this.formatWooCommerceProducts(data.data.products);
+                console.log('ProductMenu: Loaded products:', this.products);
+            } else {
+                console.warn('ProductMenu: API returned error for products:', data.data);
+                this.products = [];
+            }
+        } catch (error) {
+            console.error('ProductMenu: Error loading products:', error);
+            this.products = [];
+        }
+    }
+
+    /**
+     * Handle brand selection (Level 1 → Level 2)
+     */
+    async handleBrandSelected(brand) {
+        console.log('ProductMenu: Brand selected:', brand);
+        this.currentBrand = brand;
+
+        try {
+            await this.loadProducts(this.currentCategory.id, this.currentStoreId, brand.id);
+            this.menuLevel = 2;
+            this.updateMenuLayout();
+        } catch (error) {
+            console.error('ProductMenu: Error loading products for brand:', error);
+        }
+    }
+
+    /**
+     * Handle product selection (Level 2 → Level 3)
+     */
+    handleProductSelected(product) {
+        console.log('ProductMenu: Product selected:', product);
+        this.currentProduct = product;
+        this.menuLevel = 3;
+        this.updateMenuLayout();
+    }
+
+    /**
+     * Navigate back in menu levels
+     */
+    navigateBack() {
+        if (this.menuLevel === 3) {
+            // Product detail → Product list
+            this.menuLevel = 2;
+            this.currentProduct = null;
+        } else if (this.menuLevel === 2) {
+            // Product list → Brand list
+            this.menuLevel = 1;
+            this.currentBrand = null;
+            this.products = [];
+        } else {
+            // Brand list → Close menu
+            this.hideMenu();
+            return;
+        }
+        this.updateMenuLayout();
     }
 
     /**
@@ -253,61 +336,68 @@ class ProductMenu {
      * Show the product menu
      */
     showMenu() {
-        console.log('ProductMenu: showMenu() called');
-        console.log('ProductMenu: menuElement exists:', !!this.menuElement);
+        console.log('ProductMenu: showMenu() called at level:', this.menuLevel);
 
         if (!this.menuElement) {
             console.error('ProductMenu: menuElement is null, cannot show menu');
             return;
         }
 
-        console.log('ProductMenu: Updating menu content...');
-        this.updateMenuContent();
+        // Position menu
+        this.positionMenu();
 
-        console.log('ProductMenu: Setting menu position to visible...');
+        // Update layout based on current level
+        this.updateMenuLayout();
 
-        // Calculate safe position - ensure menu fits on screen
-        const screenWidth = window.innerWidth;
-        const menuWidth = 380;
-        const safeRight = Math.max(20, screenWidth - menuWidth - 50); // At least 50px from edge
+        this.isVisible = true;
+        this.playMenuSound();
+    }
 
-        console.log('ProductMenu: Screen width:', screenWidth, 'Safe position:', safeRight);
+    /**
+     * Position the menu on screen
+     */
+    positionMenu() {
+        const baseWidth = 380;
+        const expandedWidth = this.menuLevel === 1 ? baseWidth :
+                            this.menuLevel === 2 ? baseWidth * 1.8 :
+                            baseWidth * 2.5;
 
-        this.menuElement.style.right = '20px'; // Start with right positioning
-        this.menuElement.style.left = 'auto'; // Clear any left positioning
-        this.menuElement.style.display = 'block'; // Ensure it's visible
-        this.menuElement.style.visibility = 'visible'; // Double ensure visibility
+        this.menuElement.style.width = expandedWidth + 'px';
+        this.menuElement.style.right = '20px';
+        this.menuElement.style.left = 'auto';
+        this.menuElement.style.display = 'block';
+        this.menuElement.style.visibility = 'visible';
 
-        // If still off-screen, use left positioning instead
+        // Check if menu fits on screen
         setTimeout(() => {
             const bounds = this.menuElement.getBoundingClientRect();
             if (bounds.right > window.innerWidth) {
-                console.log('ProductMenu: Menu off-screen, switching to left positioning');
+                console.log('ProductMenu: Menu off-screen, adjusting position');
                 this.menuElement.style.right = 'auto';
-                this.menuElement.style.left = (window.innerWidth - menuWidth - 20) + 'px';
+                this.menuElement.style.left = (window.innerWidth - expandedWidth - 20) + 'px';
             }
         }, 50);
+    }
 
-        this.isVisible = true;
+    /**
+     * Update menu layout based on current level
+     */
+    updateMenuLayout() {
+        if (!this.menuElement) return;
 
-        console.log('ProductMenu: Menu should now be visible at right: 20px');
-        console.log('ProductMenu: Menu element styles:', {
-            right: this.menuElement.style.right,
-            zIndex: this.menuElement.style.zIndex,
-            display: this.menuElement.style.display,
-            position: this.menuElement.style.position
-        });
+        const header = this.menuElement.querySelector('.menu-header');
+        const content = this.menuElement.querySelector('.menu-content');
 
-        // Debug: Check if element is in DOM and visible
-        console.log('ProductMenu: Element in DOM:', document.body.contains(this.menuElement));
-        console.log('ProductMenu: Element bounds:', this.menuElement.getBoundingClientRect());
+        if (!header || !content) return;
 
-        // Remove debugging styles
-        this.menuElement.style.background = 'linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(20, 20, 20, 0.95))';
-        this.menuElement.style.border = '2px solid #00ff00';
+        // Update header based on current level
+        this.updateMenuHeader(header);
 
-        // Add GTA-style sound effect (optional)
-        this.playMenuSound();
+        // Update content based on current level
+        this.updateMenuContent(content);
+
+        // Update menu width
+        this.positionMenu();
     }
 
     /**
@@ -326,49 +416,171 @@ class ProductMenu {
     }
 
     /**
-     * Update menu content with products
+     * Update menu header based on current level
      */
-    updateMenuContent() {
-        const header = this.menuElement.querySelector('.menu-header');
-        const content = this.menuElement.querySelector('.menu-content');
+    updateMenuHeader(header) {
+        let headerHTML = '';
 
-        if (!header || !content) return;
-
-        // Update header
-        header.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div style="font-size: 18px; font-weight: bold; text-transform: uppercase;">
-                        ${this.currentCategory.name}
+        if (this.menuLevel === 1) {
+            // Brand selection level
+            headerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 18px; font-weight: bold; text-transform: uppercase;">
+                            ${this.currentCategory.name}
+                        </div>
+                        <div style="font-size: 12px; opacity: 0.7; margin-top: 2px;">
+                            Select a Brand (${this.brands.length} available)
+                        </div>
                     </div>
-                    <div style="font-size: 12px; opacity: 0.7; margin-top: 2px;">
-                        ${this.products.length} Products Available
+                    <button class="close-btn" onclick="window.productMenu.hideMenu()" style="
+                        background: none; border: 1px solid #00ff00; color: #00ff00;
+                        width: 30px; height: 30px; border-radius: 4px; cursor: pointer;
+                        font-family: 'Courier New', monospace; font-size: 18px;
+                        display: flex; align-items: center; justify-content: center;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='rgba(0,255,0,0.2)'" onmouseout="this.style.background='none'">×</button>
+                </div>
+            `;
+        } else if (this.menuLevel === 2) {
+            // Product selection level
+            headerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1;">
+                        <button onclick="window.productMenu.navigateBack()" style="
+                            background: none; border: 1px solid #00ff00; color: #00ff00;
+                            padding: 4px 8px; border-radius: 4px; cursor: pointer;
+                            font-family: 'Courier New', monospace; font-size: 12px;
+                            margin-bottom: 8px;
+                        ">← Back to Brands</button>
+                        <div style="font-size: 18px; font-weight: bold; text-transform: uppercase;">
+                            ${this.currentBrand.name}
+                        </div>
+                        <div style="font-size: 12px; opacity: 0.7; margin-top: 2px;">
+                            ${this.products.length} Products Available
+                        </div>
+                    </div>
+                    <button class="close-btn" onclick="window.productMenu.hideMenu()" style="
+                        background: none; border: 1px solid #00ff00; color: #00ff00;
+                        width: 30px; height: 30px; border-radius: 4px; cursor: pointer;
+                        font-family: 'Courier New', monospace; font-size: 18px;
+                        display: flex; align-items: center; justify-content: center;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='rgba(0,255,0,0.2)'" onmouseout="this.style.background='none'">×</button>
+                </div>
+            `;
+        } else if (this.menuLevel === 3) {
+            // Product detail level
+            headerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1;">
+                        <button onclick="window.productMenu.navigateBack()" style="
+                            background: none; border: 1px solid #00ff00; color: #00ff00;
+                            padding: 4px 8px; border-radius: 4px; cursor: pointer;
+                            font-family: 'Courier New', monospace; font-size: 12px;
+                            margin-bottom: 8px;
+                        ">← Back to Products</button>
+                        <div style="font-size: 16px; font-weight: bold; text-transform: uppercase;">
+                            ${this.currentProduct.name}
+                        </div>
+                        <div style="font-size: 12px; opacity: 0.7; margin-top: 2px;">
+                            Product Details
+                        </div>
+                    </div>
+                    <button class="close-btn" onclick="window.productMenu.hideMenu()" style="
+                        background: none; border: 1px solid #00ff00; color: #00ff00;
+                        width: 30px; height: 30px; border-radius: 4px; cursor: pointer;
+                        font-family: 'Courier New', monospace; font-size: 18px;
+                        display: flex; align-items: center; justify-content: center;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='rgba(0,255,0,0.2)'" onmouseout="this.style.background='none'">×</button>
+                </div>
+            `;
+        }
+
+        header.innerHTML = headerHTML;
+    }
+
+    /**
+     * Update menu content based on current level
+     */
+    updateMenuContent(content) {
+        let contentHTML = '';
+
+        if (this.menuLevel === 1) {
+            // Show brands list
+            contentHTML = this.renderBrandsList();
+        } else if (this.menuLevel === 2) {
+            // Show products list
+            contentHTML = this.renderProductsList();
+        } else if (this.menuLevel === 3) {
+            // Show product details
+            contentHTML = this.renderProductDetails();
+        }
+
+        content.innerHTML = contentHTML;
+    }
+
+    /**
+     * Render brands list (Level 1)
+     */
+    renderBrandsList() {
+        if (this.brands.length === 0) {
+            return `
+                <div style="padding: 40px 20px; text-align: center; opacity: 0.7;">
+                    <div style="font-size: 16px; margin-bottom: 8px;">No Brands Available</div>
+                    <div style="font-size: 12px;">This category has no products with brands assigned.</div>
+                </div>
+            `;
+        }
+
+        let html = '';
+        this.brands.forEach((brand, index) => {
+            html += `
+                <div class="brand-item" style="
+                    padding: 15px 20px;
+                    border-bottom: 1px solid #333;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    transition: background 0.2s ease;
+                    cursor: pointer;
+                " onmouseover="this.style.background='rgba(0,255,0,0.1)'" onmouseout="this.style.background='transparent'" onclick="window.productMenu.handleBrandSelected({id: ${brand.id}, name: '${brand.name}', slug: '${brand.slug}'})">
+                    <div style="flex: 1;">
+                        <div style="font-size: 16px; font-weight: bold; margin-bottom: 4px;">
+                            ${brand.name}
+                        </div>
+                        <div style="font-size: 12px; opacity: 0.7;">
+                            ${brand.product_count} products available
+                        </div>
+                    </div>
+                    <div style="color: #00ff00; font-size: 18px;">
+                        →
                     </div>
                 </div>
-                <button class="close-btn" onclick="window.productMenu.hideMenu()" style="
-                    background: none;
-                    border: 1px solid #00ff00;
-                    color: #00ff00;
-                    width: 30px;
-                    height: 30px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    font-family: 'Courier New', monospace;
-                    font-size: 18px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.2s ease;
-                " onmouseover="this.style.background='rgba(0,255,0,0.2)'" onmouseout="this.style.background='none'">×</button>
-            </div>
-        `;
+            `;
+        });
 
-        // Update content with product list
-        let productHTML = '';
+        return html;
+    }
 
+    /**
+     * Render products list (Level 2)
+     */
+    renderProductsList() {
+        if (this.products.length === 0) {
+            return `
+                <div style="padding: 40px 20px; text-align: center; opacity: 0.7;">
+                    <div style="font-size: 16px; margin-bottom: 8px;">No Products Available</div>
+                    <div style="font-size: 12px;">This brand has no products in this category.</div>
+                </div>
+            `;
+        }
+
+        let html = '';
         this.products.forEach((product, index) => {
             const isInStock = product.stock > 0;
-            productHTML += `
+            html += `
                 <div class="product-item" style="
                     padding: 15px 20px;
                     border-bottom: 1px solid #333;
@@ -378,7 +590,7 @@ class ProductMenu {
                     transition: background 0.2s ease;
                     cursor: ${isInStock ? 'pointer' : 'not-allowed'};
                     opacity: ${isInStock ? '1' : '0.5'};
-                " onmouseover="if(${isInStock}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="this.style.background='transparent'" onclick="window.productMenu.handleProductClick('${product.id}')">
+                " onmouseover="if(${isInStock}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="this.style.background='transparent'" onclick="window.productMenu.handleProductSelected({id: '${product.id}', name: \`${product.name.replace(/`/g, '\\`')}\`, price: ${product.price}, stock: ${product.stock}, description: \`${(product.description || '').replace(/`/g, '\\`')}\`, full_description: \`${(product.full_description || '').replace(/`/g, '\\`')}\`, image: '${product.image || ''}', url: '${product.url || ''}', raw_price_html: \`${(product.raw_price_html || '').replace(/`/g, '\\`')}\`})">
                     <div style="flex: 1;">
                         <div style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">
                             ${product.name}
@@ -394,25 +606,95 @@ class ProductMenu {
                         <div style="font-size: 14px; font-weight: bold; color: #00ff00;">
                             ${product.raw_price_html || '$' + product.price.toFixed(2)}
                         </div>
-                        <div style="font-size: 10px; opacity: 0.7; margin-top: 2px;">
-                            ${product.currency}
+                        <div style="color: #00ff00; font-size: 16px; margin-top: 4px;">
+                            →
                         </div>
                     </div>
                 </div>
             `;
         });
 
-        if (this.products.length === 0) {
-            productHTML = `
-                <div style="padding: 40px 20px; text-align: center; opacity: 0.7;">
-                    <div style="font-size: 16px; margin-bottom: 8px;">No Products Available</div>
-                    <div style="font-size: 12px;">This category is currently empty.</div>
-                </div>
-            `;
-        }
-
-        content.innerHTML = productHTML;
+        return html;
     }
+
+    /**
+     * Render product details (Level 3)
+     */
+    renderProductDetails() {
+        if (!this.currentProduct) return '';
+
+        const product = this.currentProduct;
+        const isInStock = product.stock > 0;
+
+        return `
+            <div style="padding: 20px;">
+                ${product.image ? `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <img src="${product.image}" alt="${product.name}" style="
+                            max-width: 100%;
+                            max-height: 200px;
+                            border-radius: 8px;
+                            border: 1px solid #333;
+                        " />
+                    </div>
+                ` : ''}
+
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 8px; color: #00ff00;">
+                        ${product.name}
+                    </div>
+                    <div style="font-size: 16px; margin-bottom: 8px;">
+                        ${product.raw_price_html || '$' + product.price.toFixed(2)}
+                    </div>
+                    <div style="font-size: 12px; opacity: 0.8; margin-bottom: 15px;">
+                        ${isInStock ? `In Stock: ${product.stock} available` : 'Out of Stock'}
+                    </div>
+                </div>
+
+                ${product.full_description ? `
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px; color: #00ff00;">
+                            Description
+                        </div>
+                        <div style="font-size: 12px; line-height: 1.4; opacity: 0.9;">
+                            ${product.full_description}
+                        </div>
+                    </div>
+                ` : ''}
+
+                <div style="margin-top: 20px; text-align: center;">
+                    ${isInStock ? `
+                        <button onclick="window.open('${product.url}', '_blank')" style="
+                            background: linear-gradient(135deg, #00ff00, #00cc00);
+                            color: black;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 6px;
+                            font-family: 'Courier New', monospace;
+                            font-weight: bold;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            VIEW PRODUCT
+                        </button>
+                    ` : `
+                        <div style="
+                            background: rgba(255, 0, 0, 0.2);
+                            color: #ff6666;
+                            border: 1px solid #ff6666;
+                            padding: 12px 24px;
+                            border-radius: 6px;
+                            font-family: 'Courier New', monospace;
+                            font-weight: bold;
+                        ">
+                            OUT OF STOCK
+                        </div>
+                    `}
+                </div>
+            </div>
+        `;
+    }
+
 
     /**
      * Handle product click

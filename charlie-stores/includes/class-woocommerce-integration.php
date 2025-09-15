@@ -18,6 +18,10 @@ class Charlie_WooCommerce_Integration {
         add_action('wp_ajax_nopriv_get_store_categories', array($this, 'get_store_categories'));
         add_action('wp_ajax_get_store_products_by_category', array($this, 'get_store_products_by_category'));
         add_action('wp_ajax_nopriv_get_store_products_by_category', array($this, 'get_store_products_by_category'));
+        add_action('wp_ajax_get_store_brands_by_category', array($this, 'get_store_brands_by_category'));
+        add_action('wp_ajax_nopriv_get_store_brands_by_category', array($this, 'get_store_brands_by_category'));
+        add_action('wp_ajax_get_store_products_by_brand', array($this, 'get_store_products_by_brand'));
+        add_action('wp_ajax_nopriv_get_store_products_by_brand', array($this, 'get_store_products_by_brand'));
 
         // Add store location field to products (only in admin)
         if (is_admin()) {
@@ -340,6 +344,257 @@ class Charlie_WooCommerce_Integration {
         }
 
         return $formatted_products;
+    }
+
+    /**
+     * Get brands for a specific store and category via AJAX
+     */
+    public function get_store_brands_by_category() {
+        check_ajax_referer('charlie_nonce', 'nonce');
+
+        $store_id = absint($_POST['store_id']);
+        $category_id = absint($_POST['category_id']);
+
+        if (!$store_id || !$category_id) {
+            wp_send_json_error('Invalid store ID or category ID');
+        }
+
+        error_log("Charlie Debug: get_store_brands_by_category called with store_id: $store_id, category_id: $category_id");
+
+        // Get brands that have products in this store and category
+        $brands = $this->get_brands_by_store_and_category($store_id, $category_id);
+
+        error_log("Charlie Debug: Found " . count($brands) . " brands for store $store_id in category $category_id");
+
+        wp_send_json_success(array(
+            'brands' => $brands,
+            'store_id' => $store_id,
+            'category_id' => $category_id
+        ));
+    }
+
+    /**
+     * Get products for a specific store, category, and brand via AJAX
+     */
+    public function get_store_products_by_brand() {
+        check_ajax_referer('charlie_nonce', 'nonce');
+
+        $store_id = absint($_POST['store_id']);
+        $category_id = absint($_POST['category_id']);
+        $brand_id = absint($_POST['brand_id']);
+
+        if (!$store_id || !$category_id || !$brand_id) {
+            wp_send_json_error('Invalid store ID, category ID, or brand ID');
+        }
+
+        error_log("Charlie Debug: get_store_products_by_brand called with store_id: $store_id, category_id: $category_id, brand_id: $brand_id");
+
+        // Get products for this store, category, and brand
+        $products = $this->get_products_by_store_category_and_brand($store_id, $category_id, $brand_id);
+
+        error_log("Charlie Debug: Found " . count($products) . " products for store $store_id, category $category_id, brand $brand_id");
+
+        wp_send_json_success(array(
+            'products' => $products,
+            'store_id' => $store_id,
+            'category_id' => $category_id,
+            'brand_id' => $brand_id
+        ));
+    }
+
+    /**
+     * Get brands that have products at a specific store in a specific category
+     */
+    public function get_brands_by_store_and_category($store_id, $category_id) {
+        // First get all products at this store in this category
+        $products = get_posts(array(
+            'post_type' => 'product',
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_charlie_store_location',
+                    'value' => $store_id,
+                    'compare' => '='
+                )
+            ),
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'product_cat',
+                    'field' => 'term_id',
+                    'terms' => $category_id
+                )
+            ),
+            'fields' => 'ids'
+        ));
+
+        if (empty($products)) {
+            return array();
+        }
+
+        // Get unique brands from these products
+        $brand_ids = array();
+        foreach ($products as $product_id) {
+            $product_brands = wp_get_post_terms($product_id, 'product_brand', array('fields' => 'ids'));
+            $brand_ids = array_merge($brand_ids, $product_brands);
+        }
+
+        $brand_ids = array_unique($brand_ids);
+
+        // Get brand details
+        $brands = array();
+        foreach ($brand_ids as $brand_id) {
+            $brand = get_term($brand_id, 'product_brand');
+            if (!is_wp_error($brand)) {
+                $product_count = $this->count_products_in_brand_at_store($brand_id, $store_id, $category_id);
+
+                $brands[] = array(
+                    'id' => $brand->term_id,
+                    'name' => $brand->name,
+                    'slug' => $brand->slug,
+                    'description' => $brand->description,
+                    'product_count' => $product_count,
+                    'image' => $this->get_brand_image($brand_id)
+                );
+            }
+        }
+
+        return $brands;
+    }
+
+    /**
+     * Get products available at a specific store in a specific category and brand
+     */
+    public function get_products_by_store_category_and_brand($store_id, $category_id, $brand_id, $limit = 12) {
+        $args = array(
+            'post_type' => 'product',
+            'posts_per_page' => $limit,
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_charlie_store_location',
+                    'value' => $store_id,
+                    'compare' => '='
+                )
+            ),
+            'tax_query' => array(
+                'relation' => 'AND',
+                array(
+                    'taxonomy' => 'product_cat',
+                    'field' => 'term_id',
+                    'terms' => $category_id
+                ),
+                array(
+                    'taxonomy' => 'product_brand',
+                    'field' => 'term_id',
+                    'terms' => $brand_id
+                )
+            )
+        );
+
+        $products = get_posts($args);
+        $formatted_products = array();
+
+        foreach ($products as $product) {
+            $wc_product = wc_get_product($product->ID);
+            if (!$wc_product) continue;
+
+            $store_stock = get_post_meta($product->ID, '_charlie_store_stock', true);
+
+            // Get brand information
+            $brands = wp_get_post_terms($product->ID, 'product_brand', array('fields' => 'names'));
+            $brand_name = !empty($brands) ? $brands[0] : 'No Brand';
+
+            $formatted_products[] = array(
+                'id' => $product->ID,
+                'name' => $product->post_title,
+                'description' => wp_trim_words($product->post_excerpt ?: $product->post_content, 20),
+                'full_description' => $product->post_content,
+                'short_description' => $product->post_excerpt,
+                'price' => $wc_product->get_price_html(),
+                'regular_price' => $wc_product->get_regular_price(),
+                'sale_price' => $wc_product->get_sale_price(),
+                'image' => get_the_post_thumbnail_url($product->ID, 'medium'),
+                'gallery_images' => $this->get_product_gallery_images($product->ID),
+                'url' => get_permalink($product->ID),
+                'add_to_cart_url' => $wc_product->add_to_cart_url(),
+                'in_stock' => $wc_product->is_in_stock(),
+                'store_stock' => $store_stock ?: 0,
+                'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names')),
+                'brand' => $brand_name,
+                'sku' => $wc_product->get_sku(),
+                'weight' => $wc_product->get_weight(),
+                'dimensions' => array(
+                    'length' => $wc_product->get_length(),
+                    'width' => $wc_product->get_width(),
+                    'height' => $wc_product->get_height()
+                )
+            );
+        }
+
+        return $formatted_products;
+    }
+
+    /**
+     * Count products in brand at specific store and category
+     */
+    private function count_products_in_brand_at_store($brand_id, $store_id, $category_id) {
+        $products = get_posts(array(
+            'post_type' => 'product',
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_charlie_store_location',
+                    'value' => $store_id,
+                    'compare' => '='
+                )
+            ),
+            'tax_query' => array(
+                'relation' => 'AND',
+                array(
+                    'taxonomy' => 'product_cat',
+                    'field' => 'term_id',
+                    'terms' => $category_id
+                ),
+                array(
+                    'taxonomy' => 'product_brand',
+                    'field' => 'term_id',
+                    'terms' => $brand_id
+                )
+            ),
+            'fields' => 'ids'
+        ));
+
+        return count($products);
+    }
+
+    /**
+     * Get brand image URL
+     */
+    private function get_brand_image($brand_id) {
+        $thumbnail_id = get_term_meta($brand_id, 'thumbnail_id', true);
+        if ($thumbnail_id) {
+            return wp_get_attachment_image_url($thumbnail_id, 'medium');
+        }
+        return '';
+    }
+
+    /**
+     * Get product gallery images
+     */
+    private function get_product_gallery_images($product_id) {
+        $wc_product = wc_get_product($product_id);
+        if (!$wc_product) return array();
+
+        $gallery_ids = $wc_product->get_gallery_image_ids();
+        $gallery_images = array();
+
+        foreach ($gallery_ids as $image_id) {
+            $gallery_images[] = wp_get_attachment_image_url($image_id, 'medium');
+        }
+
+        return $gallery_images;
     }
 
     /**
