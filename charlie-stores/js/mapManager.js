@@ -871,10 +871,12 @@ class MapManager {
             this.mapContainer.appendChild(markerElement);
         }
 
-        // Add click event for warehouse popup
+        // Add click event for warehouse interaction
         markerElement.addEventListener('click', (e) => {
             e.stopPropagation();
-            this.showWarehouseScreenPopup(warehouse, warehouse.screenPosition);
+
+            // Trigger sliding animation to left side
+            this.slideToProductMode();
 
             // Dispatch event for category circles
             document.dispatchEvent(new CustomEvent('warehouseClicked', {
@@ -1569,6 +1571,46 @@ class MapManager {
 
         this.map.off('move', this.vignetteUpdateHandler);
         this.map.off('zoom', this.vignetteUpdateHandler);
+    }
+
+    /**
+     * Slide map and vignette to left side for product mode
+     */
+    slideToProductMode() {
+        // Get map container and vignette elements
+        const mapContainer = document.getElementById('map');
+        const vignette = document.getElementById('radiusVignette');
+        const crosshair = document.getElementById('gtaCrosshair');
+
+        if (!mapContainer || !vignette) {
+            console.warn('Map container or vignette not found for sliding animation');
+            return;
+        }
+
+        // Add CSS classes for smooth animation
+        mapContainer.classList.add('product-mode');
+        vignette.classList.add('product-mode');
+        if (crosshair) crosshair.classList.add('product-mode');
+
+        // Update marker positions (they're screen-positioned)
+        this.updateMarkersForProductMode();
+
+        console.log('Sliding to product mode');
+    }
+
+    /**
+     * Update marker positions for product mode
+     */
+    updateMarkersForProductMode() {
+        this.markers.forEach((markerData, markerId) => {
+            if (markerData.isScreenMarker && markerData.element) {
+                // Shift warehouse markers to the left
+                const currentLeft = parseInt(markerData.element.style.left);
+                const newLeft = currentLeft - 200; // Shift left by 200px
+                markerData.element.style.left = `${newLeft}px`;
+                markerData.element.style.transition = 'left 0.6s ease-in-out';
+            }
+        });
     }
 
     /**

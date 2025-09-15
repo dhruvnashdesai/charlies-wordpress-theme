@@ -31,10 +31,17 @@ class CategoryCircles {
      */
     calculateVignetteGeometry() {
         const vignette = document.getElementById('radiusVignette');
+        const mapContainer = document.getElementById('map');
+        const isProductMode = mapContainer && mapContainer.classList.contains('product-mode');
+
         if (!vignette) {
             // Fallback calculations
+            let baseX = window.innerWidth * 0.4;
+            if (isProductMode) {
+                baseX = window.innerWidth * 0.25; // Shifted left position
+            }
             this.centerPoint = {
-                x: window.innerWidth * 0.4,
+                x: baseX,
                 y: window.innerHeight * 0.5
             };
             this.vignetteRadius = Math.min(window.innerWidth, window.innerHeight) * 0.25;
@@ -48,6 +55,9 @@ class CategoryCircles {
             y: rect.top + (rect.height / 2)
         };
         this.vignetteRadius = Math.min(rect.width, rect.height) / 2;
+
+        // Store if we're in product mode for category positioning
+        this.isProductMode = isProductMode;
     }
 
     /**
@@ -129,28 +139,31 @@ class CategoryCircles {
             return;
         }
 
-        this.calculateVignetteGeometry(); // Recalculate in case of changes
-
-        // Calculate positions for categories
-        const positions = this.calculateCategoryPositions();
-
-        // Create and position category elements
-        this.categories.forEach((category, index) => {
-            if (index < positions.length) {
-                const element = this.createCategoryElement(category, positions[index]);
-                this.categoryElements.set(category.id, element);
-                document.body.appendChild(element);
-            }
-        });
-
-        this.isVisible = true;
-
-        // Animate in
+        // Wait for sliding animation to complete before positioning categories
         setTimeout(() => {
-            this.categoryElements.forEach(element => {
-                element.classList.add('visible');
+            this.calculateVignetteGeometry(); // Recalculate in case of changes
+
+            // Calculate positions for categories
+            const positions = this.calculateCategoryPositions();
+
+            // Create and position category elements
+            this.categories.forEach((category, index) => {
+                if (index < positions.length) {
+                    const element = this.createCategoryElement(category, positions[index]);
+                    this.categoryElements.set(category.id, element);
+                    document.body.appendChild(element);
+                }
             });
-        }, 50);
+
+            this.isVisible = true;
+
+            // Animate in
+            setTimeout(() => {
+                this.categoryElements.forEach(element => {
+                    element.classList.add('visible');
+                });
+            }, 50);
+        }, 650); // Wait for slide animation (600ms) + small buffer
     }
 
     /**
