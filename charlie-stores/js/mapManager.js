@@ -919,6 +919,25 @@ class MapManager {
         }
 
         console.log('Vignette tracking - Screen point:', { x: screenPoint.x, y: screenPoint.y }, 'Marker center:', { markerCenterX, markerCenterY }, 'Vignette center:', { centerX, centerY }, 'Viewport:', { width: window.innerWidth, height: window.innerHeight });
+
+        // Store current vignette info for other systems to access
+        this.currentVignetteInfo = {
+            centerX: centerX,
+            centerY: centerY,
+            radius: innerRadius
+        };
+    }
+
+    /**
+     * Get current vignette center position and radius
+     * @returns {object} Vignette info with centerX, centerY, radius
+     */
+    getCurrentVignetteInfo() {
+        return this.currentVignetteInfo || {
+            centerX: window.innerWidth / 2,
+            centerY: window.innerHeight / 2,
+            radius: 200
+        };
     }
 
 
@@ -952,6 +971,9 @@ class MapManager {
         // Add click event for warehouse interaction
         markerElement.addEventListener('click', (e) => {
             e.stopPropagation();
+
+            // Hide the warehouse marker immediately
+            markerElement.style.display = 'none';
 
             // Trigger sliding animation to left side
             this.slideToProductMode();

@@ -4,7 +4,8 @@
  */
 
 class CategoryCircles {
-    constructor() {
+    constructor(mapManager) {
+        this.mapManager = mapManager;
         this.isInitialized = false;
         this.categories = [];
         this.categoryElements = new Map();
@@ -30,34 +31,33 @@ class CategoryCircles {
      * Calculate vignette center and radius for positioning
      */
     calculateVignetteGeometry() {
-        const vignette = document.getElementById('radiusVignette');
-        const mapContainer = document.getElementById('map');
-        const isProductMode = mapContainer && mapContainer.classList.contains('product-mode');
-
-        if (!vignette) {
-            // Fallback calculations
-            let baseX = window.innerWidth * 0.4;
-            if (isProductMode) {
-                baseX = window.innerWidth * 0.25; // Shifted left position
-            }
+        // Get the actual vignette center from MapManager
+        if (this.mapManager) {
+            const vignetteInfo = this.mapManager.getCurrentVignetteInfo();
             this.centerPoint = {
-                x: baseX,
-                y: window.innerHeight * 0.5
+                x: vignetteInfo.centerX,
+                y: vignetteInfo.centerY
             };
-            this.vignetteRadius = Math.min(window.innerWidth, window.innerHeight) * 0.25;
+            this.vignetteRadius = vignetteInfo.radius;
+            console.log('CategoryCircles using actual vignette center:', this.centerPoint, 'radius:', this.vignetteRadius);
             return;
         }
 
-        // Get actual vignette dimensions
-        const rect = vignette.getBoundingClientRect();
-        this.centerPoint = {
-            x: rect.left + (rect.width / 2),
-            y: rect.top + (rect.height / 2)
-        };
-        this.vignetteRadius = Math.min(rect.width, rect.height) / 2;
+        // Fallback calculations if MapManager not available
+        const mapContainer = document.getElementById('map');
+        const isProductMode = mapContainer && mapContainer.classList.contains('product-mode');
 
-        // Store if we're in product mode for category positioning
-        this.isProductMode = isProductMode;
+        let baseX = window.innerWidth * 0.4;
+        if (isProductMode) {
+            baseX = window.innerWidth * 0.25; // Shifted left position
+        }
+        this.centerPoint = {
+            x: baseX,
+            y: window.innerHeight * 0.5
+        };
+        this.vignetteRadius = Math.min(window.innerWidth, window.innerHeight) * 0.25;
+
+        console.log('CategoryCircles using fallback center:', this.centerPoint, 'radius:', this.vignetteRadius);
     }
 
     /**

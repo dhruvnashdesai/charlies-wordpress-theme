@@ -134,7 +134,7 @@ class CharlieStoreApp {
         await this.mapManager.init();
 
         // Initialize category circles system
-        this.categoryCircles = new CategoryCircles();
+        this.categoryCircles = new CategoryCircles(this.mapManager);
     }
 
 
