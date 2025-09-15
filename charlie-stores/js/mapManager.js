@@ -927,6 +927,22 @@ class MapManager {
             left: centerX - 250,
             top: centerY - 250
         });
+
+        // Debug: Calculate where the crosshair center dot should appear
+        const crosshairCenterX = (centerX - 250) + 250; // crosshair left + half width
+        const crosshairCenterY = (centerY - 250) + 250; // crosshair top + half height
+        console.log('Crosshair center dot should be at:', {
+            x: crosshairCenterX,
+            y: crosshairCenterY
+        });
+        console.log('Marker is at:', { x: centerX, y: centerY });
+        console.log('Offset:', {
+            x: crosshairCenterX - centerX,
+            y: crosshairCenterY - centerY
+        });
+
+        // Visual debug: Add a small red dot at the calculated marker center
+        this.addDebugDot(centerX, centerY);
     }
 
     /**
@@ -978,6 +994,33 @@ class MapManager {
         this.positionCrosshairOnMarker();
 
         console.log('UI elements synchronized');
+    }
+
+    /**
+     * Add a debug dot at specific coordinates (for alignment testing)
+     */
+    addDebugDot(x, y) {
+        // Remove existing debug dot
+        const existing = document.querySelector('.debug-dot');
+        if (existing) existing.remove();
+
+        // Create new debug dot
+        const dot = document.createElement('div');
+        dot.className = 'debug-dot';
+        dot.style.cssText = `
+            position: fixed;
+            left: ${x - 5}px;
+            top: ${y - 5}px;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border: 2px solid white;
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        `;
+        document.body.appendChild(dot);
+        console.log('Debug dot added at:', { x, y });
     }
 
     /**
