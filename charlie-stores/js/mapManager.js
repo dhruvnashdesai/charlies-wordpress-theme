@@ -822,7 +822,7 @@ class MapManager {
         element.style.cssText = `
             width: 40px;
             height: 40px;
-            background-image: url('assets/images/gtamap_icon.png');
+            background-image: url('${getConfig('UI.CUSTOM_LOCATION_ICON', 'assets/images/gtamap_icon.png')}');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -907,7 +907,7 @@ class MapManager {
             width: 80px;
             height: 80px;
             background-color: white;
-            background-image: url('assets/images/ass_1.png');
+            background-image: url('${getConfig('UI.WAREHOUSE_ICON', 'assets/images/ass_1.png')}');
             background-size: 70%;
             background-repeat: no-repeat;
             background-position: center;
