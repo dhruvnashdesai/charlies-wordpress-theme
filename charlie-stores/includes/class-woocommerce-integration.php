@@ -17,18 +17,22 @@ class Charlie_WooCommerce_Integration {
         add_action('wp_ajax_get_store_categories', array($this, 'get_store_categories'));
         add_action('wp_ajax_nopriv_get_store_categories', array($this, 'get_store_categories'));
 
-        // Add store location field to products
-        add_action('woocommerce_product_options_general_product_data', array($this, 'add_store_location_field'));
-        add_action('woocommerce_process_product_meta', array($this, 'save_store_location_field'));
+        // Add store location field to products (only in admin)
+        if (is_admin()) {
+            add_action('woocommerce_product_options_general_product_data', array($this, 'add_store_location_field'));
+            add_action('woocommerce_process_product_meta', array($this, 'save_store_location_field'));
 
-        // Filter shop page by store location
-        add_action('pre_get_posts', array($this, 'filter_shop_by_store'));
+            // Add category color field
+            add_action('product_cat_add_form_fields', array($this, 'add_category_color_field'));
+            add_action('product_cat_edit_form_fields', array($this, 'edit_category_color_field'));
+            add_action('edited_product_cat', array($this, 'save_category_color_field'));
+            add_action('create_product_cat', array($this, 'save_category_color_field'));
+        }
 
-        // Add category color field
-        add_action('product_cat_add_form_fields', array($this, 'add_category_color_field'));
-        add_action('product_cat_edit_form_fields', array($this, 'edit_category_color_field'));
-        add_action('edited_product_cat', array($this, 'save_category_color_field'));
-        add_action('create_product_cat', array($this, 'save_category_color_field'));
+        // Filter shop page by store location (frontend only)
+        if (!is_admin()) {
+            add_action('pre_get_posts', array($this, 'filter_shop_by_store'));
+        }
     }
 
     /**
@@ -44,6 +48,20 @@ class Charlie_WooCommerce_Integration {
      */
     public function add_store_location_field() {
         global $post;
+
+        // Ensure WooCommerce admin functions are loaded
+        if (!function_exists('woocommerce_wp_select') || !function_exists('woocommerce_wp_text_field')) {
+            // Include WooCommerce admin functions if not available
+            if (file_exists(WC()->plugin_path() . '/includes/admin/wc-meta-box-functions.php')) {
+                include_once WC()->plugin_path() . '/includes/admin/wc-meta-box-functions.php';
+            }
+
+            // If still not available, fall back to manual HTML
+            if (!function_exists('woocommerce_wp_select')) {
+                $this->add_store_location_field_fallback();
+                return;
+            }
+        }
 
         echo '<div class="options_group">';
 
@@ -78,6 +96,46 @@ class Charlie_WooCommerce_Integration {
                 'min' => '0'
             )
         ));
+
+        echo '</div>';
+    }
+
+    /**
+     * Fallback method for when WooCommerce admin functions aren't available
+     */
+    private function add_store_location_field_fallback() {
+        global $post;
+
+        $current_store = get_post_meta($post->ID, '_charlie_store_location', true);
+        $current_stock = get_post_meta($post->ID, '_charlie_store_stock', true);
+
+        // Get all stores for dropdown
+        $stores = get_posts(array(
+            'post_type' => 'charlie_store',
+            'posts_per_page' => -1,
+            'post_status' => 'publish'
+        ));
+
+        echo '<div class="options_group">';
+
+        // Store selection field
+        echo '<p class="form-field _charlie_store_location_field">';
+        echo '<label for="_charlie_store_location">' . __('Available at Store', 'charlies-stores') . '</label>';
+        echo '<select id="_charlie_store_location" name="_charlie_store_location" class="select short">';
+        echo '<option value="">' . __('Select a store', 'charlies-stores') . '</option>';
+        foreach ($stores as $store) {
+            echo '<option value="' . esc_attr($store->ID) . '"' . selected($current_store, $store->ID, false) . '>' . esc_html($store->post_title) . '</option>';
+        }
+        echo '</select>';
+        echo '<span class="description">' . __('Select which store this product is available at.', 'charlies-stores') . '</span>';
+        echo '</p>';
+
+        // Stock quantity field
+        echo '<p class="form-field _charlie_store_stock_field">';
+        echo '<label for="_charlie_store_stock">' . __('Store Stock Quantity', 'charlies-stores') . '</label>';
+        echo '<input type="number" id="_charlie_store_stock" name="_charlie_store_stock" value="' . esc_attr($current_stock) . '" step="1" min="0" class="short" />';
+        echo '<span class="description">' . __('Stock quantity at this specific store.', 'charlies-stores') . '</span>';
+        echo '</p>';
 
         echo '</div>';
     }
