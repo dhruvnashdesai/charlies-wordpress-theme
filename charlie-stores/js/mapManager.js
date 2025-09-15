@@ -895,12 +895,12 @@ class MapManager {
         const innerRadius = Math.max(tenKmInPixels * 0.7, 150); // Inner clear area
         const outerRadius = Math.max(tenKmInPixels * 1.2, 300);  // Outer fade area
 
-        // Use same pixel positioning as working charlies_site implementation
-        const centerX = markerCenterX;
-        const centerY = markerCenterY;
+        // Calculate percentage position within viewport for gradient center
+        const centerXPercent = (markerCenterX / window.innerWidth) * 100;
+        const centerYPercent = (markerCenterY / window.innerHeight) * 100;
 
         this.radiusVignette.style.background = `radial-gradient(
-            circle at ${centerX}px ${centerY}px,
+            circle at ${centerXPercent}% ${centerYPercent}%,
             transparent 0px,
             transparent ${innerRadius}px,
             rgba(0, 0, 0, 0.1) ${innerRadius + 50}px,
