@@ -28,6 +28,9 @@ class MapManager {
         this.loadingSpinner = null;
         this.crosshair = null;
         this.radiusVignette = null;
+
+        // Compact mode state
+        this.isCompactMode = false;
     }
 
     /**
@@ -76,10 +79,11 @@ class MapManager {
 
             await this.setupMapEvents();
             await this.addMapControls();
-            
+            this.setupCompactModeListeners();
+
             this.isInitialized = true;
             this.showLoading(false);
-            
+
             // Dispatch custom event for other modules
             this.dispatchMapEvent('mapInitialized', { map: this.map });
             
@@ -1717,6 +1721,122 @@ class MapManager {
      */
     isMapInitialized() {
         return this.isInitialized;
+    }
+
+    /**
+     * Setup event listeners for compact mode
+     */
+    setupCompactModeListeners() {
+        // Listen for compact mode events
+        document.addEventListener('enterCompactMode', () => {
+            this.enterCompactMode();
+        });
+
+        document.addEventListener('exitCompactMode', () => {
+            this.exitCompactMode();
+        });
+
+        // Listen for menu close to exit compact mode
+        document.addEventListener('menuClosed', () => {
+            if (this.isCompactMode) {
+                this.exitCompactMode();
+            }
+        });
+    }
+
+    /**
+     * Enter compact mode - shrink map to bottom left corner
+     */
+    enterCompactMode() {
+        if (this.isCompactMode) return;
+
+        console.log('MapManager: Entering compact mode');
+        this.isCompactMode = true;
+
+        // Add compact mode class to trigger CSS transitions
+        if (this.mapContainer) {
+            this.mapContainer.classList.add('compact-mode-map');
+        }
+
+        // Scale down the vignette and crosshair for compact view
+        this.updateVignetteForCompactMode();
+
+        // Optionally zoom out slightly for better overview in small view
+        if (this.map) {
+            const currentZoom = this.map.getZoom();
+            this.map.easeTo({
+                zoom: Math.max(currentZoom - 1, 10), // Zoom out but not too much
+                duration: 600
+            });
+        }
+    }
+
+    /**
+     * Exit compact mode - restore original layout
+     */
+    exitCompactMode() {
+        if (!this.isCompactMode) return;
+
+        console.log('MapManager: Exiting compact mode');
+        this.isCompactMode = false;
+
+        // Remove compact mode class
+        if (this.mapContainer) {
+            this.mapContainer.classList.remove('compact-mode-map');
+        }
+
+        // Restore original vignette and crosshair
+        setTimeout(() => {
+            this.updateRadiusVignette();
+        }, 100);
+
+        // Restore original zoom level
+        if (this.map) {
+            const currentZoom = this.map.getZoom();
+            this.map.easeTo({
+                zoom: Math.min(currentZoom + 1, 15), // Zoom back in
+                duration: 600
+            });
+        }
+    }
+
+    /**
+     * Update vignette positioning for compact mode
+     */
+    updateVignetteForCompactMode() {
+        if (!this.radiusVignette || !this.userLocationMarker || !this.map) return;
+
+        // Get marker coordinates and project to screen
+        const markerCoords = this.userLocationMarker.getLngLat();
+        const screenPoint = this.map.project(markerCoords);
+
+        // Scale calculations for compact view
+        const compactScale = 0.6; // Scale factor for compact mode
+        const tenKmInPixels = this.calculatePixelsPerKm() * 10;
+        const innerRadius = tenKmInPixels * 0.7 * compactScale;
+        const outerRadius = tenKmInPixels * 1.2 * compactScale;
+
+        // Position vignette center on marker (scaled for compact view)
+        const markerCenterX = screenPoint.x;
+        const markerCenterY = screenPoint.y - (20 * compactScale);
+
+        // Create scaled vignette
+        this.radiusVignette.style.background = `radial-gradient(
+            circle at ${markerCenterX}px ${markerCenterY}px,
+            transparent 0px,
+            transparent ${innerRadius}px,
+            rgba(0, 0, 0, 0.3) ${innerRadius + 10}px,
+            rgba(0, 0, 0, 0.7) ${outerRadius}px,
+            rgba(0, 0, 0, 0.9) ${outerRadius + 50}px
+        )`;
+
+        // Update crosshair position for compact mode
+        if (this.crosshair) {
+            this.crosshair.style.left = `${markerCenterX - (250 * compactScale)}px`;
+            this.crosshair.style.top = `${markerCenterY - (250 * compactScale)}px`;
+        }
+
+        console.log('MapManager: Updated vignette for compact mode');
     }
 }
 

@@ -81,6 +81,11 @@ class CategoryCircles {
                 this.repositionCategories();
             }
         });
+
+        // Listen for menu close to exit compact mode
+        document.addEventListener('menuClosed', () => {
+            this.exitCompactMode();
+        });
     }
 
     /**
@@ -281,6 +286,9 @@ class CategoryCircles {
     handleCategoryClick(category) {
         console.log('Category clicked:', category);
 
+        // Enter compact mode first
+        this.enterCompactMode();
+
         // Dispatch event for product menu to handle
         document.dispatchEvent(new CustomEvent('categorySelected', {
             detail: {
@@ -358,9 +366,96 @@ class CategoryCircles {
     isDisplayed() {
         return this.isVisible;
     }
+
+    /**
+     * Enter compact mode - shrink map to bottom left and move categories to left side
+     */
+    enterCompactMode() {
+        console.log('CategoryCircles: Entering compact mode');
+
+        // Add compact mode class to body for global styling
+        document.body.classList.add('compact-mode');
+
+        // Trigger map manager to enter compact mode
+        if (this.mapManager && typeof this.mapManager.enterCompactMode === 'function') {
+            this.mapManager.enterCompactMode();
+        } else {
+            // Fallback - dispatch event for map manager
+            document.dispatchEvent(new CustomEvent('enterCompactMode'));
+        }
+
+        // Reposition category circles to left side
+        this.repositionForCompactMode();
+    }
+
+    /**
+     * Exit compact mode - restore original layout
+     */
+    exitCompactMode() {
+        console.log('CategoryCircles: Exiting compact mode');
+
+        // Remove compact mode class
+        document.body.classList.remove('compact-mode');
+
+        // Trigger map manager to exit compact mode
+        if (this.mapManager && typeof this.mapManager.exitCompactMode === 'function') {
+            this.mapManager.exitCompactMode();
+        } else {
+            // Fallback - dispatch event for map manager
+            document.dispatchEvent(new CustomEvent('exitCompactMode'));
+        }
+
+        // Hide categories and reset positioning
+        this.hideCategories();
+    }
+
+    /**
+     * Reposition category circles for compact mode (left side of screen)
+     */
+    repositionForCompactMode() {
+        if (!this.isVisible) return;
+
+        console.log('CategoryCircles: Repositioning for compact mode');
+
+        const positions = this.calculateCompactModePositions();
+        let index = 0;
+
+        this.categoryElements.forEach(element => {
+            if (index < positions.length) {
+                const pos = positions[index];
+                element.style.transition = 'all 0.6s ease-in-out';
+                element.style.left = `${pos.x - 60}px`;
+                element.style.top = `${pos.y - 60}px`;
+                index++;
+            }
+        });
+    }
+
+    /**
+     * Calculate positions for category circles in compact mode (left side)
+     */
+    calculateCompactModePositions() {
+        const numCategories = Math.min(this.categories.length, 6);
+        const positions = [];
+
+        // Position circles vertically along the left side
+        const leftX = 100; // Fixed distance from left edge
+        const startY = window.innerHeight * 0.3; // Start at 30% from top
+        const spacing = 100; // Vertical spacing between circles
+
+        for (let i = 0; i < numCategories; i++) {
+            positions.push({
+                x: leftX,
+                y: startY + (i * spacing),
+                angle: 0 // No angle needed for vertical layout
+            });
+        }
+
+        return positions;
+    }
 }
 
-// Add CSS for category circles
+// Add CSS for category circles and compact mode
 const categoryCircleCSS = `
 .category-circle.visible {
     opacity: 1 !important;
@@ -378,6 +473,41 @@ const categoryCircleCSS = `
     50% {
         box-shadow: 0 0 40px var(--category-color, #00ff00)66;
     }
+}
+
+/* Compact Mode Styles */
+.compact-mode #map {
+    transition: all 0.6s ease-in-out;
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 20px !important;
+    width: 300px !important;
+    height: 250px !important;
+    z-index: 500 !important;
+    border: 2px solid #00ff00;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+}
+
+.compact-mode #gtaCrosshair {
+    transform: scale(0.6) !important;
+    transition: transform 0.6s ease-in-out;
+}
+
+.compact-mode #radiusVignette {
+    transition: all 0.6s ease-in-out;
+}
+
+/* Adjust product menu positioning for compact mode */
+.compact-mode .gta-product-menu {
+    right: 20px !important;
+    width: calc(100vw - 400px) !important;
+    max-width: 900px !important;
+}
+
+/* Ensure category circles stay visible in compact mode */
+.compact-mode .category-circle {
+    z-index: 1000 !important;
 }
 `;
 
