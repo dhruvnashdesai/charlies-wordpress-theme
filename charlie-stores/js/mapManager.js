@@ -919,6 +919,7 @@ class MapManager {
         }
 
         console.log('Vignette tracking - Screen point:', { x: screenPoint.x, y: screenPoint.y }, 'Marker center:', { markerCenterX, markerCenterY }, 'Vignette center:', { centerX, centerY }, 'Viewport:', { width: window.innerWidth, height: window.innerHeight });
+        console.log('Vignette radius debug - tenKmInPixels:', tenKmInPixels, 'innerRadius:', innerRadius, 'outerRadius:', outerRadius);
 
         // Store current vignette info for other systems to access
         this.currentVignetteInfo = {

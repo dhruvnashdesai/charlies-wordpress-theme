@@ -176,6 +176,13 @@ class CategoryCircles {
         // Position circles exactly on the circumference where the vignette fade begins
         const distance = this.vignetteRadius; // Right at the edge of the clear area
 
+        console.log('Category positioning debug:', {
+            vignetteCenter: this.centerPoint,
+            vignetteRadius: this.vignetteRadius,
+            distance: distance,
+            numCategories: numCategories
+        });
+
         // Define specific angles for better positioning around the full circumference
         let angles = [];
 
