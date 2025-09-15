@@ -841,8 +841,13 @@ class MapManager {
         // Create separate vignette overlay that tracks this marker
         this.createMarkerVignette();
 
-        // Show crosshair at the center
+        // Show crosshair at the center and position it on marker
         this.showCrosshair();
+
+        // Position crosshair on marker immediately
+        setTimeout(() => {
+            this.positionCrosshairOnMarker();
+        }, 100); // Small delay to ensure marker is rendered
         
         // Vape stores removed for clean map
     }
@@ -886,7 +891,30 @@ class MapManager {
         this.markerVignette = vignetteOverlay;
 
         // Update vignette position to center on marker
-        this.updateVignettePosition();
+        setTimeout(() => {
+            this.updateVignettePosition();
+        }, 100); // Small delay to ensure marker is rendered
+    }
+
+    /**
+     * Position crosshair directly on the marker
+     */
+    positionCrosshairOnMarker() {
+        if (!this.crosshair || !this.userLocationMarker) return;
+
+        // Get marker's screen position
+        const markerElement = this.userLocationMarker.getElement();
+        const markerRect = markerElement.getBoundingClientRect();
+
+        // Calculate center point of marker
+        const centerX = markerRect.left + (markerRect.width / 2);
+        const centerY = markerRect.top + (markerRect.height / 2);
+
+        // Position crosshair at marker center
+        this.crosshair.style.position = 'fixed';
+        this.crosshair.style.left = `${centerX - 250}px`; // Center the 500px crosshair
+        this.crosshair.style.top = `${centerY - 250}px`;
+        this.crosshair.style.zIndex = '600';
     }
 
     /**
@@ -1659,8 +1687,8 @@ class MapManager {
             return;
         }
 
-        // Calculate slide distance
-        const slideDistance = window.innerWidth * 0.15; // 15% of screen width in pixels
+        // Calculate slide distance - increased for more movement
+        const slideDistance = window.innerWidth * 0.25; // 25% of screen width in pixels
 
         // Pan the map so the marker moves left
         const currentCenter = this.map.getCenter();
@@ -1682,12 +1710,13 @@ class MapManager {
             essential: true
         });
 
-        // Update vignette position after map movement
+        // Update vignette and crosshair positions after map movement
         setTimeout(() => {
             this.updateVignettePosition();
+            this.positionCrosshairOnMarker();
         }, 650); // After pan completes
 
-        // Move crosshair
+        // Immediately start crosshair movement animation
         const crosshair = document.getElementById('gtaCrosshair');
         if (crosshair) {
             crosshair.style.transform = `translateX(-${slideDistance}px)`;
