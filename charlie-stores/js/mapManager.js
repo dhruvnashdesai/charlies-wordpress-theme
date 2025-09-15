@@ -1577,7 +1577,12 @@ class MapManager {
      * Slide map and vignette to left side for product mode
      */
     slideToProductMode() {
-        // Get vignette and overlay elements (NOT the map container)
+        if (!this.isInitialized || !this.map) {
+            console.warn('Map not initialized for sliding animation');
+            return;
+        }
+
+        // Get vignette and overlay elements
         const mapContainer = document.getElementById('map');
         const vignette = document.getElementById('radiusVignette');
         const crosshair = document.getElementById('gtaCrosshair');
@@ -1587,29 +1592,57 @@ class MapManager {
             return;
         }
 
-        // Add CSS classes for smooth animation - ONLY to overlay elements
-        // DON'T move the map container itself
-        if (mapContainer) mapContainer.classList.add('product-mode'); // For state tracking only
+        // Calculate how much to pan the map (200px left in screen space)
+        const panDistance = 200; // pixels
+        const currentCenter = this.map.getCenter();
+
+        // Convert screen pixel offset to geographic coordinates
+        const mapContainer_rect = this.mapContainer.getBoundingClientRect();
+        const screenCenterX = mapContainer_rect.width / 2;
+        const newScreenCenterX = screenCenterX - panDistance;
+
+        // Get the geographic coordinate at the new screen center
+        const currentCenterPixel = this.map.project(currentCenter);
+        const newCenterPixel = {
+            x: currentCenterPixel.x - panDistance,
+            y: currentCenterPixel.y
+        };
+        const newCenter = this.map.unproject(newCenterPixel);
+
+        // Add CSS classes for smooth animation to overlay elements
+        if (mapContainer) mapContainer.classList.add('product-mode'); // For state tracking
         vignette.classList.add('product-mode');
         if (crosshair) crosshair.classList.add('product-mode');
 
-        // Update marker positions (they're screen-positioned)
-        this.updateMarkersForProductMode();
+        // Pan the map to new center with smooth animation
+        this.map.easeTo({
+            center: newCenter,
+            duration: 600, // Match CSS animation duration
+            essential: true // Ensures animation plays even with reduced motion
+        });
 
-        console.log('Sliding to product mode');
+        // Update warehouse marker positions (they're screen-positioned, so they need adjustment)
+        setTimeout(() => {
+            this.updateMarkersForProductMode();
+        }, 100); // Small delay to let the pan start
+
+        console.log('Sliding to product mode with map pan');
     }
 
     /**
      * Update marker positions for product mode
      */
     updateMarkersForProductMode() {
+        // Since we're panning the map, screen-positioned markers need minimal adjustment
+        // The map pan handles most of the movement, but we may need slight fine-tuning
         this.markers.forEach((markerData, markerId) => {
             if (markerData.isScreenMarker && markerData.element) {
-                // Shift warehouse markers to the left
-                const currentLeft = parseInt(markerData.element.style.left);
-                const newLeft = currentLeft - 200; // Shift left by 200px
-                markerData.element.style.left = `${newLeft}px`;
+                // The map pan will move geographic content, but screen-positioned markers
+                // may need a small adjustment to stay properly positioned relative to the vignette
                 markerData.element.style.transition = 'left 0.6s ease-in-out';
+
+                // Optional: small adjustment if needed (can be fine-tuned)
+                // For now, let the map pan handle the movement
             }
         });
     }
