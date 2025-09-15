@@ -176,21 +176,21 @@ class CategoryCircles {
         // Position circles exactly on the circumference where the vignette fade begins
         const distance = this.vignetteRadius; // Right at the edge of the clear area
 
-        // Define specific angles for better positioning
+        // Define specific angles for better positioning around the full circumference
         let angles = [];
 
         if (numCategories === 1) {
             angles = [0]; // Right side
         } else if (numCategories === 2) {
-            angles = [-30, 30]; // Upper-right and lower-right
+            angles = [-45, 45]; // Upper-right and lower-right
         } else if (numCategories === 3) {
-            angles = [-45, 0, 45]; // Upper-right, right, lower-right
+            angles = [-60, 0, 60]; // Spread evenly
         } else if (numCategories === 4) {
-            angles = [-60, -20, 20, 60]; // Spread around right side
+            angles = [-90, -30, 30, 90]; // Top, upper-right, lower-right, bottom
         } else if (numCategories === 5) {
-            angles = [-70, -35, 0, 35, 70]; // Five positions around right side
+            angles = [-90, -45, 0, 45, 90]; // Evenly distributed from top to bottom
         } else {
-            angles = [-80, -48, -16, 16, 48, 80]; // Six positions around right side
+            angles = [-90, -54, -18, 18, 54, 90]; // Six positions evenly distributed
         }
 
         for (let i = 0; i < numCategories; i++) {
