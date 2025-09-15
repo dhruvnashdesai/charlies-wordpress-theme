@@ -1577,18 +1577,19 @@ class MapManager {
      * Slide map and vignette to left side for product mode
      */
     slideToProductMode() {
-        // Get map container and vignette elements
+        // Get vignette and overlay elements (NOT the map container)
         const mapContainer = document.getElementById('map');
         const vignette = document.getElementById('radiusVignette');
         const crosshair = document.getElementById('gtaCrosshair');
 
-        if (!mapContainer || !vignette) {
-            console.warn('Map container or vignette not found for sliding animation');
+        if (!vignette) {
+            console.warn('Vignette not found for sliding animation');
             return;
         }
 
-        // Add CSS classes for smooth animation
-        mapContainer.classList.add('product-mode');
+        // Add CSS classes for smooth animation - ONLY to overlay elements
+        // DON'T move the map container itself
+        if (mapContainer) mapContainer.classList.add('product-mode'); // For state tracking only
         vignette.classList.add('product-mode');
         if (crosshair) crosshair.classList.add('product-mode');
 

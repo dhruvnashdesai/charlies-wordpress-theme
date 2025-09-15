@@ -422,18 +422,15 @@
 }
 
 /* Product Mode - Sliding Animation */
-.fullscreen-map.product-mode {
-    transform: translateX(-25%);
-    transition: transform 0.6s ease-in-out;
-}
+/* Keep map stationary, only move overlay elements */
 
 .radius-vignette.product-mode {
-    transform: translateX(-25%);
+    transform: translateX(-200px);
     transition: transform 0.6s ease-in-out;
 }
 
 .gta-crosshair.product-mode {
-    transform: translateX(-25%);
+    transform: translateX(-200px);
     transition: transform 0.6s ease-in-out;
 }
 
