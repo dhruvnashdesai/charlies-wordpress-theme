@@ -1592,19 +1592,15 @@ class MapManager {
             return;
         }
 
-        // Calculate how much to pan the map (200px left in screen space)
+        // Calculate how much to pan the map (200px right to move location marker left)
         const panDistance = 200; // pixels
         const currentCenter = this.map.getCenter();
 
         // Convert screen pixel offset to geographic coordinates
-        const mapContainer_rect = this.mapContainer.getBoundingClientRect();
-        const screenCenterX = mapContainer_rect.width / 2;
-        const newScreenCenterX = screenCenterX - panDistance;
-
-        // Get the geographic coordinate at the new screen center
+        // Pan RIGHT so the location marker appears to move LEFT
         const currentCenterPixel = this.map.project(currentCenter);
         const newCenterPixel = {
-            x: currentCenterPixel.x - panDistance,
+            x: currentCenterPixel.x + panDistance, // ADD to pan right
             y: currentCenterPixel.y
         };
         const newCenter = this.map.unproject(newCenterPixel);
