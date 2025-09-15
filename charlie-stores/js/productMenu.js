@@ -51,6 +51,7 @@ class ProductMenu {
         // Close menu when clicking outside
         document.addEventListener('click', (e) => {
             if (this.isVisible && this.menuElement && !this.menuElement.contains(e.target)) {
+                console.log('ProductMenu: Clicked outside menu, closing...');
                 this.hideMenu();
             }
         });
@@ -147,6 +148,42 @@ class ProductMenu {
         this.menuElement.appendChild(header);
         this.menuElement.appendChild(panelContainer);
         this.menuElement.appendChild(scrollbarStyle);
+
+        // Handle clicks inside the menu with event delegation
+        this.menuElement.addEventListener('click', (e) => {
+            console.log('ProductMenu: Click inside menu');
+
+            // Handle brand clicks
+            const brandItem = e.target.closest('[data-action]');
+            if (brandItem) {
+                const action = brandItem.getAttribute('data-action');
+
+                if (action === 'clear-filter') {
+                    console.log('ProductMenu: Clear brand filter clicked');
+                    this.clearBrandFilter();
+                } else if (action === 'select-brand') {
+                    const brandData = {
+                        id: parseInt(brandItem.getAttribute('data-brand-id')),
+                        name: brandItem.getAttribute('data-brand-name'),
+                        slug: brandItem.getAttribute('data-brand-slug')
+                    };
+                    console.log('ProductMenu: Brand selected via delegation:', brandData);
+                    this.handleBrandSelected(brandData);
+                }
+
+                // Stop propagation for brand clicks
+                e.stopPropagation();
+                return;
+            }
+
+            // For all other clicks inside menu, prevent closing but don't stop propagation
+            // (this allows product links to work normally)
+            if (!e.target.closest('.close-btn')) {
+                console.log('ProductMenu: General click inside menu, preventing close');
+                e.stopPropagation();
+            }
+        });
+
         document.body.appendChild(this.menuElement);
     }
 
@@ -596,7 +633,7 @@ class ProductMenu {
                 transition: background 0.2s ease;
                 background: ${allSelected ? 'rgba(0,255,0,0.2)' : 'transparent'};
                 border-left: ${allSelected ? '3px solid #00ff00' : '3px solid transparent'};
-            " onmouseover="if(!${allSelected}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="if(!${allSelected}) this.style.background='transparent'" onclick="window.productMenu.clearBrandFilter()">
+            " onmouseover="if(!${allSelected}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="if(!${allSelected}) this.style.background='transparent'" data-action="clear-filter">
                 <div style="font-size: 14px; font-weight: bold;">
                     All Brands
                 </div>
@@ -617,7 +654,7 @@ class ProductMenu {
                     transition: background 0.2s ease;
                     background: ${isSelected ? 'rgba(0,255,0,0.2)' : 'transparent'};
                     border-left: ${isSelected ? '3px solid #00ff00' : '3px solid transparent'};
-                " onmouseover="if(!${isSelected}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="if(!${isSelected}) this.style.background='transparent'" onclick="window.productMenu.handleBrandSelected({id: ${brand.id}, name: '${brand.name}', slug: '${brand.slug}'})">
+                " onmouseover="if(!${isSelected}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="if(!${isSelected}) this.style.background='transparent'" data-action="select-brand" data-brand-id="${brand.id}" data-brand-name="${brand.name}" data-brand-slug="${brand.slug}">
                     <div style="font-size: 14px; font-weight: bold;">
                         ${brand.name}
                     </div>
