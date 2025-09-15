@@ -902,27 +902,19 @@ class MapManager {
     positionCrosshairOnMarker() {
         if (!this.crosshair || !this.userLocationMarker) return;
 
-        // Get marker's screen position
-        const markerElement = this.userLocationMarker.getElement();
-        const markerRect = markerElement.getBoundingClientRect();
+        // Get marker's position using Mapbox projection for accuracy
 
-        // Calculate marker center based on anchor point
-        // Marker uses anchor: 'bottom', so its geographic center is at bottom-center of the element
-        const centerX = markerRect.left + (markerRect.width / 2);
-        const centerY = markerRect.bottom; // Use bottom since anchor is 'bottom'
+        // Use Mapbox's projection system for accurate positioning
+        const markerLngLat = this.userLocationMarker.getLngLat();
+        const projectedPoint = this.map.project(markerLngLat);
+
+        // Mapbox projection gives us the anchor point, but may need fine-tuning
+        // Based on visual feedback: blue dot was slightly too left and lower
+        const centerX = projectedPoint.x + 2; // Adjust slightly right
+        const centerY = projectedPoint.y - 3; // Adjust slightly up
 
         // Debug logging
-        console.log('Marker rect:', {
-            x: markerRect.x,
-            y: markerRect.y,
-            width: markerRect.width,
-            height: markerRect.height,
-            top: markerRect.top,
-            bottom: markerRect.bottom,
-            left: markerRect.left,
-            right: markerRect.right
-        });
-        console.log('Calculated center:', { centerX, centerY });
+        console.log('Crosshair positioned at marker center:', { centerX, centerY });
 
         // Position crosshair container so its center dot aligns with marker center
         // The crosshair is 500x500 with center dot at 50% 50%, so we offset by 250px
@@ -950,15 +942,8 @@ class MapManager {
             y: crosshairCenterY - centerY
         });
 
-        // Visual debug: Add a small red dot at the calculated marker center
+        // Visual debug: Add a red dot at the calculated marker center
         this.addDebugDot(centerX, centerY);
-
-        // Also add a blue dot using Mapbox's projection system for comparison
-        const markerLngLat = this.userLocationMarker.getLngLat();
-        const projectedPoint = this.map.project(markerLngLat);
-        console.log('Marker geographic coordinates:', markerLngLat);
-        console.log('Mapbox projected screen position:', { x: projectedPoint.x, y: projectedPoint.y });
-        this.addDebugDot(projectedPoint.x, projectedPoint.y, 'blue');
     }
 
     /**
@@ -967,17 +952,16 @@ class MapManager {
     updateVignettePosition() {
         if (!this.markerVignette || !this.userLocationMarker) return;
 
-        // Get marker's screen position
-        const markerElement = this.userLocationMarker.getElement();
-        const markerRect = markerElement.getBoundingClientRect();
+        // Use Mapbox's projection system for accurate positioning
+        const markerLngLat = this.userLocationMarker.getLngLat();
+        const projectedPoint = this.map.project(markerLngLat);
 
-        // Calculate marker center based on anchor point
-        // Marker uses anchor: 'bottom', so its geographic center is at bottom-center of the element
-        const centerX = markerRect.left + (markerRect.width / 2);
-        const centerY = markerRect.bottom; // Use bottom since anchor is 'bottom'
+        // Mapbox projection gives us the anchor point, apply same fine-tuning as crosshair
+        const centerX = projectedPoint.x + 2; // Adjust slightly right
+        const centerY = projectedPoint.y - 3; // Adjust slightly up
 
         // Debug logging
-        console.log('Vignette - Marker center:', { centerX, centerY });
+        console.log('Vignette centered at marker position:', { centerX, centerY });
 
         // Convert to percentages
         const centerXPercent = (centerX / window.innerWidth) * 100;
