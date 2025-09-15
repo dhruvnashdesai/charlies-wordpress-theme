@@ -217,6 +217,16 @@ class ProductMenu {
             position: this.menuElement.style.position
         });
 
+        // Debug: Check if element is in DOM and visible
+        console.log('ProductMenu: Element in DOM:', document.body.contains(this.menuElement));
+        console.log('ProductMenu: Element bounds:', this.menuElement.getBoundingClientRect());
+
+        // Force a bright red background for debugging
+        this.menuElement.style.background = 'red';
+        this.menuElement.style.border = '5px solid yellow';
+
+        console.log('ProductMenu: Applied red background and yellow border for debugging');
+
         // Add GTA-style sound effect (optional)
         this.playMenuSound();
     }
