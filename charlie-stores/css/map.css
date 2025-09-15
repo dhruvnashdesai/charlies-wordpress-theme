@@ -102,25 +102,10 @@
     opacity: 1;
 }
 
-/* Create circular mask effect using radial gradient */
+/* Static circular mask disabled - now using dynamic JavaScript vignette */
 .radius-vignette::before {
     content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(
-        circle at 50% 50%,
-        transparent 0px,
-        transparent 200px,
-        rgba(0, 0, 0, 0.1) 250px,
-        rgba(0, 0, 0, 0.3) 300px,
-        rgba(0, 0, 0, 0.6) 350px,
-        rgba(0, 0, 0, 0.8) 400px,
-        rgba(0, 0, 0, 0.95) 450px,
-        rgba(0, 0, 0, 1) 500px
-    );
+    display: none;
 }
 
 /* Warehouse Marker Pulse Animation */
