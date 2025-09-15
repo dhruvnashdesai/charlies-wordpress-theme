@@ -190,15 +190,15 @@ class CategoryCircles {
         if (numCategories === 1) {
             angles = [0]; // Due right
         } else if (numCategories === 2) {
-            angles = [-30, 30]; // Upper-right and lower-right
+            angles = [-20, 20]; // Closer to middle
         } else if (numCategories === 3) {
-            angles = [-45, 0, 45]; // Top-right, right, bottom-right
+            angles = [-30, 0, 30]; // Tighter cluster around middle
         } else if (numCategories === 4) {
-            angles = [-60, -20, 20, 60]; // Spread along right edge
+            angles = [-40, -15, 15, 40]; // Closer to center
         } else if (numCategories === 5) {
-            angles = [-70, -35, 0, 35, 70]; // Five positions along right edge
+            angles = [-45, -25, 0, 25, 45]; // Tighter spread
         } else {
-            angles = [-75, -45, -15, 15, 45, 75]; // Six positions along right edge
+            angles = [-50, -30, -10, 10, 30, 50]; // Six positions closer to middle
         }
 
         for (let i = 0; i < numCategories; i++) {
@@ -225,10 +225,10 @@ class CategoryCircles {
         // Style the category circle
         element.style.cssText = `
             position: fixed;
-            left: ${position.x - 40}px;
-            top: ${position.y - 40}px;
-            width: 80px;
-            height: 80px;
+            left: ${position.x - 60}px;
+            top: ${position.y - 60}px;
+            width: 120px;
+            height: 120px;
             background: radial-gradient(circle, ${category.color}22, ${category.color}44);
             border: 3px solid ${category.color};
             border-radius: 50%;
@@ -240,7 +240,7 @@ class CategoryCircles {
             z-index: 800;
             font-family: 'Courier New', monospace;
             color: ${category.color};
-            font-size: 10px;
+            font-size: 14px;
             font-weight: bold;
             text-align: center;
             text-transform: uppercase;
@@ -252,8 +252,8 @@ class CategoryCircles {
 
         // Add content
         element.innerHTML = `
-            <div style="font-size: 12px; margin-bottom: 2px;">${category.name}</div>
-            <div style="font-size: 8px; opacity: 0.8;">${category.product_count} items</div>
+            <div style="font-size: 16px; margin-bottom: 4px;">${category.name}</div>
+            <div style="font-size: 12px; opacity: 0.8;">${category.product_count} items</div>
         `;
 
         // Add hover effects
