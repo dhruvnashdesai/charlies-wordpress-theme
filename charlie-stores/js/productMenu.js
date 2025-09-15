@@ -544,8 +544,8 @@ class ProductMenu {
 
         // Wait for animation to complete, then dispatch close event
         setTimeout(() => {
-            // Exit compact mode when menu closes
-            document.body.classList.remove('compact-mode');
+            // Exit product view when menu closes
+            document.body.classList.remove('product-view-mode');
             document.dispatchEvent(new CustomEvent('menuClosed'));
             console.log('ProductMenu: Menu hidden and menuClosed event dispatched');
         }, 400);

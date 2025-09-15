@@ -76,9 +76,9 @@ class CategoryCircles {
 
         // Window resize
         window.addEventListener('resize', () => {
-            // Don't recalculate geometry in compact mode
-            const isCompactMode = document.body.classList.contains('compact-mode');
-            if (!isCompactMode) {
+            // Don't recalculate geometry in product view
+            const isProductView = document.body.classList.contains('product-view-mode');
+            if (!isProductView) {
                 this.calculateVignetteGeometry();
                 if (this.isVisible) {
                     this.repositionCategories();
@@ -86,9 +86,9 @@ class CategoryCircles {
             }
         });
 
-        // Listen for menu close to exit compact mode
+        // Listen for menu close to exit product view
         document.addEventListener('menuClosed', () => {
-            this.exitCompactMode();
+            this.exitProductView();
         });
     }
 
@@ -290,17 +290,16 @@ class CategoryCircles {
     handleCategoryClick(category) {
         console.log('Category clicked:', category);
 
-        // Check if we're already in compact mode
-        const isAlreadyCompact = document.body.classList.contains('compact-mode');
+        // Check if we're already in product view mode
+        const isAlreadyInProductView = document.body.classList.contains('product-view-mode');
 
-        if (!isAlreadyCompact) {
-            // First time entering compact mode
-            console.log('CategoryCircles: Entering compact mode for first time');
-            this.enterCompactMode();
+        if (!isAlreadyInProductView) {
+            // First time entering product view
+            console.log('CategoryCircles: Entering product view for first time');
+            this.enterProductView();
         } else {
-            // Already in compact mode, just update the menu content
-            console.log('CategoryCircles: Already in compact mode, just updating menu');
-            console.log('CategoryCircles: Body has compact-mode class:', document.body.classList.contains('compact-mode'));
+            // Already in product view, just update the menu content
+            console.log('CategoryCircles: Already in product view, just updating menu');
         }
 
         // Always dispatch event for product menu to handle (menu will update content)
@@ -308,7 +307,7 @@ class CategoryCircles {
             detail: {
                 category: category,
                 storeId: this.currentStoreId,
-                isCompactModeUpdate: isAlreadyCompact // Let other systems know this is just a content update
+                isProductViewUpdate: isAlreadyInProductView
             }
         }));
 
@@ -362,10 +361,10 @@ class CategoryCircles {
     repositionCategories() {
         if (!this.isVisible) return;
 
-        // Don't reposition if we're in compact mode - categories should stay in place
-        const isCompactMode = document.body.classList.contains('compact-mode');
-        if (isCompactMode) {
-            console.log('CategoryCircles: Skipping repositioning - in compact mode');
+        // Don't reposition if we're in product view - categories should stay in place
+        const isProductView = document.body.classList.contains('product-view-mode');
+        if (isProductView) {
+            console.log('CategoryCircles: Skipping repositioning - in product view');
             return;
         }
 
@@ -390,51 +389,55 @@ class CategoryCircles {
     }
 
     /**
-     * Enter compact mode - shrink map to bottom left and move categories to left side
+     * Enter product view - hide vignette and move categories to top right
      */
-    enterCompactMode() {
-        // Check if already in compact mode
-        if (document.body.classList.contains('compact-mode')) {
-            console.log('CategoryCircles: Already in compact mode, skipping enter');
-            return;
-        }
+    enterProductView() {
+        console.log('CategoryCircles: Entering product view');
 
-        console.log('CategoryCircles: Entering compact mode');
+        // Add product view class to body for global styling
+        document.body.classList.add('product-view-mode');
 
-        // Add compact mode class to body for global styling
-        document.body.classList.add('compact-mode');
+        // Hide the vignette overlay
+        this.hideVignette();
 
-        // Trigger map manager to enter compact mode
-        if (this.mapManager && typeof this.mapManager.enterCompactMode === 'function') {
-            this.mapManager.enterCompactMode();
-        } else {
-            // Fallback - dispatch event for map manager
-            document.dispatchEvent(new CustomEvent('enterCompactMode'));
-        }
-
-        // Reposition category circles to left side
-        this.repositionForCompactMode();
+        // Reposition category circles to top right horizontally
+        this.repositionForProductView();
     }
 
     /**
-     * Exit compact mode - restore original layout
+     * Exit product view - restore original layout
      */
-    exitCompactMode() {
-        console.log('CategoryCircles: Exiting compact mode');
+    exitProductView() {
+        console.log('CategoryCircles: Exiting product view');
 
-        // Remove compact mode class
-        document.body.classList.remove('compact-mode');
+        // Remove product view class
+        document.body.classList.remove('product-view-mode');
 
-        // Trigger map manager to exit compact mode
-        if (this.mapManager && typeof this.mapManager.exitCompactMode === 'function') {
-            this.mapManager.exitCompactMode();
-        } else {
-            // Fallback - dispatch event for map manager
-            document.dispatchEvent(new CustomEvent('exitCompactMode'));
-        }
+        // Show the vignette overlay again
+        this.showVignette();
 
-        // Instead of hiding categories, restore them to their original positions around the vignette
+        // Restore category circles to their original positions around the vignette
         this.restoreOriginalPositions();
+    }
+
+    /**
+     * Hide the vignette overlay
+     */
+    hideVignette() {
+        const vignette = document.getElementById('radiusVignette');
+        if (vignette) {
+            vignette.style.display = 'none';
+        }
+    }
+
+    /**
+     * Show the vignette overlay
+     */
+    showVignette() {
+        const vignette = document.getElementById('radiusVignette');
+        if (vignette) {
+            vignette.style.display = '';
+        }
     }
 
     /**
@@ -462,14 +465,14 @@ class CategoryCircles {
     }
 
     /**
-     * Reposition category circles for compact mode (left side of screen)
+     * Reposition category circles for product view (top right horizontally)
      */
-    repositionForCompactMode() {
+    repositionForProductView() {
         if (!this.isVisible) return;
 
-        console.log('CategoryCircles: Repositioning for compact mode');
+        console.log('CategoryCircles: Repositioning for product view - top right horizontal');
 
-        const positions = this.calculateCompactModePositions();
+        const positions = this.calculateProductViewPositions();
         let index = 0;
 
         this.categoryElements.forEach(element => {
@@ -484,22 +487,22 @@ class CategoryCircles {
     }
 
     /**
-     * Calculate positions for category circles in compact mode (left side)
+     * Calculate positions for category circles in product view (top right horizontal)
      */
-    calculateCompactModePositions() {
+    calculateProductViewPositions() {
         const numCategories = Math.min(this.categories.length, 6);
         const positions = [];
 
-        // Position circles vertically along the left side
-        const leftX = 80; // Very close to left edge
-        const startY = window.innerHeight * 0.2; // Start at 20% from top
-        const spacing = 140; // Increased vertical spacing between circles
+        // Position circles horizontally across the top right
+        const topY = 80; // Close to top edge
+        const startX = window.innerWidth - 120; // Start from right edge minus circle width
+        const spacing = 140; // Horizontal spacing between circles
 
         for (let i = 0; i < numCategories; i++) {
             positions.push({
-                x: leftX,
-                y: startY + (i * spacing),
-                angle: 0 // No angle needed for vertical layout
+                x: startX - (i * spacing), // Move left for each subsequent circle
+                y: topY,
+                angle: 0
             });
         }
 
@@ -507,7 +510,7 @@ class CategoryCircles {
     }
 }
 
-// Add CSS for category circles and compact mode
+// Add CSS for category circles and product view mode
 const categoryCircleCSS = `
 .category-circle.visible {
     opacity: 1 !important;
@@ -527,66 +530,9 @@ const categoryCircleCSS = `
     }
 }
 
-/* Compact Mode Styles */
-.compact-mode #map {
-    position: fixed !important;
-    top: auto !important;
-    bottom: 20px !important;
-    left: 20px !important;
-    right: auto !important;
-    width: 200px !important;
-    height: 200px !important;
-    z-index: 500 !important;
-    border: 2px solid #00ff00;
-    border-radius: 50% !important;
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-    overflow: hidden;
-    transition: all 0.6s ease-in-out;
-}
-
-.compact-mode #gtaCrosshair {
-    display: none !important;
-}
-
-.compact-mode #radiusVignette {
-    display: none !important;
-}
-
-/* Ensure map content is visible in compact mode */
-.compact-mode #map .mapboxgl-canvas {
-    border-radius: 50% !important;
-}
-
-/* Adjust product menu positioning for compact mode */
-.compact-mode .gta-product-menu {
-    right: 20px !important;
-    width: calc(100vw - 400px) !important;
-    max-width: 900px !important;
-}
-
-/* Ensure category circles stay visible in compact mode */
-.compact-mode .category-circle {
+/* Ensure category circles stay visible in product view mode */
+.product-view-mode .category-circle {
     z-index: 1000 !important;
-}
-
-/* Keep background black in compact mode */
-.compact-mode,
-.compact-mode body,
-.compact-mode html {
-    background: #000000 !important;
-    background-color: #000000 !important;
-}
-
-/* Keep app background black and ensure it covers the screen */
-.compact-mode #app {
-    background: #000000 !important;
-    background-color: #000000 !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 100 !important;
 }
 `;
 
