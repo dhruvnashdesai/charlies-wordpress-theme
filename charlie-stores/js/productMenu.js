@@ -65,17 +65,18 @@ class ProductMenu {
             width: 380px;
             height: 500px;
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(20, 20, 20, 0.95));
-            border: 2px solid #444;
+            border: 2px solid #00ff00;
             border-radius: 8px;
             box-shadow:
-                0 0 30px rgba(0, 255, 0, 0.3),
+                0 0 30px rgba(0, 255, 0, 0.5),
                 inset 0 0 20px rgba(0, 0, 0, 0.8);
-            z-index: 900;
+            z-index: 9999;
             transform: translateY(-50%);
             transition: right 0.4s ease-in-out;
             font-family: 'Courier New', monospace;
             color: #00ff00;
             overflow: hidden;
+            display: block;
         `;
 
         // Add menu header
@@ -205,9 +206,16 @@ class ProductMenu {
         console.log('ProductMenu: Setting menu position to visible...');
         this.menuElement.style.right = '20px'; // Slide in from right
         this.menuElement.style.display = 'block'; // Ensure it's visible
+        this.menuElement.style.visibility = 'visible'; // Double ensure visibility
         this.isVisible = true;
 
         console.log('ProductMenu: Menu should now be visible at right: 20px');
+        console.log('ProductMenu: Menu element styles:', {
+            right: this.menuElement.style.right,
+            zIndex: this.menuElement.style.zIndex,
+            display: this.menuElement.style.display,
+            position: this.menuElement.style.position
+        });
 
         // Add GTA-style sound effect (optional)
         this.playMenuSound();
@@ -388,6 +396,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Make available globally for debugging and button clicks
         window.productMenu = productMenu;
         console.log('ProductMenu: Instance created and available as window.productMenu');
+
+        // Add manual test function
+        window.testProductMenu = () => {
+            console.log('Testing product menu manually...');
+            if (window.productMenu) {
+                window.productMenu.currentCategory = { id: 'test', name: 'Test Category' };
+                window.productMenu.currentStoreId = 'test';
+                window.productMenu.products = [
+                    { id: 'test1', name: 'Test Product', price: 29.99, currency: 'CAD', stock: 5, description: 'Test description' }
+                ];
+                window.productMenu.showMenu();
+            }
+        };
+        console.log('ProductMenu: Use window.testProductMenu() to manually test the menu');
     }, 150);
 });
 
