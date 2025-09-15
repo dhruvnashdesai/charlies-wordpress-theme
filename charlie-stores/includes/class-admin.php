@@ -33,6 +33,7 @@ class Charlie_Admin {
         register_setting('charlie_store_settings', 'charlie_enable_crosshair');
         register_setting('charlie_store_settings', 'charlie_enable_vignette');
         register_setting('charlie_store_settings', 'charlie_vignette_radius');
+        register_setting('charlie_store_settings', 'charlie_warehouse_store_id');
 
         add_settings_section(
             'charlie_api_settings',
@@ -68,6 +69,14 @@ class Charlie_Admin {
             'search_radius',
             __('Default Search Radius (km)', 'charlies-stores'),
             array($this, 'search_radius_field'),
+            'charlie-store-settings',
+            'charlie_app_settings'
+        );
+
+        add_settings_field(
+            'warehouse_store_id',
+            __('Warehouse Store ID', 'charlies-stores'),
+            array($this, 'warehouse_store_id_field'),
             'charlie-store-settings',
             'charlie_app_settings'
         );
@@ -155,6 +164,17 @@ class Charlie_Admin {
         ?>
         <input type="number" min="1" max="500" name="charlie_search_radius" value="<?php echo esc_attr($value); ?>" />
         <p class="description"><?php _e('Default radius in kilometers for store searches.', 'charlies-stores'); ?></p>
+        <?php
+    }
+
+    /**
+     * Warehouse store ID field
+     */
+    public function warehouse_store_id_field() {
+        $value = get_option('charlie_warehouse_store_id', 1);
+        ?>
+        <input type="number" min="1" name="charlie_warehouse_store_id" value="<?php echo esc_attr($value); ?>" />
+        <p class="description"><?php _e('The store ID that represents your warehouse/distribution center.', 'charlies-stores'); ?></p>
         <?php
     }
 

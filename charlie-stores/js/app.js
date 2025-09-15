@@ -254,9 +254,12 @@ class CharlieStoreApp {
         const clampedX = Math.max(50, Math.min(screenWidth - 50, screenX));
         const clampedY = Math.max(50, Math.min(screenHeight - 50, screenY));
         
-        // Create fake warehouse data with screen position
+        // Create warehouse data with screen position
+        // Use a single warehouse store ID (configurable in WordPress admin)
+        const warehouseStoreId = getConfig('APP.WAREHOUSE_STORE_ID', 1);
+
         const fakeWarehouse = {
-            id: 'fake_warehouse_' + Date.now(),
+            id: warehouseStoreId,
             name: "Charlie's Distribution Center",
             type: 'warehouse',
             screenPosition: { x: clampedX, y: clampedY },
@@ -264,7 +267,8 @@ class CharlieStoreApp {
             distance: Math.random() * 30 + 15, // 15-45km away
             distanceText: `${(Math.random() * 30 + 15).toFixed(1)} km away`,
             hours: "24/7 Distribution",
-            description: "Main distribution hub serving your area"
+            description: "Main distribution hub serving your area",
+            postalCode: this.currentLocation?.postalCode // Pass postal code for regional filtering
         };
         
         return fakeWarehouse;

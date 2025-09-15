@@ -193,7 +193,8 @@ function charlie_enqueue_store_assets() {
             'MINIMUM_AGE' => get_option('charlie_minimum_age', 19),
             'SESSION_DURATION' => 24 * 60 * 60 * 1000,
             'SEARCH_RADIUS_KM' => get_option('charlie_search_radius', 50),
-            'MAX_STORE_RESULTS' => 10
+            'MAX_STORE_RESULTS' => 10,
+            'WAREHOUSE_STORE_ID' => get_option('charlie_warehouse_store_id', 1)
         ),
         'UI' => array(
             'ENABLE_CROSSHAIR' => get_option('charlie_enable_crosshair', true),
