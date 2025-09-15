@@ -440,8 +440,8 @@ class CategoryCircles {
 
         // Position circles vertically along the left side
         const leftX = 80; // Very close to left edge
-        const startY = window.innerHeight * 0.25; // Start at 25% from top
-        const spacing = 110; // Vertical spacing between circles
+        const startY = window.innerHeight * 0.2; // Start at 20% from top
+        const spacing = 140; // Increased vertical spacing between circles
 
         for (let i = 0; i < numCategories; i++) {
             positions.push({
@@ -479,8 +479,10 @@ const categoryCircleCSS = `
 .compact-mode #map {
     transition: all 0.6s ease-in-out;
     position: fixed !important;
+    top: auto !important;
     bottom: 20px !important;
     left: 20px !important;
+    right: auto !important;
     width: 200px !important;
     height: 200px !important;
     z-index: 500 !important;
@@ -491,12 +493,21 @@ const categoryCircleCSS = `
 }
 
 .compact-mode #gtaCrosshair {
-    transform: scale(0.6) !important;
-    transition: transform 0.6s ease-in-out;
+    position: fixed !important;
+    transform: scale(0.3) !important;
+    transition: all 0.6s ease-in-out;
+    z-index: 600 !important;
+    pointer-events: none !important;
 }
 
 .compact-mode #radiusVignette {
     transition: all 0.6s ease-in-out;
+    z-index: 550 !important;
+}
+
+/* Ensure map content is visible in compact mode */
+.compact-mode #map .mapboxgl-canvas {
+    border-radius: 50% !important;
 }
 
 /* Adjust product menu positioning for compact mode */

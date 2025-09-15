@@ -1758,16 +1758,22 @@ class MapManager {
             this.mapContainer.classList.add('compact-mode-map');
         }
 
-        // Scale down the vignette and crosshair for compact view
-        this.updateVignetteForCompactMode();
-
-        // Optionally zoom out slightly for better overview in small view
-        if (this.map) {
-            const currentZoom = this.map.getZoom();
+        // Center the map on user location for compact view
+        if (this.map && this.userLocationMarker) {
+            const userCoords = this.userLocationMarker.getLngLat();
             this.map.easeTo({
-                zoom: Math.max(currentZoom - 1, 10), // Zoom out but not too much
+                center: userCoords,
+                zoom: Math.max(12, this.map.getZoom() - 1), // Good zoom for compact view
                 duration: 600
             });
+
+            // Update vignette after map movement and CSS transition
+            setTimeout(() => {
+                this.updateVignetteForCompactMode();
+            }, 700); // Wait for both map animation and CSS transition
+        } else {
+            // Fallback if no user location
+            this.updateVignetteForCompactMode();
         }
     }
 
@@ -1859,10 +1865,12 @@ class MapManager {
         // Position crosshair at the center of the compact map
         if (this.crosshair) {
             this.crosshair.style.position = 'fixed';
-            this.crosshair.style.left = `${compactCenterX - 150}px`; // Center 300px crosshair
-            this.crosshair.style.top = `${compactCenterY - 150}px`;
-            this.crosshair.style.transform = 'scale(0.4)'; // Scale down for compact view
+            this.crosshair.style.left = `${compactCenterX - 100}px`; // Center 200px scaled crosshair
+            this.crosshair.style.top = `${compactCenterY - 100}px`;
+            this.crosshair.style.transform = 'scale(0.3)'; // Smaller scale for compact view
             this.crosshair.style.zIndex = '600';
+            this.crosshair.style.pointerEvents = 'none'; // Don't interfere with map
+            this.crosshair.classList.add('visible'); // Ensure it's visible
         }
 
         // Position user location marker at center of compact map
@@ -1872,8 +1880,9 @@ class MapManager {
                 markerElement.style.position = 'fixed';
                 markerElement.style.left = `${compactCenterX}px`;
                 markerElement.style.top = `${compactCenterY}px`;
-                markerElement.style.transform = 'translate(-50%, -50%) scale(0.8)';
-                markerElement.style.zIndex = '600';
+                markerElement.style.transform = 'translate(-50%, -50%) scale(0.6)';
+                markerElement.style.zIndex = '601'; // Above crosshair
+                markerElement.style.pointerEvents = 'none'; // Don't interfere with map
             }
         }
 
