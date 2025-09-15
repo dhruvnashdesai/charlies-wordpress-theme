@@ -16,7 +16,10 @@ class Charlie_Store_Manager {
      * Register the store custom post type
      */
     public function register_post_type() {
-        register_post_type('charlie_store', array(
+        // Debug logging
+        error_log('Charlie Stores: Registering charlie_store post type');
+
+        $result = register_post_type('charlie_store', array(
             'labels' => array(
                 'name' => __('Stores', 'charlies-stores'),
                 'singular_name' => __('Store', 'charlies-stores'),
@@ -36,6 +39,13 @@ class Charlie_Store_Manager {
             'menu_icon' => 'dashicons-store',
             'rewrite' => array('slug' => 'stores'),
         ));
+
+        // Debug logging
+        if (is_wp_error($result)) {
+            error_log('Charlie Stores: Post type registration failed: ' . $result->get_error_message());
+        } else {
+            error_log('Charlie Stores: Post type registered successfully');
+        }
     }
 
     /**

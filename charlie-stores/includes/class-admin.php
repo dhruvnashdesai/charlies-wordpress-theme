@@ -8,6 +8,7 @@ class Charlie_Admin {
     public function __construct() {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'register_settings'));
+        add_action('admin_notices', array($this, 'check_store_setup'));
     }
 
     /**
@@ -172,10 +173,87 @@ class Charlie_Admin {
      */
     public function warehouse_store_id_field() {
         $value = get_option('charlie_warehouse_store_id', 1);
+
+        // Get all stores for dropdown
+        $stores = get_posts(array(
+            'post_type' => 'charlie_store',
+            'posts_per_page' => -1,
+            'post_status' => 'publish'
+        ));
+
+        if (empty($stores)) {
+            ?>
+            <p style="color: #d63638; font-weight: bold;">
+                <?php _e('No stores found! Please create a store first.', 'charlies-stores'); ?>
+                <a href="<?php echo admin_url('post-new.php?post_type=charlie_store'); ?>">
+                    <?php _e('Create Store', 'charlies-stores'); ?>
+                </a>
+            </p>
+            <input type="number" min="1" name="charlie_warehouse_store_id" value="<?php echo esc_attr($value); ?>" />
+            <?php
+        } else {
+            ?>
+            <select name="charlie_warehouse_store_id">
+                <option value=""><?php _e('Select warehouse store', 'charlies-stores'); ?></option>
+                <?php foreach ($stores as $store) : ?>
+                    <option value="<?php echo esc_attr($store->ID); ?>" <?php selected($value, $store->ID); ?>>
+                        <?php echo esc_html($store->post_title); ?> (ID: <?php echo $store->ID; ?>)
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <?php
+        }
         ?>
-        <input type="number" min="1" name="charlie_warehouse_store_id" value="<?php echo esc_attr($value); ?>" />
-        <p class="description"><?php _e('The store ID that represents your warehouse/distribution center.', 'charlies-stores'); ?></p>
+        <p class="description"><?php _e('Select which store represents your warehouse/distribution center.', 'charlies-stores'); ?></p>
         <?php
+    }
+
+    /**
+     * Check store setup and show admin notices
+     */
+    public function check_store_setup() {
+        // Only show on relevant admin pages
+        $screen = get_current_screen();
+        if (!$screen || !in_array($screen->base, ['edit', 'post', 'settings_page_charlie-store-settings'])) {
+            return;
+        }
+
+        // Check if we have any stores
+        $stores = get_posts(array(
+            'post_type' => 'charlie_store',
+            'posts_per_page' => 1,
+            'post_status' => 'publish'
+        ));
+
+        if (empty($stores)) {
+            ?>
+            <div class="notice notice-warning">
+                <p>
+                    <strong><?php _e('Charlie\'s Store Finder:', 'charlies-stores'); ?></strong>
+                    <?php _e('No stores found. Products cannot be linked to stores until you create at least one store.', 'charlies-stores'); ?>
+                    <a href="<?php echo admin_url('post-new.php?post_type=charlie_store'); ?>" class="button button-primary">
+                        <?php _e('Create Your First Store', 'charlies-stores'); ?>
+                    </a>
+                </p>
+            </div>
+            <?php
+        }
+
+        // Check warehouse configuration
+        $warehouse_id = get_option('charlie_warehouse_store_id');
+        if ($warehouse_id && !get_post($warehouse_id)) {
+            ?>
+            <div class="notice notice-error">
+                <p>
+                    <strong><?php _e('Charlie\'s Store Finder:', 'charlies-stores'); ?></strong>
+                    <?php printf(__('Warehouse store ID %d does not exist.', 'charlies-stores'), $warehouse_id); ?>
+                    <a href="<?php echo admin_url('options-general.php?page=charlie-store-settings'); ?>">
+                        <?php _e('Update Settings', 'charlies-stores'); ?>
+                    </a>
+                </p>
+            </div>
+            <?php
+        }
     }
 
     /**

@@ -72,9 +72,20 @@ class Charlie_WooCommerce_Integration {
             'post_status' => 'publish'
         ));
 
+        // Debug: Log store count for troubleshooting
+        error_log('Charlie Stores Debug: Found ' . count($stores) . ' stores');
+        foreach ($stores as $store) {
+            error_log('Store: ID=' . $store->ID . ', Title=' . $store->post_title);
+        }
+
         $store_options = array('' => __('Select a store', 'charlies-stores'));
         foreach ($stores as $store) {
             $store_options[$store->ID] = $store->post_title;
+        }
+
+        // If no stores exist, add a helpful message
+        if (empty($stores)) {
+            $store_options[''] = __('No stores found - Please create a store first', 'charlies-stores');
         }
 
         woocommerce_wp_select(array(
@@ -122,9 +133,14 @@ class Charlie_WooCommerce_Integration {
         echo '<p class="form-field _charlie_store_location_field">';
         echo '<label for="_charlie_store_location">' . __('Available at Store', 'charlies-stores') . '</label>';
         echo '<select id="_charlie_store_location" name="_charlie_store_location" class="select short">';
-        echo '<option value="">' . __('Select a store', 'charlies-stores') . '</option>';
-        foreach ($stores as $store) {
-            echo '<option value="' . esc_attr($store->ID) . '"' . selected($current_store, $store->ID, false) . '>' . esc_html($store->post_title) . '</option>';
+
+        if (empty($stores)) {
+            echo '<option value="">' . __('No stores found - Please create a store first', 'charlies-stores') . '</option>';
+        } else {
+            echo '<option value="">' . __('Select a store', 'charlies-stores') . '</option>';
+            foreach ($stores as $store) {
+                echo '<option value="' . esc_attr($store->ID) . '"' . selected($current_store, $store->ID, false) . '>' . esc_html($store->post_title) . '</option>';
+            }
         }
         echo '</select>';
         echo '<span class="description">' . __('Select which store this product is available at.', 'charlies-stores') . '</span>';

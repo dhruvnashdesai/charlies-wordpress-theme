@@ -39,12 +39,40 @@ add_action('after_setup_theme', 'charlies_theme_setup');
  * Initialize Charlie's Store functionality
  */
 function charlie_stores_init() {
-    new Charlie_Store_Manager();
-    new Charlie_REST_API();
-    new Charlie_Admin();
-    new Charlie_WooCommerce_Integration();
+    error_log('Charlie Stores: Initializing store functionality');
+
+    try {
+        new Charlie_Store_Manager();
+        error_log('Charlie Stores: Store Manager initialized');
+
+        new Charlie_REST_API();
+        error_log('Charlie Stores: REST API initialized');
+
+        new Charlie_Admin();
+        error_log('Charlie Stores: Admin initialized');
+
+        new Charlie_WooCommerce_Integration();
+        error_log('Charlie Stores: WooCommerce integration initialized');
+
+    } catch (Exception $e) {
+        error_log('Charlie Stores: Initialization error: ' . $e->getMessage());
+    }
 }
 add_action('init', 'charlie_stores_init');
+
+/**
+ * Flush rewrite rules on theme activation
+ */
+function charlie_stores_activation() {
+    // Register post types first
+    charlie_stores_init();
+
+    // Flush rewrite rules
+    flush_rewrite_rules();
+
+    error_log('Charlie Stores: Rewrite rules flushed');
+}
+add_action('after_switch_theme', 'charlie_stores_activation');
 
 /**
  * Enqueue theme styles and scripts
