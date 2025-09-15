@@ -193,6 +193,14 @@ function charlie_enqueue_store_assets() {
     );
 
     wp_enqueue_script(
+        'charlie-product-menu',
+        get_template_directory_uri() . '/charlie-stores/js/productMenu.js',
+        array('charlie-config'),
+        '1.0.0',
+        true
+    );
+
+    wp_enqueue_script(
         'charlie-app',
         get_template_directory_uri() . '/charlie-stores/js/app.js',
         array(
@@ -201,7 +209,8 @@ function charlie_enqueue_store_assets() {
             'charlie-geocoding',
             'charlie-map',
             'charlie-stores',
-            'charlie-category-circles'
+            'charlie-category-circles',
+            'charlie-product-menu'
         ),
         '1.0.0',
         true

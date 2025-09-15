@@ -1,0 +1,375 @@
+/**
+ * GTA-Style Product Menu
+ * Handles product display when category circles are clicked
+ */
+
+class ProductMenu {
+    constructor() {
+        this.isVisible = false;
+        this.currentCategory = null;
+        this.currentStoreId = null;
+        this.products = [];
+        this.menuElement = null;
+
+        this.init();
+    }
+
+    /**
+     * Initialize the product menu system
+     */
+    init() {
+        this.createMenuElement();
+        this.setupEventListeners();
+        console.log('ProductMenu initialized');
+    }
+
+    /**
+     * Setup event listeners
+     */
+    setupEventListeners() {
+        // Listen for category selection
+        document.addEventListener('categorySelected', (e) => {
+            this.handleCategorySelected(e.detail);
+        });
+
+        // Close menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isVisible) {
+                this.hideMenu();
+            }
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (this.isVisible && this.menuElement && !this.menuElement.contains(e.target)) {
+                this.hideMenu();
+            }
+        });
+    }
+
+    /**
+     * Create the menu DOM element
+     */
+    createMenuElement() {
+        this.menuElement = document.createElement('div');
+        this.menuElement.className = 'gta-product-menu';
+        this.menuElement.style.cssText = `
+            position: fixed;
+            top: 50%;
+            right: -400px;
+            width: 380px;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(20, 20, 20, 0.95));
+            border: 2px solid #444;
+            border-radius: 8px;
+            box-shadow:
+                0 0 30px rgba(0, 255, 0, 0.3),
+                inset 0 0 20px rgba(0, 0, 0, 0.8);
+            z-index: 900;
+            transform: translateY(-50%);
+            transition: right 0.4s ease-in-out;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            overflow: hidden;
+        `;
+
+        // Add menu header
+        const header = document.createElement('div');
+        header.className = 'menu-header';
+        header.style.cssText = `
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+            background: linear-gradient(90deg, rgba(0, 255, 0, 0.2), rgba(0, 0, 0, 0.8));
+        `;
+
+        // Add menu content area
+        const content = document.createElement('div');
+        content.className = 'menu-content';
+        content.style.cssText = `
+            height: calc(100% - 60px);
+            overflow-y: auto;
+            padding: 0;
+        `;
+
+        // Custom scrollbar styling
+        content.innerHTML = `
+            <style>
+            .menu-content::-webkit-scrollbar {
+                width: 8px;
+            }
+            .menu-content::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.5);
+            }
+            .menu-content::-webkit-scrollbar-thumb {
+                background: #00ff00;
+                border-radius: 4px;
+            }
+            .menu-content::-webkit-scrollbar-thumb:hover {
+                background: #00cc00;
+            }
+            </style>
+        `;
+
+        this.menuElement.appendChild(header);
+        this.menuElement.appendChild(content);
+        document.body.appendChild(this.menuElement);
+    }
+
+    /**
+     * Handle category selection
+     */
+    async handleCategorySelected(detail) {
+        console.log('Category selected for product menu:', detail);
+
+        this.currentCategory = detail.category;
+        this.currentStoreId = detail.storeId;
+
+        try {
+            // Load products for this category
+            await this.loadProducts(detail.category.id, detail.storeId);
+
+            // Show the menu
+            this.showMenu();
+
+        } catch (error) {
+            console.error('Failed to load products:', error);
+            this.showErrorMenu();
+        }
+    }
+
+    /**
+     * Load products from API
+     */
+    async loadProducts(categoryId, storeId) {
+        // For now, generate fake products
+        // TODO: Replace with actual WooCommerce API call
+        this.products = this.generateFakeProducts(this.currentCategory);
+        console.log('Loaded products:', this.products);
+    }
+
+    /**
+     * Generate fake products for testing
+     */
+    generateFakeProducts(category) {
+        const products = [];
+        const productCount = Math.floor(Math.random() * 8) + 4; // 4-12 products
+
+        const productNames = [
+            'Premium Blend', 'Classic Mix', 'Special Reserve', 'Daily Choice',
+            'Elite Selection', 'Signature Series', 'House Special', 'Deluxe Option',
+            'Standard Grade', 'High Quality', 'Top Tier', 'Select Edition'
+        ];
+
+        for (let i = 0; i < productCount; i++) {
+            const name = productNames[Math.floor(Math.random() * productNames.length)];
+            const price = (Math.random() * 50 + 10).toFixed(2);
+            const inStock = Math.random() > 0.2; // 80% chance in stock
+
+            products.push({
+                id: `product_${category.id}_${i}`,
+                name: `${name} ${i + 1}`,
+                price: parseFloat(price),
+                currency: 'CAD',
+                stock: inStock ? Math.floor(Math.random() * 20) + 1 : 0,
+                category: category.name,
+                description: `Premium ${category.name.toLowerCase()} product with excellent quality.`,
+                image: null // We'll add images later
+            });
+        }
+
+        return products;
+    }
+
+    /**
+     * Show the product menu
+     */
+    showMenu() {
+        if (!this.menuElement) return;
+
+        this.updateMenuContent();
+        this.menuElement.style.right = '20px'; // Slide in from right
+        this.isVisible = true;
+
+        // Add GTA-style sound effect (optional)
+        this.playMenuSound();
+    }
+
+    /**
+     * Hide the product menu
+     */
+    hideMenu() {
+        if (!this.menuElement) return;
+
+        this.menuElement.style.right = '-400px'; // Slide out to right
+        this.isVisible = false;
+
+        setTimeout(() => {
+            // Clear selection highlighting after menu closes
+            document.dispatchEvent(new CustomEvent('menuClosed'));
+        }, 400);
+    }
+
+    /**
+     * Update menu content with products
+     */
+    updateMenuContent() {
+        const header = this.menuElement.querySelector('.menu-header');
+        const content = this.menuElement.querySelector('.menu-content');
+
+        if (!header || !content) return;
+
+        // Update header
+        header.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 18px; font-weight: bold; text-transform: uppercase;">
+                        ${this.currentCategory.name}
+                    </div>
+                    <div style="font-size: 12px; opacity: 0.7; margin-top: 2px;">
+                        ${this.products.length} Products Available
+                    </div>
+                </div>
+                <button class="close-btn" onclick="window.productMenu.hideMenu()" style="
+                    background: none;
+                    border: 1px solid #00ff00;
+                    color: #00ff00;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-family: 'Courier New', monospace;
+                    font-size: 18px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.2s ease;
+                " onmouseover="this.style.background='rgba(0,255,0,0.2)'" onmouseout="this.style.background='none'">×</button>
+            </div>
+        `;
+
+        // Update content with product list
+        let productHTML = '';
+
+        this.products.forEach((product, index) => {
+            const isInStock = product.stock > 0;
+            productHTML += `
+                <div class="product-item" style="
+                    padding: 15px 20px;
+                    border-bottom: 1px solid #333;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    transition: background 0.2s ease;
+                    cursor: ${isInStock ? 'pointer' : 'not-allowed'};
+                    opacity: ${isInStock ? '1' : '0.5'};
+                " onmouseover="if(${isInStock}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="this.style.background='transparent'" onclick="window.productMenu.handleProductClick('${product.id}')">
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">
+                            ${product.name}
+                        </div>
+                        <div style="font-size: 11px; opacity: 0.7; margin-bottom: 2px;">
+                            ${product.description}
+                        </div>
+                        <div style="font-size: 10px; opacity: 0.6;">
+                            ${isInStock ? `Stock: ${product.stock}` : 'Out of Stock'}
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 16px; font-weight: bold; color: #00ff00;">
+                            $${product.price.toFixed(2)}
+                        </div>
+                        <div style="font-size: 10px; opacity: 0.7; margin-top: 2px;">
+                            ${product.currency}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        if (this.products.length === 0) {
+            productHTML = `
+                <div style="padding: 40px 20px; text-align: center; opacity: 0.7;">
+                    <div style="font-size: 16px; margin-bottom: 8px;">No Products Available</div>
+                    <div style="font-size: 12px;">This category is currently empty.</div>
+                </div>
+            `;
+        }
+
+        content.innerHTML = productHTML;
+    }
+
+    /**
+     * Handle product click
+     */
+    handleProductClick(productId) {
+        const product = this.products.find(p => p.id === productId);
+        if (!product || product.stock === 0) return;
+
+        console.log('Product clicked:', product);
+
+        // TODO: Add to cart, show product details, etc.
+        // For now, just show an alert
+        alert(`Selected: ${product.name}\nPrice: $${product.price}\nStock: ${product.stock}`);
+    }
+
+    /**
+     * Show error menu
+     */
+    showErrorMenu() {
+        const content = this.menuElement.querySelector('.menu-content');
+        const header = this.menuElement.querySelector('.menu-header');
+
+        if (header) {
+            header.innerHTML = `
+                <div style="color: #ff4444;">
+                    <div style="font-size: 18px; font-weight: bold;">ERROR</div>
+                    <div style="font-size: 12px; opacity: 0.7;">Failed to load products</div>
+                </div>
+            `;
+        }
+
+        if (content) {
+            content.innerHTML = `
+                <div style="padding: 40px 20px; text-align: center; color: #ff4444;">
+                    <div style="font-size: 16px; margin-bottom: 8px;">Unable to Load Products</div>
+                    <div style="font-size: 12px; opacity: 0.7;">Please try again later.</div>
+                </div>
+            `;
+        }
+
+        this.showMenu();
+    }
+
+    /**
+     * Play GTA-style menu sound (optional)
+     */
+    playMenuSound() {
+        // TODO: Add menu sound effect
+        // For now, just log
+        console.log('🔊 Menu sound: *beep*');
+    }
+
+    /**
+     * Check if menu is currently visible
+     */
+    isMenuVisible() {
+        return this.isVisible;
+    }
+}
+
+// Initialize product menu
+let productMenu;
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        productMenu = new ProductMenu();
+
+        // Make available globally for debugging and button clicks
+        window.productMenu = productMenu;
+    }, 150);
+});
+
+// Export for use in other modules
+if (typeof window !== 'undefined') {
+    window.ProductMenu = ProductMenu;
+}
