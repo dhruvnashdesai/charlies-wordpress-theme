@@ -38,7 +38,7 @@ class CategoryCircles {
                 x: vignetteInfo.centerX,
                 y: vignetteInfo.centerY
             };
-            this.vignetteRadius = vignetteInfo.radius;
+            this.vignetteRadius = vignetteInfo.innerRadius; // Use innerRadius for positioning right at the edge
             console.log('CategoryCircles using actual vignette center:', this.centerPoint, 'radius:', this.vignetteRadius);
             return;
         }
@@ -173,8 +173,8 @@ class CategoryCircles {
         const numCategories = Math.min(this.categories.length, 6); // Max 6 categories
         const positions = [];
 
-        // Distance from vignette edge - much closer to the circumference
-        const distance = this.vignetteRadius + 20; // Reduced from 80 to 20
+        // Position circles exactly on the circumference where the vignette fade begins
+        const distance = this.vignetteRadius; // Right at the edge of the clear area
 
         // Define specific angles for better positioning
         let angles = [];

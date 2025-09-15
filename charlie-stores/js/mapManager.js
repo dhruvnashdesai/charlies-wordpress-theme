@@ -924,7 +924,8 @@ class MapManager {
         this.currentVignetteInfo = {
             centerX: centerX,
             centerY: centerY,
-            radius: innerRadius
+            innerRadius: innerRadius,  // Clear area - where circles should be positioned
+            outerRadius: outerRadius   // Full fade area
         };
     }
 
@@ -936,7 +937,8 @@ class MapManager {
         return this.currentVignetteInfo || {
             centerX: window.innerWidth / 2,
             centerY: window.innerHeight / 2,
-            radius: 200
+            innerRadius: 200,
+            outerRadius: 300
         };
     }
 
