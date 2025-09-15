@@ -212,31 +212,57 @@ class Charlie_Admin {
      * Check store setup and show admin notices
      */
     public function check_store_setup() {
-        // Only show on relevant admin pages
+        // Show debug info on dashboard
         $screen = get_current_screen();
-        if (!$screen || !in_array($screen->base, ['edit', 'post', 'settings_page_charlie-store-settings'])) {
+        if (!$screen) {
+            return;
+        }
+
+        // DEBUG NOTICE - Show post type registration status
+        $all_post_types = get_post_types(array(), 'names');
+        $charlie_store_registered = in_array('charlie_store', $all_post_types);
+
+        ?>
+        <div class="notice notice-info">
+            <h3>🔧 Charlie's Store Debug Info</h3>
+            <p>
+                <strong>Post type 'charlie_store' registered:</strong> <?php echo $charlie_store_registered ? '✅ YES' : '❌ NO'; ?><br>
+                <strong>Classes loaded:</strong>
+                <?php echo class_exists('Charlie_Store_Manager') ? '✅ Store Manager ' : '❌ Store Manager '; ?>
+                <?php echo class_exists('Charlie_Admin') ? '✅ Admin ' : '❌ Admin '; ?>
+                <?php echo class_exists('Charlie_WooCommerce_Integration') ? '✅ WooCommerce ' : '❌ WooCommerce '; ?><br>
+                <strong>All registered post types:</strong> <?php echo implode(', ', $all_post_types); ?><br>
+                <strong>Current screen:</strong> <?php echo $screen->base; ?>
+            </p>
+        </div>
+        <?php
+
+        // Only show setup notices on relevant pages
+        if (!in_array($screen->base, ['edit', 'post', 'settings_page_charlie-store-settings', 'dashboard'])) {
             return;
         }
 
         // Check if we have any stores
-        $stores = get_posts(array(
-            'post_type' => 'charlie_store',
-            'posts_per_page' => 1,
-            'post_status' => 'publish'
-        ));
+        if ($charlie_store_registered) {
+            $stores = get_posts(array(
+                'post_type' => 'charlie_store',
+                'posts_per_page' => 1,
+                'post_status' => 'publish'
+            ));
 
-        if (empty($stores)) {
-            ?>
-            <div class="notice notice-warning">
-                <p>
-                    <strong><?php _e('Charlie\'s Store Finder:', 'charlies-stores'); ?></strong>
-                    <?php _e('No stores found. Products cannot be linked to stores until you create at least one store.', 'charlies-stores'); ?>
-                    <a href="<?php echo admin_url('post-new.php?post_type=charlie_store'); ?>" class="button button-primary">
-                        <?php _e('Create Your First Store', 'charlies-stores'); ?>
-                    </a>
-                </p>
-            </div>
-            <?php
+            if (empty($stores)) {
+                ?>
+                <div class="notice notice-warning">
+                    <p>
+                        <strong><?php _e('Charlie\'s Store Finder:', 'charlies-stores'); ?></strong>
+                        <?php _e('No stores found. Products cannot be linked to stores until you create at least one store.', 'charlies-stores'); ?>
+                        <a href="<?php echo admin_url('post-new.php?post_type=charlie_store'); ?>" class="button button-primary">
+                            <?php _e('Create Your First Store', 'charlies-stores'); ?>
+                        </a>
+                    </p>
+                </div>
+                <?php
+            }
         }
 
         // Check warehouse configuration
