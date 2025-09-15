@@ -173,8 +173,8 @@ class CategoryCircles {
         const numCategories = Math.min(this.categories.length, 6); // Max 6 categories
         const positions = [];
 
-        // Position circles exactly on the circumference where the vignette fade begins
-        const distance = this.vignetteRadius; // Right at the edge of the clear area
+        // Position circles outside the vignette in the dark area
+        const distance = this.vignetteRadius * 2; // Double the distance to push into dark area
 
         console.log('Category positioning debug:', {
             vignetteCenter: this.centerPoint,
