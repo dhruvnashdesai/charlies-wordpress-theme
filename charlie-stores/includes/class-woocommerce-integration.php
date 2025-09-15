@@ -14,6 +14,8 @@ class Charlie_WooCommerce_Integration {
         add_action('init', array($this, 'init'));
         add_action('wp_ajax_get_store_products', array($this, 'get_store_products'));
         add_action('wp_ajax_nopriv_get_store_products', array($this, 'get_store_products'));
+        add_action('wp_ajax_get_store_categories', array($this, 'get_store_categories'));
+        add_action('wp_ajax_nopriv_get_store_categories', array($this, 'get_store_categories'));
 
         // Add store location field to products
         add_action('woocommerce_product_options_general_product_data', array($this, 'add_store_location_field'));
@@ -21,6 +23,12 @@ class Charlie_WooCommerce_Integration {
 
         // Filter shop page by store location
         add_action('pre_get_posts', array($this, 'filter_shop_by_store'));
+
+        // Add category color field
+        add_action('product_cat_add_form_fields', array($this, 'add_category_color_field'));
+        add_action('product_cat_edit_form_fields', array($this, 'edit_category_color_field'));
+        add_action('edited_product_cat', array($this, 'save_category_color_field'));
+        add_action('create_product_cat', array($this, 'save_category_color_field'));
     }
 
     /**
@@ -191,6 +199,119 @@ class Charlie_WooCommerce_Integration {
     }
 
     /**
+     * Get categories for a specific store via AJAX
+     */
+    public function get_store_categories() {
+        check_ajax_referer('charlie_nonce', 'nonce');
+
+        $store_id = absint($_POST['store_id']);
+        if (!$store_id) {
+            wp_send_json_error('Invalid store ID');
+        }
+
+        // Get all categories that have products at this store
+        $categories = $this->get_categories_by_store($store_id);
+
+        wp_send_json_success(array(
+            'categories' => $categories,
+            'store_id' => $store_id
+        ));
+    }
+
+    /**
+     * Get product categories available at a specific store
+     */
+    public function get_categories_by_store($store_id) {
+        // First get all products at this store
+        $products = get_posts(array(
+            'post_type' => 'product',
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_charlie_store_location',
+                    'value' => $store_id,
+                    'compare' => '='
+                )
+            ),
+            'fields' => 'ids'
+        ));
+
+        if (empty($products)) {
+            return array();
+        }
+
+        // Get unique categories from these products
+        $category_ids = array();
+        foreach ($products as $product_id) {
+            $product_categories = wp_get_post_terms($product_id, 'product_cat', array('fields' => 'ids'));
+            $category_ids = array_merge($category_ids, $product_categories);
+        }
+
+        $category_ids = array_unique($category_ids);
+
+        // Get category details
+        $categories = array();
+        foreach ($category_ids as $cat_id) {
+            $category = get_term($cat_id, 'product_cat');
+            if (!is_wp_error($category)) {
+                $product_count = $this->count_products_in_category_at_store($cat_id, $store_id);
+
+                $categories[] = array(
+                    'id' => $category->term_id,
+                    'name' => $category->name,
+                    'slug' => $category->slug,
+                    'description' => $category->description,
+                    'product_count' => $product_count,
+                    'image' => $this->get_category_image($cat_id),
+                    'color' => get_term_meta($cat_id, '_charlie_category_color', true) ?: '#00ff00'
+                );
+            }
+        }
+
+        return $categories;
+    }
+
+    /**
+     * Count products in category at specific store
+     */
+    private function count_products_in_category_at_store($category_id, $store_id) {
+        $products = get_posts(array(
+            'post_type' => 'product',
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'product_cat',
+                    'field' => 'term_id',
+                    'terms' => $category_id
+                )
+            ),
+            'meta_query' => array(
+                array(
+                    'key' => '_charlie_store_location',
+                    'value' => $store_id,
+                    'compare' => '='
+                )
+            ),
+            'fields' => 'ids'
+        ));
+
+        return count($products);
+    }
+
+    /**
+     * Get category image URL
+     */
+    private function get_category_image($category_id) {
+        $thumbnail_id = get_term_meta($category_id, 'thumbnail_id', true);
+        if ($thumbnail_id) {
+            return wp_get_attachment_image_url($thumbnail_id, 'medium');
+        }
+        return '';
+    }
+
+    /**
      * Check if WooCommerce is active
      */
     public static function is_woocommerce_active() {
@@ -209,5 +330,49 @@ class Charlie_WooCommerce_Integration {
      */
     public function get_checkout_url() {
         return wc_get_checkout_url();
+    }
+
+    /**
+     * Add category color field to category creation form
+     */
+    public function add_category_color_field() {
+        ?>
+        <div class="form-field">
+            <label for="charlie_category_color"><?php _e('Category Color', 'charlies-stores'); ?></label>
+            <input type="color" name="charlie_category_color" id="charlie_category_color" value="#00ff00" />
+            <p class="description"><?php _e('Choose a color for this category in the map interface.', 'charlies-stores'); ?></p>
+        </div>
+        <?php
+    }
+
+    /**
+     * Add category color field to category edit form
+     */
+    public function edit_category_color_field($term) {
+        $color = get_term_meta($term->term_id, '_charlie_category_color', true);
+        if (empty($color)) {
+            $color = '#00ff00';
+        }
+        ?>
+        <tr class="form-field">
+            <th scope="row" valign="top">
+                <label for="charlie_category_color"><?php _e('Category Color', 'charlies-stores'); ?></label>
+            </th>
+            <td>
+                <input type="color" name="charlie_category_color" id="charlie_category_color" value="<?php echo esc_attr($color); ?>" />
+                <p class="description"><?php _e('Choose a color for this category in the map interface.', 'charlies-stores'); ?></p>
+            </td>
+        </tr>
+        <?php
+    }
+
+    /**
+     * Save category color field
+     */
+    public function save_category_color_field($term_id) {
+        if (isset($_POST['charlie_category_color'])) {
+            $color = sanitize_hex_color($_POST['charlie_category_color']);
+            update_term_meta($term_id, '_charlie_category_color', $color);
+        }
     }
 }

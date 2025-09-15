@@ -132,6 +132,9 @@ class CharlieStoreApp {
     async initMap() {
         this.mapManager = new MapManager();
         await this.mapManager.init();
+
+        // Initialize category circles system
+        this.categoryCircles = new CategoryCircles();
     }
 
 

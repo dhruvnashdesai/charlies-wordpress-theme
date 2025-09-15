@@ -157,6 +157,14 @@ function charlie_enqueue_store_assets() {
     );
 
     wp_enqueue_script(
+        'charlie-category-circles',
+        get_template_directory_uri() . '/charlie-stores/js/categoryCircles.js',
+        array('charlie-config'),
+        '1.0.0',
+        true
+    );
+
+    wp_enqueue_script(
         'charlie-app',
         get_template_directory_uri() . '/charlie-stores/js/app.js',
         array(
@@ -164,7 +172,8 @@ function charlie_enqueue_store_assets() {
             'charlie-age-verification',
             'charlie-geocoding',
             'charlie-map',
-            'charlie-stores'
+            'charlie-stores',
+            'charlie-category-circles'
         ),
         '1.0.0',
         true
@@ -198,6 +207,7 @@ function charlie_enqueue_store_assets() {
             'NEARBY' => rest_url('charlie-stores/v1/stores/nearby'),
             'GEOCODE' => rest_url('charlie-stores/v1/geocode'),
             'STORE_PRODUCTS' => admin_url('admin-ajax.php?action=get_store_products'),
+            'STORE_CATEGORIES' => admin_url('admin-ajax.php?action=get_store_categories'),
         ),
         'STORAGE_KEYS' => array(
             'AGE_VERIFIED' => 'charlie_age_verified',

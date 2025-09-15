@@ -875,6 +875,11 @@ class MapManager {
         markerElement.addEventListener('click', (e) => {
             e.stopPropagation();
             this.showWarehouseScreenPopup(warehouse, warehouse.screenPosition);
+
+            // Dispatch event for category circles
+            document.dispatchEvent(new CustomEvent('warehouseClicked', {
+                detail: warehouse
+            }));
         });
 
         // Store marker reference
