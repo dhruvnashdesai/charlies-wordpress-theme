@@ -439,9 +439,9 @@ class CategoryCircles {
         const positions = [];
 
         // Position circles vertically along the left side
-        const leftX = 100; // Fixed distance from left edge
-        const startY = window.innerHeight * 0.3; // Start at 30% from top
-        const spacing = 100; // Vertical spacing between circles
+        const leftX = 80; // Very close to left edge
+        const startY = window.innerHeight * 0.25; // Start at 25% from top
+        const spacing = 110; // Vertical spacing between circles
 
         for (let i = 0; i < numCategories; i++) {
             positions.push({
@@ -481,12 +481,13 @@ const categoryCircleCSS = `
     position: fixed !important;
     bottom: 20px !important;
     left: 20px !important;
-    width: 300px !important;
-    height: 250px !important;
+    width: 200px !important;
+    height: 200px !important;
     z-index: 500 !important;
     border: 2px solid #00ff00;
-    border-radius: 8px;
+    border-radius: 50% !important;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+    overflow: hidden;
 }
 
 .compact-mode #gtaCrosshair {
@@ -508,6 +509,20 @@ const categoryCircleCSS = `
 /* Ensure category circles stay visible in compact mode */
 .compact-mode .category-circle {
     z-index: 1000 !important;
+}
+
+/* Keep background black in compact mode */
+.compact-mode {
+    background-color: #000000 !important;
+}
+
+.compact-mode body {
+    background-color: #000000 !important;
+}
+
+/* Keep app background black */
+.compact-mode #app {
+    background-color: #000000 !important;
 }
 `;
 

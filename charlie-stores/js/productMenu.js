@@ -479,7 +479,16 @@ class ProductMenu {
         this.menuElement.style.display = 'block';
         this.menuElement.style.visibility = 'visible';
 
+        // Ensure menu content is visible
+        const panelContainer = this.menuElement.querySelector('.panel-container');
+        if (panelContainer) {
+            panelContainer.style.display = 'flex';
+            panelContainer.style.height = 'calc(100% - 60px)';
+        }
+
         console.log('ProductMenu: Menu positioned with right: 20px');
+        console.log('ProductMenu: Brands loaded:', this.brands.length);
+        console.log('ProductMenu: Products loaded:', this.allProducts.length);
     }
 
     /**
