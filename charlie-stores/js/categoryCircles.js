@@ -183,21 +183,22 @@ class CategoryCircles {
             numCategories: numCategories
         });
 
-        // Define specific angles for better positioning around the full circumference
+        // Position circles only along the right edge of the vignette
+        // Angles from -90° (top-right) to +90° (bottom-right), with 0° being due right
         let angles = [];
 
         if (numCategories === 1) {
-            angles = [0]; // Right side
+            angles = [0]; // Due right
         } else if (numCategories === 2) {
-            angles = [-45, 45]; // Upper-right and lower-right
+            angles = [-30, 30]; // Upper-right and lower-right
         } else if (numCategories === 3) {
-            angles = [-60, 0, 60]; // Spread evenly
+            angles = [-45, 0, 45]; // Top-right, right, bottom-right
         } else if (numCategories === 4) {
-            angles = [-90, -30, 30, 90]; // Top, upper-right, lower-right, bottom
+            angles = [-60, -20, 20, 60]; // Spread along right edge
         } else if (numCategories === 5) {
-            angles = [-90, -45, 0, 45, 90]; // Evenly distributed from top to bottom
+            angles = [-70, -35, 0, 35, 70]; // Five positions along right edge
         } else {
-            angles = [-90, -54, -18, 18, 54, 90]; // Six positions evenly distributed
+            angles = [-75, -45, -15, 15, 45, 75]; // Six positions along right edge
         }
 
         for (let i = 0; i < numCategories; i++) {
