@@ -87,11 +87,11 @@
 
 /* 10km Radius Vignette Overlay */
 .radius-vignette {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: fixed;
+    top: -100vh;
+    left: -100vw;
+    width: 300vw;
+    height: 300vh;
     pointer-events: none;
     z-index: 500;
     opacity: 0;
