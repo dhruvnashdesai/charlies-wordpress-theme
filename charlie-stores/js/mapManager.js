@@ -895,13 +895,12 @@ class MapManager {
         const innerRadius = Math.max(tenKmInPixels * 0.7, 150); // Inner clear area
         const outerRadius = Math.max(tenKmInPixels * 1.2, 300);  // Outer fade area
 
-        // Ensure vignette stays within viewport bounds to prevent clipping
-        const maxRadius = outerRadius + 100;
-        const centerX = Math.max(maxRadius, Math.min(window.innerWidth - maxRadius, markerCenterX));
-        const centerY = Math.max(maxRadius, Math.min(window.innerHeight - maxRadius, markerCenterY));
+        // Convert marker position to percentages for better viewport handling
+        const centerXPercent = (markerCenterX / window.innerWidth) * 100;
+        const centerYPercent = (markerCenterY / window.innerHeight) * 100;
 
         this.radiusVignette.style.background = `radial-gradient(
-            circle at ${centerX}px ${centerY}px,
+            circle at ${centerXPercent}% ${centerYPercent}%,
             transparent 0px,
             transparent ${innerRadius}px,
             rgba(0, 0, 0, 0.1) ${innerRadius + 50}px,
@@ -919,7 +918,7 @@ class MapManager {
             this.crosshair.style.zIndex = '600';
         }
 
-        console.log('Vignette centered at:', { centerX, centerY }, 'Crosshair at marker:', { markerCenterX, markerCenterY });
+        console.log('Vignette centered at:', { centerXPercent, centerYPercent }, 'Crosshair at marker:', { markerCenterX, markerCenterY });
     }
 
 
