@@ -1593,9 +1593,9 @@ class MapManager {
         }
 
         // Calculate how much to pan the map to match vignette circle movement
-        // Vignette moves from 50% to 35% = 15% of screen width
-        const screenWidth = this.mapContainer.getBoundingClientRect().width;
-        const panDistance = screenWidth * 0.15; // 15% of screen width
+        // Vignette circle moves left by 15vw
+        const screenWidth = window.innerWidth;
+        const panDistance = screenWidth * 0.15; // 15% of viewport width
         const currentCenter = this.map.getCenter();
 
         // Convert screen pixel offset to geographic coordinates

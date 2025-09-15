@@ -422,25 +422,29 @@
 }
 
 /* Product Mode - Sliding Animation */
-/* Keep vignette container full-screen, only move the circle center */
+/* Create separate background overlay and sliding circle */
 
+/* Add a full-screen black background that stays in place */
+.radius-vignette::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 1);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* In product mode, slide the circle mask left */
 .radius-vignette.product-mode::before {
-    background: radial-gradient(
-        circle at 35% 50%, /* Move circle center left from 50% to 35% */
-        transparent 0px,
-        transparent 200px,
-        rgba(0, 0, 0, 0.1) 250px,
-        rgba(0, 0, 0, 0.3) 300px,
-        rgba(0, 0, 0, 0.6) 350px,
-        rgba(0, 0, 0, 0.8) 400px,
-        rgba(0, 0, 0, 0.95) 450px,
-        rgba(0, 0, 0, 1) 500px
-    );
-    transition: background 0.6s ease-in-out;
+    transform: translateX(-15vw); /* Move circle left by 15% of viewport width */
+    transition: transform 0.6s ease-in-out;
 }
 
 .gta-crosshair.product-mode {
-    transform: translateX(-200px);
+    transform: translateX(-15vw);
     transition: transform 0.6s ease-in-out;
 }
 
