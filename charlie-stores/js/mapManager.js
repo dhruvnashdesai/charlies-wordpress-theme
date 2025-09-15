@@ -912,7 +912,16 @@ class MapManager {
         const centerY = markerRect.bottom; // Use bottom since anchor is 'bottom'
 
         // Debug logging
-        console.log('Marker rect:', markerRect);
+        console.log('Marker rect:', {
+            x: markerRect.x,
+            y: markerRect.y,
+            width: markerRect.width,
+            height: markerRect.height,
+            top: markerRect.top,
+            bottom: markerRect.bottom,
+            left: markerRect.left,
+            right: markerRect.right
+        });
         console.log('Calculated center:', { centerX, centerY });
 
         // Position crosshair container so its center dot aligns with marker center
@@ -943,6 +952,13 @@ class MapManager {
 
         // Visual debug: Add a small red dot at the calculated marker center
         this.addDebugDot(centerX, centerY);
+
+        // Also add a blue dot using Mapbox's projection system for comparison
+        const markerLngLat = this.userLocationMarker.getLngLat();
+        const projectedPoint = this.map.project(markerLngLat);
+        console.log('Marker geographic coordinates:', markerLngLat);
+        console.log('Mapbox projected screen position:', { x: projectedPoint.x, y: projectedPoint.y });
+        this.addDebugDot(projectedPoint.x, projectedPoint.y, 'blue');
     }
 
     /**
@@ -999,28 +1015,28 @@ class MapManager {
     /**
      * Add a debug dot at specific coordinates (for alignment testing)
      */
-    addDebugDot(x, y) {
-        // Remove existing debug dot
-        const existing = document.querySelector('.debug-dot');
+    addDebugDot(x, y, color = 'red') {
+        // Remove existing debug dot of this color
+        const existing = document.querySelector(`.debug-dot-${color}`);
         if (existing) existing.remove();
 
         // Create new debug dot
         const dot = document.createElement('div');
-        dot.className = 'debug-dot';
+        dot.className = `debug-dot debug-dot-${color}`;
         dot.style.cssText = `
             position: fixed;
             left: ${x - 5}px;
             top: ${y - 5}px;
             width: 10px;
             height: 10px;
-            background-color: red;
+            background-color: ${color};
             border: 2px solid white;
             border-radius: 50%;
             z-index: 9999;
             pointer-events: none;
         `;
         document.body.appendChild(dot);
-        console.log('Debug dot added at:', { x, y });
+        console.log(`${color} debug dot added at:`, { x, y });
     }
 
     /**
