@@ -76,9 +76,13 @@ class CategoryCircles {
 
         // Window resize
         window.addEventListener('resize', () => {
-            this.calculateVignetteGeometry();
-            if (this.isVisible) {
-                this.repositionCategories();
+            // Don't recalculate geometry in compact mode
+            const isCompactMode = document.body.classList.contains('compact-mode');
+            if (!isCompactMode) {
+                this.calculateVignetteGeometry();
+                if (this.isVisible) {
+                    this.repositionCategories();
+                }
             }
         });
 
@@ -302,7 +306,8 @@ class CategoryCircles {
         document.dispatchEvent(new CustomEvent('categorySelected', {
             detail: {
                 category: category,
-                storeId: this.currentStoreId
+                storeId: this.currentStoreId,
+                isCompactModeUpdate: isAlreadyCompact // Let other systems know this is just a content update
             }
         }));
 
@@ -356,6 +361,13 @@ class CategoryCircles {
     repositionCategories() {
         if (!this.isVisible) return;
 
+        // Don't reposition if we're in compact mode - categories should stay in place
+        const isCompactMode = document.body.classList.contains('compact-mode');
+        if (isCompactMode) {
+            console.log('CategoryCircles: Skipping repositioning - in compact mode');
+            return;
+        }
+
         const positions = this.calculateCategoryPositions();
         let index = 0;
 
@@ -380,6 +392,12 @@ class CategoryCircles {
      * Enter compact mode - shrink map to bottom left and move categories to left side
      */
     enterCompactMode() {
+        // Check if already in compact mode
+        if (document.body.classList.contains('compact-mode')) {
+            console.log('CategoryCircles: Already in compact mode, skipping enter');
+            return;
+        }
+
         console.log('CategoryCircles: Entering compact mode');
 
         // Add compact mode class to body for global styling

@@ -1748,7 +1748,10 @@ class MapManager {
      * Enter compact mode - shrink map to bottom left corner
      */
     enterCompactMode() {
-        if (this.isCompactMode) return;
+        if (this.isCompactMode) {
+            console.log('MapManager: Already in compact mode, skipping enter');
+            return;
+        }
 
         console.log('MapManager: Entering compact mode');
         this.isCompactMode = true;
