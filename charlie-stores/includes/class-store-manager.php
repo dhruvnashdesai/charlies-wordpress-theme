@@ -6,8 +6,11 @@
 class Charlie_Store_Manager {
 
     public function __construct() {
-        add_action('init', array($this, 'register_post_type'));
-        add_action('init', array($this, 'register_taxonomies'));
+        // Since this class is instantiated on 'init', register immediately
+        $this->register_post_type();
+        $this->register_taxonomies();
+
+        // These hooks are for later actions
         add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
         add_action('save_post', array($this, 'save_store_meta'));
     }
