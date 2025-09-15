@@ -533,25 +533,46 @@ class ProductMenu {
         // Add event listener to close button
         const closeBtn = header.querySelector('.close-btn');
         if (closeBtn) {
+            console.log('ProductMenu: Close button found, adding event listeners...');
+
             // Remove any existing event listeners
             closeBtn.onclick = null;
 
-            // Add proper event listener
+            // Add multiple event types to test
             closeBtn.addEventListener('click', (e) => {
+                console.log('ProductMenu: CLICK EVENT FIRED!');
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('ProductMenu: Close button clicked');
                 this.hideMenu();
+            });
+
+            closeBtn.addEventListener('mousedown', (e) => {
+                console.log('ProductMenu: MOUSEDOWN EVENT FIRED!');
+            });
+
+            closeBtn.addEventListener('mouseup', (e) => {
+                console.log('ProductMenu: MOUSEUP EVENT FIRED!');
             });
 
             // Add hover effects
             closeBtn.addEventListener('mouseenter', () => {
+                console.log('ProductMenu: Mouse entered close button');
                 closeBtn.style.background = 'rgba(0,255,0,0.2)';
             });
 
             closeBtn.addEventListener('mouseleave', () => {
+                console.log('ProductMenu: Mouse left close button');
                 closeBtn.style.background = 'none';
             });
+
+            // Test if button is actually clickable
+            closeBtn.style.pointerEvents = 'all';
+            closeBtn.style.position = 'relative';
+            closeBtn.style.zIndex = '10000';
+
+            console.log('ProductMenu: Close button setup complete');
+        } else {
+            console.error('ProductMenu: Close button not found in header!');
         }
     }
 
