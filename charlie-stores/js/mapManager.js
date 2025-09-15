@@ -882,8 +882,8 @@ class MapManager {
         const screenPoint = this.map.project(markerCoords);
 
         // Position vignette center on marker (with anchor offset)
-        const centerX = screenPoint.x;
-        const centerY = screenPoint.y - 20; // Offset for marker anchor
+        const markerCenterX = screenPoint.x;
+        const markerCenterY = screenPoint.y - 20; // Offset for marker anchor
 
         // Calculate 10km in pixels at current zoom level
         const earthCircumference = 40075017; // Earth's circumference in meters
@@ -894,6 +894,11 @@ class MapManager {
         // Create dynamic gradient based on calculated radius
         const innerRadius = Math.max(tenKmInPixels * 0.7, 150); // Inner clear area
         const outerRadius = Math.max(tenKmInPixels * 1.2, 300);  // Outer fade area
+
+        // Ensure vignette stays within viewport bounds to prevent clipping
+        const maxRadius = outerRadius + 100;
+        const centerX = Math.max(maxRadius, Math.min(window.innerWidth - maxRadius, markerCenterX));
+        const centerY = Math.max(maxRadius, Math.min(window.innerHeight - maxRadius, markerCenterY));
 
         this.radiusVignette.style.background = `radial-gradient(
             circle at ${centerX}px ${centerY}px,
@@ -906,15 +911,15 @@ class MapManager {
             rgba(0, 0, 0, 1) ${outerRadius + 100}px
         )`;
 
-        // Position crosshair at the same center point
+        // Position crosshair at the marker position (not clamped vignette position)
         if (this.crosshair) {
             this.crosshair.style.position = 'fixed';
-            this.crosshair.style.left = `${centerX - 250}px`; // Center the 500px crosshair
-            this.crosshair.style.top = `${centerY - 250}px`;
+            this.crosshair.style.left = `${markerCenterX - 250}px`; // Center the 500px crosshair on marker
+            this.crosshair.style.top = `${markerCenterY - 250}px`;
             this.crosshair.style.zIndex = '600';
         }
 
-        console.log('Vignette and crosshair updated to marker position:', { centerX, centerY });
+        console.log('Vignette centered at:', { centerX, centerY }, 'Crosshair at marker:', { markerCenterX, markerCenterY });
     }
 
 
