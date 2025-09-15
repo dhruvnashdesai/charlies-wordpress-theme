@@ -279,12 +279,16 @@ class Charlie_WooCommerce_Integration {
         check_ajax_referer('charlie_nonce', 'nonce');
 
         $store_id = absint($_POST['store_id']);
+        error_log("Charlie Debug: get_store_categories called with store_id: $store_id");
+
         if (!$store_id) {
+            error_log("Charlie Debug: Invalid store ID provided");
             wp_send_json_error('Invalid store ID');
         }
 
         // Get all categories that have products at this store
         $categories = $this->get_categories_by_store($store_id);
+        error_log("Charlie Debug: Found " . count($categories) . " categories for store $store_id");
 
         wp_send_json_success(array(
             'categories' => $categories,
@@ -296,6 +300,8 @@ class Charlie_WooCommerce_Integration {
      * Get product categories available at a specific store
      */
     public function get_categories_by_store($store_id) {
+        error_log("Charlie Debug: Getting categories for store ID: $store_id");
+
         // First get all products at this store
         $products = get_posts(array(
             'post_type' => 'product',
@@ -311,7 +317,11 @@ class Charlie_WooCommerce_Integration {
             'fields' => 'ids'
         ));
 
+        error_log("Charlie Debug: Found " . count($products) . " products linked to store $store_id");
+        error_log("Charlie Debug: Product IDs: " . implode(', ', $products));
+
         if (empty($products)) {
+            error_log("Charlie Debug: No products found for store $store_id, returning empty categories");
             return array();
         }
 

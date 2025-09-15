@@ -222,6 +222,11 @@ class Charlie_Admin {
         $all_post_types = get_post_types(array(), 'names');
         $charlie_store_registered = in_array('charlie_store', $all_post_types);
 
+        <?php
+        // Get additional debug info
+        $warehouse_id = get_option('charlie_warehouse_store_id', 1);
+        $warehouse_post = get_post($warehouse_id);
+        $stores = get_posts(array('post_type' => 'charlie_store', 'posts_per_page' => -1, 'post_status' => 'publish'));
         ?>
         <div class="notice notice-info">
             <h3>🔧 Charlie's Store Debug Info</h3>
@@ -231,7 +236,12 @@ class Charlie_Admin {
                 <?php echo class_exists('Charlie_Store_Manager') ? '✅ Store Manager ' : '❌ Store Manager '; ?>
                 <?php echo class_exists('Charlie_Admin') ? '✅ Admin ' : '❌ Admin '; ?>
                 <?php echo class_exists('Charlie_WooCommerce_Integration') ? '✅ WooCommerce ' : '❌ WooCommerce '; ?><br>
-                <strong>All registered post types:</strong> <?php echo implode(', ', $all_post_types); ?><br>
+                <strong>Warehouse Store ID:</strong> <?php echo $warehouse_id; ?>
+                (<?php echo $warehouse_post ? '✅ ' . $warehouse_post->post_title : '❌ Store not found'; ?>)<br>
+                <strong>Total Stores:</strong> <?php echo count($stores); ?>
+                <?php if (!empty($stores)): ?>
+                    (<?php foreach($stores as $store) echo $store->ID . ':' . $store->post_title . ' '; ?>)
+                <?php endif; ?><br>
                 <strong>Current screen:</strong> <?php echo $screen->base; ?>
             </p>
         </div>
