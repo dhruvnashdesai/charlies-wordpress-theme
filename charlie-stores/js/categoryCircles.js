@@ -300,6 +300,7 @@ class CategoryCircles {
         } else {
             // Already in compact mode, just update the menu content
             console.log('CategoryCircles: Already in compact mode, just updating menu');
+            console.log('CategoryCircles: Body has compact-mode class:', document.body.classList.contains('compact-mode'));
         }
 
         // Always dispatch event for product menu to handle (menu will update content)
@@ -528,7 +529,6 @@ const categoryCircleCSS = `
 
 /* Compact Mode Styles */
 .compact-mode #map {
-    transition: all 0.6s ease-in-out;
     position: fixed !important;
     top: auto !important;
     bottom: 20px !important;
@@ -541,6 +541,7 @@ const categoryCircleCSS = `
     border-radius: 50% !important;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
     overflow: hidden;
+    transition: all 0.6s ease-in-out;
 }
 
 .compact-mode #gtaCrosshair {
@@ -569,17 +570,23 @@ const categoryCircleCSS = `
 }
 
 /* Keep background black in compact mode */
-.compact-mode {
+.compact-mode,
+.compact-mode body,
+.compact-mode html {
+    background: #000000 !important;
     background-color: #000000 !important;
 }
 
-.compact-mode body {
-    background-color: #000000 !important;
-}
-
-/* Keep app background black */
+/* Keep app background black and ensure it covers the screen */
 .compact-mode #app {
+    background: #000000 !important;
     background-color: #000000 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 100 !important;
 }
 `;
 
