@@ -1681,8 +1681,14 @@ class MapManager {
             essential: true
         });
 
-        // Update vignette and crosshair positions after map movement
+        // Update vignette continuously during animation for smooth tracking
+        const animationInterval = setInterval(() => {
+            this.updateRadiusVignette();
+        }, 16); // ~60fps updates
+
+        // Clear interval and do final update after animation completes
         setTimeout(() => {
+            clearInterval(animationInterval);
             this.updateRadiusVignette();
         }, 650); // After pan completes
 
