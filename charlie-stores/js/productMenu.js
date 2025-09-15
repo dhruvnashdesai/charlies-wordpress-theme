@@ -18,17 +18,22 @@ class ProductMenu {
      * Initialize the product menu system
      */
     init() {
+        console.log('ProductMenu: Initializing...');
         this.createMenuElement();
+        console.log('ProductMenu: Menu element created:', !!this.menuElement);
         this.setupEventListeners();
-        console.log('ProductMenu initialized');
+        console.log('ProductMenu: Event listeners setup complete');
+        console.log('ProductMenu: Initialization complete');
     }
 
     /**
      * Setup event listeners
      */
     setupEventListeners() {
+        console.log('ProductMenu: Setting up categorySelected event listener...');
         // Listen for category selection
         document.addEventListener('categorySelected', (e) => {
+            console.log('ProductMenu: categorySelected event received!', e.detail);
             this.handleCategorySelected(e.detail);
         });
 
@@ -119,20 +124,22 @@ class ProductMenu {
      * Handle category selection
      */
     async handleCategorySelected(detail) {
-        console.log('Category selected for product menu:', detail);
+        console.log('ProductMenu: Category selected for product menu:', detail);
 
         this.currentCategory = detail.category;
         this.currentStoreId = detail.storeId;
 
         try {
+            console.log('ProductMenu: Loading products for category:', detail.category.id);
             // Load products for this category
             await this.loadProducts(detail.category.id, detail.storeId);
 
+            console.log('ProductMenu: Products loaded, calling showMenu()');
             // Show the menu
             this.showMenu();
 
         } catch (error) {
-            console.error('Failed to load products:', error);
+            console.error('ProductMenu: Failed to load products:', error);
             this.showErrorMenu();
         }
     }
@@ -184,11 +191,23 @@ class ProductMenu {
      * Show the product menu
      */
     showMenu() {
-        if (!this.menuElement) return;
+        console.log('ProductMenu: showMenu() called');
+        console.log('ProductMenu: menuElement exists:', !!this.menuElement);
 
+        if (!this.menuElement) {
+            console.error('ProductMenu: menuElement is null, cannot show menu');
+            return;
+        }
+
+        console.log('ProductMenu: Updating menu content...');
         this.updateMenuContent();
+
+        console.log('ProductMenu: Setting menu position to visible...');
         this.menuElement.style.right = '20px'; // Slide in from right
+        this.menuElement.style.display = 'block'; // Ensure it's visible
         this.isVisible = true;
+
+        console.log('ProductMenu: Menu should now be visible at right: 20px');
 
         // Add GTA-style sound effect (optional)
         this.playMenuSound();
@@ -361,11 +380,14 @@ class ProductMenu {
 let productMenu;
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('ProductMenu: DOM loaded, initializing in 150ms...');
     setTimeout(() => {
+        console.log('ProductMenu: Creating ProductMenu instance...');
         productMenu = new ProductMenu();
 
         // Make available globally for debugging and button clicks
         window.productMenu = productMenu;
+        console.log('ProductMenu: Instance created and available as window.productMenu');
     }, 150);
 });
 
