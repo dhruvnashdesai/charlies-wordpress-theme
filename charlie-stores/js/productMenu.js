@@ -487,12 +487,17 @@ class ProductMenu {
             return;
         }
 
-        console.log('ProductMenu: Setting right position to -800px');
-        this.menuElement.style.right = '-800px'; // Slide out to right (matches initial position)
+        console.log('ProductMenu: Current position before hide:', this.menuElement.style.right);
+        console.log('ProductMenu: Current computed position before hide:', window.getComputedStyle(this.menuElement).right);
+
+        // Reset to hidden position with animation
+        this.menuElement.style.right = '-800px';
         this.isVisible = false;
 
+        console.log('ProductMenu: Position set to -800px for hiding animation');
+
+        // Wait for animation to complete, then dispatch close event
         setTimeout(() => {
-            // Clear selection highlighting after menu closes
             document.dispatchEvent(new CustomEvent('menuClosed'));
             console.log('ProductMenu: Menu hidden and menuClosed event dispatched');
         }, 400);
@@ -521,16 +526,31 @@ class ProductMenu {
                     font-family: 'Courier New', monospace; font-size: 18px;
                     display: flex; align-items: center; justify-content: center;
                     transition: all 0.2s ease;
-                " onmouseover="this.style.background='rgba(0,255,0,0.2)'" onmouseout="this.style.background='none'">×</button>
+                ">×</button>
             </div>
         `;
 
         // Add event listener to close button
         const closeBtn = header.querySelector('.close-btn');
         if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
+            // Remove any existing event listeners
+            closeBtn.onclick = null;
+
+            // Add proper event listener
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 console.log('ProductMenu: Close button clicked');
                 this.hideMenu();
+            });
+
+            // Add hover effects
+            closeBtn.addEventListener('mouseenter', () => {
+                closeBtn.style.background = 'rgba(0,255,0,0.2)';
+            });
+
+            closeBtn.addEventListener('mouseleave', () => {
+                closeBtn.style.background = 'none';
             });
         }
     }
