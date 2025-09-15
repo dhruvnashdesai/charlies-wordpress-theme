@@ -906,15 +906,16 @@ class MapManager {
         const markerElement = this.userLocationMarker.getElement();
         const markerRect = markerElement.getBoundingClientRect();
 
-        // Calculate center point of marker
+        // Since marker is anchored at bottom, the geographic center is at the bottom center
         const centerX = markerRect.left + (markerRect.width / 2);
-        const centerY = markerRect.top + (markerRect.height / 2);
+        const centerY = markerRect.bottom; // Use bottom since anchor is 'bottom'
 
         // Position crosshair at marker center
         this.crosshair.style.position = 'fixed';
         this.crosshair.style.left = `${centerX - 250}px`; // Center the 500px crosshair
         this.crosshair.style.top = `${centerY - 250}px`;
         this.crosshair.style.zIndex = '600';
+        this.crosshair.style.transform = 'none'; // Reset any existing transforms
     }
 
     /**
@@ -927,9 +928,9 @@ class MapManager {
         const markerElement = this.userLocationMarker.getElement();
         const markerRect = markerElement.getBoundingClientRect();
 
-        // Calculate center point of marker
+        // Since marker is anchored at bottom, the geographic center is at the bottom center
         const centerX = markerRect.left + (markerRect.width / 2);
-        const centerY = markerRect.top + (markerRect.height / 2);
+        const centerY = markerRect.bottom; // Use bottom since anchor is 'bottom'
 
         // Convert to percentages
         const centerXPercent = (centerX / window.innerWidth) * 100;
@@ -1716,12 +1717,7 @@ class MapManager {
             this.positionCrosshairOnMarker();
         }, 650); // After pan completes
 
-        // Immediately start crosshair movement animation
-        const crosshair = document.getElementById('gtaCrosshair');
-        if (crosshair) {
-            crosshair.style.transform = `translateX(-${slideDistance}px)`;
-            crosshair.style.transition = 'transform 0.6s ease-in-out';
-        }
+        // Don't use transform on crosshair - let positionCrosshairOnMarker handle it
 
         console.log('Sliding to product mode with map pan and vignette tracking');
     }
