@@ -847,7 +847,7 @@ class MapManager {
         // Position crosshair on marker immediately
         setTimeout(() => {
             this.positionCrosshairOnMarker();
-        }, 100); // Small delay to ensure marker is rendered
+        }, 200); // Increased delay to ensure marker is fully rendered
         
         // Vape stores removed for clean map
     }
@@ -893,7 +893,7 @@ class MapManager {
         // Update vignette position to center on marker
         setTimeout(() => {
             this.updateVignettePosition();
-        }, 100); // Small delay to ensure marker is rendered
+        }, 200); // Increased delay to ensure marker is fully rendered
     }
 
     /**
@@ -906,9 +906,9 @@ class MapManager {
         const markerElement = this.userLocationMarker.getElement();
         const markerRect = markerElement.getBoundingClientRect();
 
-        // Since marker is anchored at bottom, the geographic center is at the bottom center
+        // Calculate visual center of the marker (not anchor point)
         const centerX = markerRect.left + (markerRect.width / 2);
-        const centerY = markerRect.bottom; // Use bottom since anchor is 'bottom'
+        const centerY = markerRect.top + (markerRect.height / 2); // Use visual center, not anchor
 
         // Position crosshair at marker center
         this.crosshair.style.position = 'fixed';
@@ -928,9 +928,9 @@ class MapManager {
         const markerElement = this.userLocationMarker.getElement();
         const markerRect = markerElement.getBoundingClientRect();
 
-        // Since marker is anchored at bottom, the geographic center is at the bottom center
+        // Calculate visual center of the marker (not anchor point)
         const centerX = markerRect.left + (markerRect.width / 2);
-        const centerY = markerRect.bottom; // Use bottom since anchor is 'bottom'
+        const centerY = markerRect.top + (markerRect.height / 2); // Use visual center, not anchor
 
         // Convert to percentages
         const centerXPercent = (centerX / window.innerWidth) * 100;
@@ -948,6 +948,19 @@ class MapManager {
             rgba(0, 0, 0, 0.95) 450px,
             rgba(0, 0, 0, 1) 500px
         )`;
+    }
+
+    /**
+     * Synchronize all UI elements (marker, vignette, crosshair) alignment
+     */
+    synchronizeAlignment() {
+        if (!this.userLocationMarker) return;
+
+        // Update both vignette and crosshair positions
+        this.updateVignettePosition();
+        this.positionCrosshairOnMarker();
+
+        console.log('UI elements synchronized');
     }
 
     /**
@@ -1663,7 +1676,13 @@ class MapManager {
     setupVignetteTracking() {
         if (!this.map) return;
 
-        this.vignetteUpdateHandler = () => this.updateRadiusVignette();
+        this.vignetteUpdateHandler = () => {
+            this.updateRadiusVignette();
+            // Also sync marker-based vignette and crosshair if user location marker exists
+            if (this.userLocationMarker) {
+                this.synchronizeAlignment();
+            }
+        };
         
         this.map.on('move', this.vignetteUpdateHandler);
         this.map.on('zoom', this.vignetteUpdateHandler);
@@ -1713,8 +1732,7 @@ class MapManager {
 
         // Update vignette and crosshair positions after map movement
         setTimeout(() => {
-            this.updateVignettePosition();
-            this.positionCrosshairOnMarker();
+            this.synchronizeAlignment();
         }, 650); // After pan completes
 
         // Don't use transform on crosshair - let positionCrosshairOnMarker handle it
