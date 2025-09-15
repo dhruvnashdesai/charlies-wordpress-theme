@@ -1588,46 +1588,6 @@ class MapManager {
         }
     }
 
-    /**
-     * Update radius vignette and crosshair to maintain 10km radius at current zoom level
-     */
-    updateRadiusVignette() {
-        if (!this.radiusVignette || !this.userLocationMarker || !this.map) return;
-
-        // Get marker coordinates
-        const markerCoords = this.userLocationMarker.getLngLat();
-        const screenPoint = this.map.project(markerCoords);
-        
-        // Calculate 10km in pixels at current zoom level
-        const earthCircumference = 40075017; // Earth's circumference in meters
-        const currentZoom = this.map.getZoom();
-        const metersPerPixel = earthCircumference * Math.cos(markerCoords.lat * Math.PI / 180) / Math.pow(2, currentZoom + 8);
-        const tenKmInPixels = (10 * 1000) / metersPerPixel; // 10km in pixels
-        
-        // Update the vignette gradient to use the calculated radius
-        const vignetteElement = this.radiusVignette;
-        const centerX = screenPoint.x;
-        const centerY = screenPoint.y - 20; // Offset for marker anchor
-        
-        // Create dynamic gradient based on calculated radius
-        const innerRadius = Math.max(tenKmInPixels * 0.7, 150); // Inner clear area
-        const outerRadius = Math.max(tenKmInPixels * 1.2, 300);  // Outer fade area
-        
-        vignetteElement.style.background = `radial-gradient(
-            circle at ${centerX}px ${centerY}px,
-            transparent 0px,
-            transparent ${innerRadius}px,
-            rgba(0, 0, 0, 0.1) ${innerRadius + 20}px,
-            rgba(0, 0, 0, 0.3) ${innerRadius + 40}px,
-            rgba(0, 0, 0, 0.6) ${innerRadius + 60}px,
-            rgba(0, 0, 0, 0.8) ${innerRadius + 80}px,
-            rgba(0, 0, 0, 0.95) ${outerRadius}px,
-            rgba(0, 0, 0, 1) ${outerRadius + 50}px
-        )`;
-        
-        // Update crosshair position to match circle center
-        this.updateCrosshairFromCircle(centerX, centerY);
-    }
 
     /**
      * Set up event listeners for vignette tracking
@@ -1687,6 +1647,7 @@ class MapManager {
 
         // Update vignette continuously during animation for smooth tracking
         const animationInterval = setInterval(() => {
+            console.log('Animation interval tick - calling updateRadiusVignette');
             this.updateRadiusVignette();
         }, 16); // ~60fps updates
 
