@@ -422,11 +422,21 @@
 }
 
 /* Product Mode - Sliding Animation */
-/* Keep map stationary, only move overlay elements */
+/* Keep vignette container full-screen, only move the circle center */
 
-.radius-vignette.product-mode {
-    transform: translateX(-200px);
-    transition: transform 0.6s ease-in-out;
+.radius-vignette.product-mode::before {
+    background: radial-gradient(
+        circle at 35% 50%, /* Move circle center left from 50% to 35% */
+        transparent 0px,
+        transparent 200px,
+        rgba(0, 0, 0, 0.1) 250px,
+        rgba(0, 0, 0, 0.3) 300px,
+        rgba(0, 0, 0, 0.6) 350px,
+        rgba(0, 0, 0, 0.8) 400px,
+        rgba(0, 0, 0, 0.95) 450px,
+        rgba(0, 0, 0, 1) 500px
+    );
+    transition: background 0.6s ease-in-out;
 }
 
 .gta-crosshair.product-mode {

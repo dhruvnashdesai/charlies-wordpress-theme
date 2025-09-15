@@ -1592,8 +1592,10 @@ class MapManager {
             return;
         }
 
-        // Calculate how much to pan the map (200px right to move location marker left)
-        const panDistance = 200; // pixels
+        // Calculate how much to pan the map to match vignette circle movement
+        // Vignette moves from 50% to 35% = 15% of screen width
+        const screenWidth = this.mapContainer.getBoundingClientRect().width;
+        const panDistance = screenWidth * 0.15; // 15% of screen width
         const currentCenter = this.map.getCenter();
 
         // Convert screen pixel offset to geographic coordinates
@@ -1607,7 +1609,7 @@ class MapManager {
 
         // Add CSS classes for smooth animation to overlay elements
         if (mapContainer) mapContainer.classList.add('product-mode'); // For state tracking
-        vignette.classList.add('product-mode');
+        vignette.classList.add('product-mode'); // This changes the gradient center, not position
         if (crosshair) crosshair.classList.add('product-mode');
 
         // Pan the map to new center with smooth animation
