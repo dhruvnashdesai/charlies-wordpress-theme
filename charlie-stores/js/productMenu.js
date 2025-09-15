@@ -479,14 +479,22 @@ class ProductMenu {
      * Hide the product menu
      */
     hideMenu() {
-        if (!this.menuElement) return;
+        console.log('ProductMenu: hideMenu() called');
+        console.log('ProductMenu: menuElement exists:', !!this.menuElement);
 
+        if (!this.menuElement) {
+            console.error('ProductMenu: Cannot hide menu - menuElement is null');
+            return;
+        }
+
+        console.log('ProductMenu: Setting right position to -800px');
         this.menuElement.style.right = '-800px'; // Slide out to right (matches initial position)
         this.isVisible = false;
 
         setTimeout(() => {
             // Clear selection highlighting after menu closes
             document.dispatchEvent(new CustomEvent('menuClosed'));
+            console.log('ProductMenu: Menu hidden and menuClosed event dispatched');
         }, 400);
     }
 
@@ -507,7 +515,7 @@ class ProductMenu {
                         Showing ${this.filteredProducts.length} of ${this.allProducts.length} products
                     </div>
                 </div>
-                <button class="close-btn" onclick="window.productMenu.hideMenu()" style="
+                <button class="close-btn" style="
                     background: none; border: 1px solid #00ff00; color: #00ff00;
                     width: 30px; height: 30px; border-radius: 4px; cursor: pointer;
                     font-family: 'Courier New', monospace; font-size: 18px;
@@ -516,6 +524,15 @@ class ProductMenu {
                 " onmouseover="this.style.background='rgba(0,255,0,0.2)'" onmouseout="this.style.background='none'">×</button>
             </div>
         `;
+
+        // Add event listener to close button
+        const closeBtn = header.querySelector('.close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                console.log('ProductMenu: Close button clicked');
+                this.hideMenu();
+            });
+        }
     }
 
     /**
