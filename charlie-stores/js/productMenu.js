@@ -149,10 +149,71 @@ class ProductMenu {
      * Load products from API
      */
     async loadProducts(categoryId, storeId) {
-        // For now, generate fake products
-        // TODO: Replace with actual WooCommerce API call
-        this.products = this.generateFakeProducts(this.currentCategory);
-        console.log('Loaded products:', this.products);
+        try {
+            console.log('ProductMenu: Loading real WooCommerce products for category:', categoryId, 'store:', storeId);
+
+            const formData = new FormData();
+            formData.append('action', 'get_store_products_by_category');
+            formData.append('store_id', storeId);
+            formData.append('category_id', categoryId);
+            formData.append('nonce', getConfig('nonce'));
+
+            const response = await fetch(getConfig('ajax_url'), {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                this.products = this.formatWooCommerceProducts(data.data.products);
+                console.log('ProductMenu: Loaded real products:', this.products);
+            } else {
+                console.warn('ProductMenu: API returned error, falling back to fake products:', data.data);
+                // Fallback to fake products for now
+                this.products = this.generateFakeProducts(this.currentCategory);
+            }
+        } catch (error) {
+            console.error('ProductMenu: Error loading products, falling back to fake products:', error);
+            // Fallback to fake products
+            this.products = this.generateFakeProducts(this.currentCategory);
+        }
+    }
+
+    /**
+     * Format WooCommerce products for menu display
+     */
+    formatWooCommerceProducts(wooProducts) {
+        return wooProducts.map(product => {
+            return {
+                id: product.id,
+                name: product.name,
+                price: this.extractPriceFromHTML(product.price),
+                currency: 'CAD',
+                stock: parseInt(product.store_stock) || 0,
+                category: this.currentCategory.name,
+                description: product.description || 'No description available',
+                image: product.image,
+                url: product.url,
+                add_to_cart_url: product.add_to_cart_url,
+                in_stock: product.in_stock && parseInt(product.store_stock) > 0,
+                raw_price_html: product.price // Keep original price HTML
+            };
+        });
+    }
+
+    /**
+     * Extract numeric price from WooCommerce price HTML
+     */
+    extractPriceFromHTML(priceHTML) {
+        if (!priceHTML) return 0;
+
+        // Extract price from HTML like "<span class="amount">$29.99</span>"
+        const matches = priceHTML.match(/[\d,]+\.?\d*/);
+        if (matches) {
+            return parseFloat(matches[0].replace(',', ''));
+        }
+        return 0;
     }
 
     /**
@@ -241,11 +302,9 @@ class ProductMenu {
         console.log('ProductMenu: Element in DOM:', document.body.contains(this.menuElement));
         console.log('ProductMenu: Element bounds:', this.menuElement.getBoundingClientRect());
 
-        // Force a bright red background for debugging
-        this.menuElement.style.background = 'red';
-        this.menuElement.style.border = '5px solid yellow';
-
-        console.log('ProductMenu: Applied red background and yellow border for debugging');
+        // Remove debugging styles
+        this.menuElement.style.background = 'linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(20, 20, 20, 0.95))';
+        this.menuElement.style.border = '2px solid #00ff00';
 
         // Add GTA-style sound effect (optional)
         this.playMenuSound();
@@ -332,8 +391,8 @@ class ProductMenu {
                         </div>
                     </div>
                     <div style="text-align: right;">
-                        <div style="font-size: 16px; font-weight: bold; color: #00ff00;">
-                            $${product.price.toFixed(2)}
+                        <div style="font-size: 14px; font-weight: bold; color: #00ff00;">
+                            ${product.raw_price_html || '$' + product.price.toFixed(2)}
                         </div>
                         <div style="font-size: 10px; opacity: 0.7; margin-top: 2px;">
                             ${product.currency}
@@ -364,9 +423,19 @@ class ProductMenu {
 
         console.log('Product clicked:', product);
 
-        // TODO: Add to cart, show product details, etc.
-        // For now, just show an alert
-        alert(`Selected: ${product.name}\nPrice: $${product.price}\nStock: ${product.stock}`);
+        // For real WooCommerce products, redirect to product page or add to cart
+        if (product.url) {
+            // Option 1: Navigate to product page
+            window.open(product.url, '_blank');
+
+            // Option 2: Add to cart directly (uncomment if preferred)
+            // if (product.add_to_cart_url) {
+            //     window.location.href = product.add_to_cart_url;
+            // }
+        } else {
+            // Fallback for fake products
+            alert(`Selected: ${product.name}\nPrice: $${product.price}\nStock: ${product.stock}`);
+        }
     }
 
     /**

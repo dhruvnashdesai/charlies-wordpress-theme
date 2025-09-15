@@ -16,6 +16,8 @@ class Charlie_WooCommerce_Integration {
         add_action('wp_ajax_nopriv_get_store_products', array($this, 'get_store_products'));
         add_action('wp_ajax_get_store_categories', array($this, 'get_store_categories'));
         add_action('wp_ajax_nopriv_get_store_categories', array($this, 'get_store_categories'));
+        add_action('wp_ajax_get_store_products_by_category', array($this, 'get_store_products_by_category'));
+        add_action('wp_ajax_nopriv_get_store_products_by_category', array($this, 'get_store_products_by_category'));
 
         // Add store location field to products (only in admin)
         if (is_admin()) {
@@ -209,6 +211,38 @@ class Charlie_WooCommerce_Integration {
     }
 
     /**
+     * Get products for a specific store and category via AJAX
+     */
+    public function get_store_products_by_category() {
+        check_ajax_referer('charlie_nonce', 'nonce');
+
+        $store_id = absint($_POST['store_id']);
+        $category_id = absint($_POST['category_id']);
+
+        if (!$store_id) {
+            wp_send_json_error('Invalid store ID');
+        }
+
+        if (!$category_id) {
+            wp_send_json_error('Invalid category ID');
+        }
+
+        error_log("Charlie Debug: get_store_products_by_category called with store_id: $store_id, category_id: $category_id");
+
+        // Get products for this store and category
+        $products = $this->get_products_by_store_and_category($store_id, $category_id);
+
+        error_log("Charlie Debug: Found " . count($products) . " products for store $store_id in category $category_id");
+
+        wp_send_json_success(array(
+            'products' => $products,
+            'store_id' => $store_id,
+            'category_id' => $category_id,
+            'shop_url' => $this->get_store_shop_url($store_id)
+        ));
+    }
+
+    /**
      * Get products available at a specific store
      */
     public function get_products_by_store($store_id, $limit = 12) {
@@ -244,6 +278,65 @@ class Charlie_WooCommerce_Integration {
                 'store_stock' => get_post_meta($product->ID, '_charlie_store_stock', true),
                 'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names'))
             );
+        }
+
+        return $formatted_products;
+    }
+
+    /**
+     * Get products available at a specific store in a specific category
+     */
+    public function get_products_by_store_and_category($store_id, $category_id, $limit = 12) {
+        $args = array(
+            'post_type' => 'product',
+            'posts_per_page' => $limit,
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_charlie_store_location',
+                    'value' => $store_id,
+                    'compare' => '='
+                )
+            ),
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'product_cat',
+                    'field' => 'term_id',
+                    'terms' => $category_id
+                )
+            )
+        );
+
+        error_log("Charlie Debug: Query args for store $store_id, category $category_id: " . print_r($args, true));
+
+        $products = get_posts($args);
+        $formatted_products = array();
+
+        error_log("Charlie Debug: Raw query returned " . count($products) . " products");
+
+        foreach ($products as $product) {
+            $wc_product = wc_get_product($product->ID);
+            if (!$wc_product) continue;
+
+            $store_stock = get_post_meta($product->ID, '_charlie_store_stock', true);
+
+            $formatted_products[] = array(
+                'id' => $product->ID,
+                'name' => $product->post_title,
+                'description' => wp_trim_words($product->post_excerpt ?: $product->post_content, 20),
+                'price' => $wc_product->get_price_html(),
+                'regular_price' => $wc_product->get_regular_price(),
+                'sale_price' => $wc_product->get_sale_price(),
+                'image' => get_the_post_thumbnail_url($product->ID, 'medium'),
+                'url' => get_permalink($product->ID),
+                'add_to_cart_url' => $wc_product->add_to_cart_url(),
+                'in_stock' => $wc_product->is_in_stock(),
+                'store_stock' => $store_stock ?: 0,
+                'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names')),
+                'sku' => $wc_product->get_sku()
+            );
+
+            error_log("Charlie Debug: Formatted product: " . $product->post_title . " (Stock: $store_stock)");
         }
 
         return $formatted_products;
