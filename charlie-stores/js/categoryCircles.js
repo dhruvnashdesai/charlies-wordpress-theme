@@ -160,16 +160,28 @@ class CategoryCircles {
         const numCategories = Math.min(this.categories.length, 6); // Max 6 categories
         const positions = [];
 
-        // Distance from vignette edge
-        const distance = this.vignetteRadius + 80;
+        // Distance from vignette edge - much closer to the circumference
+        const distance = this.vignetteRadius + 20; // Reduced from 80 to 20
 
-        // Calculate angles - distribute around right side of circle
-        const startAngle = -60; // Start at upper-right
-        const endAngle = 60;    // End at lower-right
-        const angleStep = numCategories > 1 ? (endAngle - startAngle) / (numCategories - 1) : 0;
+        // Define specific angles for better positioning
+        let angles = [];
+
+        if (numCategories === 1) {
+            angles = [0]; // Right side
+        } else if (numCategories === 2) {
+            angles = [-30, 30]; // Upper-right and lower-right
+        } else if (numCategories === 3) {
+            angles = [-45, 0, 45]; // Upper-right, right, lower-right
+        } else if (numCategories === 4) {
+            angles = [-60, -20, 20, 60]; // Spread around right side
+        } else if (numCategories === 5) {
+            angles = [-70, -35, 0, 35, 70]; // Five positions around right side
+        } else {
+            angles = [-80, -48, -16, 16, 48, 80]; // Six positions around right side
+        }
 
         for (let i = 0; i < numCategories; i++) {
-            const angle = startAngle + (angleStep * i);
+            const angle = angles[i];
             const radians = (angle * Math.PI) / 180;
 
             const x = this.centerPoint.x + (distance * Math.cos(radians));
