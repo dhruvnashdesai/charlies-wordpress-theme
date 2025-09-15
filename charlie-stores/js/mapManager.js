@@ -1638,6 +1638,9 @@ class MapManager {
         const mapContainer = document.getElementById('map');
         if (mapContainer) mapContainer.classList.add('product-mode');
 
+        // Temporarily disable map event tracking to avoid conflicts during animation
+        this.removeVignetteTracking();
+
         // Pan the map with animation
         this.map.easeTo({
             center: newCenter,
@@ -1651,10 +1654,13 @@ class MapManager {
             this.updateRadiusVignette();
         }, 16); // ~60fps updates
 
-        // Clear interval and do final update after animation completes
+        // Clear interval and re-enable map event tracking after animation completes
         setTimeout(() => {
             clearInterval(animationInterval);
             this.updateRadiusVignette();
+            // Re-enable map event tracking
+            this.setupVignetteTracking();
+            console.log('Animation complete - re-enabled map event tracking');
         }, 650); // After pan completes
 
         // Don't use transform on crosshair - let positionCrosshairOnMarker handle it
