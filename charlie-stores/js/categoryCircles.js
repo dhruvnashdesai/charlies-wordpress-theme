@@ -286,10 +286,19 @@ class CategoryCircles {
     handleCategoryClick(category) {
         console.log('Category clicked:', category);
 
-        // Enter compact mode first
-        this.enterCompactMode();
+        // Check if we're already in compact mode
+        const isAlreadyCompact = document.body.classList.contains('compact-mode');
 
-        // Dispatch event for product menu to handle
+        if (!isAlreadyCompact) {
+            // First time entering compact mode
+            console.log('CategoryCircles: Entering compact mode for first time');
+            this.enterCompactMode();
+        } else {
+            // Already in compact mode, just update the menu content
+            console.log('CategoryCircles: Already in compact mode, just updating menu');
+        }
+
+        // Always dispatch event for product menu to handle (menu will update content)
         document.dispatchEvent(new CustomEvent('categorySelected', {
             detail: {
                 category: category,

@@ -450,21 +450,23 @@ class ProductMenu {
      * Show the product menu
      */
     showMenu() {
-        console.log('ProductMenu: showMenu() called at level:', this.menuLevel);
+        console.log('ProductMenu: showMenu() called, already visible:', this.isVisible);
 
         if (!this.menuElement) {
             console.error('ProductMenu: menuElement is null, cannot show menu');
             return;
         }
 
-        // Position menu
-        this.positionMenu();
+        // Only position menu if it's not already visible
+        if (!this.isVisible) {
+            this.positionMenu();
+            this.playMenuSound();
+        }
 
-        // Update layout based on current level
+        // Always update layout with new category data
         this.updateMenuLayout();
 
         this.isVisible = true;
-        this.playMenuSound();
     }
 
     /**
