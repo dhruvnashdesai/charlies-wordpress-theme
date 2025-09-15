@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
 require_once get_template_directory() . '/charlie-stores/includes/class-store-manager.php';
 require_once get_template_directory() . '/charlie-stores/includes/class-rest-api.php';
 require_once get_template_directory() . '/charlie-stores/includes/class-admin.php';
+require_once get_template_directory() . '/charlie-stores/includes/class-woocommerce-integration.php';
 
 /**
  * Theme setup
@@ -41,6 +42,7 @@ function charlie_stores_init() {
     new Charlie_Store_Manager();
     new Charlie_REST_API();
     new Charlie_Admin();
+    new Charlie_WooCommerce_Integration();
 }
 add_action('init', 'charlie_stores_init');
 
@@ -102,6 +104,16 @@ function charlie_enqueue_store_assets() {
         array('mapbox-gl'),
         '1.0.0'
     );
+
+    // WooCommerce integration styles
+    if (class_exists('WooCommerce')) {
+        wp_enqueue_style(
+            'charlie-woocommerce',
+            get_template_directory_uri() . '/charlie-stores/css/woocommerce.css',
+            array('charlie-styles'),
+            '1.0.0'
+        );
+    }
 
     // Charlie's Store scripts
     wp_enqueue_script(
@@ -185,6 +197,7 @@ function charlie_enqueue_store_assets() {
             'STORES' => rest_url('charlie-stores/v1/stores'),
             'NEARBY' => rest_url('charlie-stores/v1/stores/nearby'),
             'GEOCODE' => rest_url('charlie-stores/v1/geocode'),
+            'STORE_PRODUCTS' => admin_url('admin-ajax.php?action=get_store_products'),
         ),
         'STORAGE_KEYS' => array(
             'AGE_VERIFIED' => 'charlie_age_verified',
@@ -197,6 +210,12 @@ function charlie_enqueue_store_assets() {
             'GEOCODING_FAILED' => __('Unable to find that postal code. Please check and try again.', 'charlies-stores'),
             'MAP_LOAD_ERROR' => __('Unable to load map. Please refresh the page and try again.', 'charlies-stores'),
             'NO_STORES_FOUND' => __('No stores found within 50km of your location.', 'charlies-stores'),
+        ),
+        'WOOCOMMERCE' => array(
+            'SHOP_URL' => class_exists('WooCommerce') ? wc_get_page_permalink('shop') : '',
+            'CART_URL' => class_exists('WooCommerce') ? wc_get_cart_url() : '',
+            'CHECKOUT_URL' => class_exists('WooCommerce') ? wc_get_checkout_url() : '',
+            'IS_ACTIVE' => class_exists('WooCommerce')
         ),
         'nonce' => wp_create_nonce('charlie_nonce'),
         'ajax_url' => admin_url('admin-ajax.php'),

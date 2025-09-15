@@ -406,7 +406,7 @@ class MapManager {
     handleBrowseProducts(store) {
         // Dispatch event for other modules to handle
         this.dispatchMapEvent('browseProducts', { store });
-        
+
         // For WordPress: trigger navigation
         if (isWordPressEnvironment() && store.products_url) {
             window.location.href = store.products_url;
@@ -1039,6 +1039,32 @@ class MapManager {
      * @returns {string} HTML content
      */
     createWarehousePopupContent(warehouse) {
+        const wooConfig = getConfig('WOOCOMMERCE', {});
+        const isWooActive = wooConfig.IS_ACTIVE;
+
+        let actionButtons = '';
+        if (isWooActive) {
+            const storeShopUrl = `${wooConfig.SHOP_URL}?store_location=${warehouse.id}`;
+            actionButtons = `
+                <div class="popup-actions" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                    <button class="browse-products-btn" onclick="window.open('${storeShopUrl}', '_blank')"
+                            style="background: #0073aa; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 8px;">
+                        🛒 Browse Products
+                    </button>
+                    <button class="view-cart-btn" onclick="window.open('${wooConfig.CART_URL}', '_blank')"
+                            style="background: #666; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                        🛍️ View Cart
+                    </button>
+                </div>
+            `;
+        } else {
+            actionButtons = `
+                <div class="popup-actions" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                    <p style="color: #666; font-size: 12px; margin: 0;">E-commerce coming soon!</p>
+                </div>
+            `;
+        }
+
         return `
             <div class="popup-content warehouse-popup-content">
                 <h3>🏭 ${warehouse.name}</h3>
@@ -1046,6 +1072,7 @@ class MapManager {
                 <p class="hours">⏰ ${warehouse.hours}</p>
                 <p class="distance">📍 ${warehouse.distanceText}</p>
                 <p class="description">${warehouse.description}</p>
+                ${actionButtons}
             </div>
         `;
     }

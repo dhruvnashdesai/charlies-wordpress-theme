@@ -1,0 +1,170 @@
+/**
+ * WooCommerce Integration Styles for Charlie's Store Finder
+ */
+
+/* Popup Action Buttons */
+.popup-actions {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.browse-products-btn,
+.view-cart-btn {
+    background: #0073aa;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.browse-products-btn:hover {
+    background: #005a87;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.view-cart-btn {
+    background: #666;
+}
+
+.view-cart-btn:hover {
+    background: #555;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Store Location Badge on Shop Page */
+.woocommerce-store-location-notice {
+    background: #0073aa;
+    color: white;
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.woocommerce-store-location-notice a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.woocommerce-store-location-notice .close-notice {
+    float: right;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    margin-left: 10px;
+}
+
+/* Product Cards - Store Information */
+.woocommerce ul.products li.product .store-availability {
+    background: #f8f9fa;
+    padding: 6px 10px;
+    margin-top: 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #666;
+}
+
+.woocommerce ul.products li.product .store-availability.in-stock {
+    background: #d4edda;
+    color: #155724;
+}
+
+.woocommerce ul.products li.product .store-availability.out-of-stock {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Single Product - Store Information */
+.single-product .store-location-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border-left: 4px solid #0073aa;
+}
+
+.single-product .store-location-info h4 {
+    margin: 0 0 10px 0;
+    color: #0073aa;
+    font-size: 16px;
+}
+
+.single-product .store-location-info p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.single-product .store-stock-info {
+    display: inline-block;
+    background: #d4edda;
+    color: #155724;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 5px;
+}
+
+.single-product .store-stock-info.out-of-stock {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Cart - Store Context */
+.woocommerce-cart .store-context-notice {
+    background: #e3f2fd;
+    border: 1px solid #90caf9;
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #1565c0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .popup-actions {
+        text-align: center;
+    }
+
+    .browse-products-btn,
+    .view-cart-btn {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+        margin-right: 0;
+    }
+
+    .single-product .store-location-info {
+        padding: 12px;
+    }
+}
+
+/* Dark Theme Compatibility */
+@media (prefers-color-scheme: dark) {
+    .single-product .store-location-info {
+        background: #2a2a2a;
+        color: #e0e0e0;
+        border-left-color: #4fc3f7;
+    }
+
+    .single-product .store-location-info h4 {
+        color: #4fc3f7;
+    }
+
+    .single-product .store-location-info p {
+        color: #b0b0b0;
+    }
+}
