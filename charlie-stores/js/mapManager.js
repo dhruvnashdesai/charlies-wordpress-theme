@@ -809,17 +809,45 @@ class MapManager {
     addUserLocationMarker(coordinates) {
         if (!this.isInitialized) return;
 
-        // Remove existing user location marker
+        // Remove existing user location marker and vignette
         if (this.userLocationMarker) {
             this.userLocationMarker.remove();
             this.hideRadiusVignette();
         }
 
-        // Create user location marker element using custom icon
-        const element = document.createElement('div');
-        element.className = 'user-location-marker';
-        
-        element.style.cssText = `
+        // Create container element that includes both marker and vignette
+        const container = document.createElement('div');
+        container.className = 'user-location-container';
+
+        // Create the vignette overlay that's attached to this marker
+        const vignetteOverlay = document.createElement('div');
+        vignetteOverlay.className = 'location-vignette-overlay';
+        vignetteOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(
+                circle at 50% 50%,
+                transparent 0px,
+                transparent 200px,
+                rgba(0, 0, 0, 0.1) 250px,
+                rgba(0, 0, 0, 0.3) 300px,
+                rgba(0, 0, 0, 0.6) 350px,
+                rgba(0, 0, 0, 0.8) 400px,
+                rgba(0, 0, 0, 0.95) 450px,
+                rgba(0, 0, 0, 1) 500px
+            );
+            pointer-events: none;
+            z-index: 500;
+            transition: all 0.6s ease-in-out;
+        `;
+
+        // Create the actual marker icon
+        const markerIcon = document.createElement('div');
+        markerIcon.className = 'user-location-marker';
+        markerIcon.style.cssText = `
             width: 40px;
             height: 40px;
             background-image: url('${getConfig('UI.CUSTOM_LOCATION_ICON', 'assets/images/gtamap_icon.png')}');
@@ -831,15 +859,22 @@ class MapManager {
             z-index: 1000;
         `;
 
+        // Add both to container
+        container.appendChild(vignetteOverlay);
+        container.appendChild(markerIcon);
+
+        // Store reference to vignette for product mode
+        this.markerVignette = vignetteOverlay;
+
         this.userLocationMarker = new mapboxgl.Marker({
-            element,
+            element: container,
             anchor: 'bottom'
         })
         .setLngLat(coordinates)
         .addTo(this.map);
-        
-        // Show radius vignette effect
-        this.showRadiusVignette();
+
+        // Show crosshair at the center
+        this.showCrosshair();
         
         // Vape stores removed for clean map
     }
@@ -1577,54 +1612,41 @@ class MapManager {
      * Slide map and vignette to left side for product mode
      */
     slideToProductMode() {
-        if (!this.isInitialized || !this.map) {
-            console.warn('Map not initialized for sliding animation');
+        if (!this.isInitialized || !this.map || !this.markerVignette) {
+            console.warn('Map or marker vignette not available for sliding animation');
             return;
         }
 
-        // Get vignette and overlay elements
+        // Get overlay elements
         const mapContainer = document.getElementById('map');
-        const vignette = document.getElementById('radiusVignette');
         const crosshair = document.getElementById('gtaCrosshair');
 
-        if (!vignette) {
-            console.warn('Vignette not found for sliding animation');
-            return;
+        // Calculate how much to slide the vignette gradient
+        const slideDistance = 15; // 15% of viewport width
+
+        // Update the vignette gradient to move the circle left
+        this.markerVignette.style.background = `radial-gradient(
+            circle at ${50 - slideDistance}% 50%,
+            transparent 0px,
+            transparent 200px,
+            rgba(0, 0, 0, 0.1) 250px,
+            rgba(0, 0, 0, 0.3) 300px,
+            rgba(0, 0, 0, 0.6) 350px,
+            rgba(0, 0, 0, 0.8) 400px,
+            rgba(0, 0, 0, 0.95) 450px,
+            rgba(0, 0, 0, 1) 500px
+        )`;
+
+        // Add CSS class for state tracking
+        if (mapContainer) mapContainer.classList.add('product-mode');
+
+        // Move crosshair to follow the new circle center
+        if (crosshair) {
+            crosshair.style.transform = `translateX(-${slideDistance}vw)`;
+            crosshair.style.transition = 'transform 0.6s ease-in-out';
         }
 
-        // Calculate how much to pan the map to match vignette circle movement
-        // Vignette circle moves left by 15vw
-        const screenWidth = window.innerWidth;
-        const panDistance = screenWidth * 0.15; // 15% of viewport width
-        const currentCenter = this.map.getCenter();
-
-        // Convert screen pixel offset to geographic coordinates
-        // Pan RIGHT so the location marker appears to move LEFT
-        const currentCenterPixel = this.map.project(currentCenter);
-        const newCenterPixel = {
-            x: currentCenterPixel.x + panDistance, // ADD to pan right
-            y: currentCenterPixel.y
-        };
-        const newCenter = this.map.unproject(newCenterPixel);
-
-        // Add CSS classes for smooth animation to overlay elements
-        if (mapContainer) mapContainer.classList.add('product-mode'); // For state tracking
-        vignette.classList.add('product-mode'); // This changes the gradient center, not position
-        if (crosshair) crosshair.classList.add('product-mode');
-
-        // Pan the map to new center with smooth animation
-        this.map.easeTo({
-            center: newCenter,
-            duration: 600, // Match CSS animation duration
-            essential: true // Ensures animation plays even with reduced motion
-        });
-
-        // Update warehouse marker positions (they're screen-positioned, so they need adjustment)
-        setTimeout(() => {
-            this.updateMarkersForProductMode();
-        }, 100); // Small delay to let the pan start
-
-        console.log('Sliding to product mode with map pan');
+        console.log('Sliding to product mode with marker-attached vignette');
     }
 
     /**

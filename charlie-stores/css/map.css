@@ -422,31 +422,7 @@
 }
 
 /* Product Mode - Sliding Animation */
-/* Create separate background overlay and sliding circle */
-
-/* Add a full-screen black background that stays in place */
-.radius-vignette::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 1);
-    z-index: -1;
-    pointer-events: none;
-}
-
-/* In product mode, slide the circle mask left */
-.radius-vignette.product-mode::before {
-    transform: translateX(-15vw); /* Move circle left by 15% of viewport width */
-    transition: transform 0.6s ease-in-out;
-}
-
-.gta-crosshair.product-mode {
-    transform: translateX(-15vw);
-    transition: transform 0.6s ease-in-out;
-}
+/* Marker-attached vignette approach - no CSS needed as it's handled in JS */
 
 /* Ensure category circles appear on the right side after slide */
 .category-circle {
