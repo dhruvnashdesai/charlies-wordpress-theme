@@ -906,16 +906,27 @@ class MapManager {
         const markerElement = this.userLocationMarker.getElement();
         const markerRect = markerElement.getBoundingClientRect();
 
-        // Calculate visual center of the marker (not anchor point)
+        // Calculate marker center based on anchor point
+        // Marker uses anchor: 'bottom', so its geographic center is at bottom-center of the element
         const centerX = markerRect.left + (markerRect.width / 2);
-        const centerY = markerRect.top + (markerRect.height / 2); // Use visual center, not anchor
+        const centerY = markerRect.bottom; // Use bottom since anchor is 'bottom'
 
-        // Position crosshair at marker center
+        // Debug logging
+        console.log('Marker rect:', markerRect);
+        console.log('Calculated center:', { centerX, centerY });
+
+        // Position crosshair container so its center dot aligns with marker center
+        // The crosshair is 500x500 with center dot at 50% 50%, so we offset by 250px
         this.crosshair.style.position = 'fixed';
         this.crosshair.style.left = `${centerX - 250}px`; // Center the 500px crosshair
         this.crosshair.style.top = `${centerY - 250}px`;
         this.crosshair.style.zIndex = '600';
         this.crosshair.style.transform = 'none'; // Reset any existing transforms
+
+        console.log('Crosshair positioned at:', {
+            left: centerX - 250,
+            top: centerY - 250
+        });
     }
 
     /**
@@ -928,13 +939,19 @@ class MapManager {
         const markerElement = this.userLocationMarker.getElement();
         const markerRect = markerElement.getBoundingClientRect();
 
-        // Calculate visual center of the marker (not anchor point)
+        // Calculate marker center based on anchor point
+        // Marker uses anchor: 'bottom', so its geographic center is at bottom-center of the element
         const centerX = markerRect.left + (markerRect.width / 2);
-        const centerY = markerRect.top + (markerRect.height / 2); // Use visual center, not anchor
+        const centerY = markerRect.bottom; // Use bottom since anchor is 'bottom'
+
+        // Debug logging
+        console.log('Vignette - Marker center:', { centerX, centerY });
 
         // Convert to percentages
         const centerXPercent = (centerX / window.innerWidth) * 100;
         const centerYPercent = (centerY / window.innerHeight) * 100;
+
+        console.log('Vignette - Center percentages:', { centerXPercent, centerYPercent });
 
         // Update gradient center
         this.markerVignette.style.background = `radial-gradient(
