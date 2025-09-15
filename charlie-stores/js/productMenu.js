@@ -204,9 +204,29 @@ class ProductMenu {
         this.updateMenuContent();
 
         console.log('ProductMenu: Setting menu position to visible...');
-        this.menuElement.style.right = '20px'; // Slide in from right
+
+        // Calculate safe position - ensure menu fits on screen
+        const screenWidth = window.innerWidth;
+        const menuWidth = 380;
+        const safeRight = Math.max(20, screenWidth - menuWidth - 50); // At least 50px from edge
+
+        console.log('ProductMenu: Screen width:', screenWidth, 'Safe position:', safeRight);
+
+        this.menuElement.style.right = '20px'; // Start with right positioning
+        this.menuElement.style.left = 'auto'; // Clear any left positioning
         this.menuElement.style.display = 'block'; // Ensure it's visible
         this.menuElement.style.visibility = 'visible'; // Double ensure visibility
+
+        // If still off-screen, use left positioning instead
+        setTimeout(() => {
+            const bounds = this.menuElement.getBoundingClientRect();
+            if (bounds.right > window.innerWidth) {
+                console.log('ProductMenu: Menu off-screen, switching to left positioning');
+                this.menuElement.style.right = 'auto';
+                this.menuElement.style.left = (window.innerWidth - menuWidth - 20) + 'px';
+            }
+        }, 50);
+
         this.isVisible = true;
 
         console.log('ProductMenu: Menu should now be visible at right: 20px');
