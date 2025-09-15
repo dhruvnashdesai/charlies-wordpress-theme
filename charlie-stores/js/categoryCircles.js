@@ -405,8 +405,32 @@ class CategoryCircles {
             document.dispatchEvent(new CustomEvent('exitCompactMode'));
         }
 
-        // Hide categories and reset positioning
-        this.hideCategories();
+        // Instead of hiding categories, restore them to their original positions around the vignette
+        this.restoreOriginalPositions();
+    }
+
+    /**
+     * Restore category circles to their original positions around the vignette
+     */
+    restoreOriginalPositions() {
+        if (!this.isVisible) return;
+
+        console.log('CategoryCircles: Restoring original positions around vignette');
+
+        // Recalculate original positions around the vignette
+        this.calculateVignetteGeometry();
+        const positions = this.calculateCategoryPositions();
+        let index = 0;
+
+        this.categoryElements.forEach(element => {
+            if (index < positions.length) {
+                const pos = positions[index];
+                element.style.transition = 'all 0.6s ease-in-out';
+                element.style.left = `${pos.x - 60}px`;
+                element.style.top = `${pos.y - 60}px`;
+                index++;
+            }
+        });
     }
 
     /**
@@ -493,16 +517,11 @@ const categoryCircleCSS = `
 }
 
 .compact-mode #gtaCrosshair {
-    position: fixed !important;
-    transform: scale(0.3) !important;
-    transition: all 0.6s ease-in-out;
-    z-index: 600 !important;
-    pointer-events: none !important;
+    display: none !important;
 }
 
 .compact-mode #radiusVignette {
-    transition: all 0.6s ease-in-out;
-    z-index: 550 !important;
+    display: none !important;
 }
 
 /* Ensure map content is visible in compact mode */

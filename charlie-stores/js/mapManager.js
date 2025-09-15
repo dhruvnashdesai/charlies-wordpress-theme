@@ -1798,12 +1798,19 @@ class MapManager {
             this.mapContainer.style.borderRadius = '';
         }
 
-        // Restore crosshair positioning
+        // Restore crosshair positioning and visibility
         if (this.crosshair) {
             this.crosshair.style.transform = '';
             this.crosshair.style.position = '';
             this.crosshair.style.left = '';
             this.crosshair.style.top = '';
+            this.crosshair.style.display = '';
+            this.crosshair.style.pointerEvents = '';
+        }
+
+        // Restore vignette visibility
+        if (this.radiusVignette) {
+            this.radiusVignette.style.display = '';
         }
 
         // Restore user location marker positioning
@@ -1814,6 +1821,7 @@ class MapManager {
                 markerElement.style.left = '';
                 markerElement.style.top = '';
                 markerElement.style.transform = '';
+                markerElement.style.pointerEvents = '';
             }
         }
 
@@ -1862,16 +1870,7 @@ class MapManager {
             rgba(0, 0, 0, 0.9) ${outerRadius + 20}px
         )`;
 
-        // Position crosshair at the center of the compact map
-        if (this.crosshair) {
-            this.crosshair.style.position = 'fixed';
-            this.crosshair.style.left = `${compactCenterX - 100}px`; // Center 200px scaled crosshair
-            this.crosshair.style.top = `${compactCenterY - 100}px`;
-            this.crosshair.style.transform = 'scale(0.3)'; // Smaller scale for compact view
-            this.crosshair.style.zIndex = '600';
-            this.crosshair.style.pointerEvents = 'none'; // Don't interfere with map
-            this.crosshair.classList.add('visible'); // Ensure it's visible
-        }
+        // Crosshair is hidden via CSS in compact mode, so no positioning needed
 
         // Position user location marker at center of compact map
         if (this.userLocationMarker) {
