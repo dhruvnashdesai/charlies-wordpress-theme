@@ -381,9 +381,18 @@ class ProductMenu {
      */
     handleProductSelected(productId) {
         console.log('ProductMenu: Product selected for details:', productId);
+        console.log('ProductMenu: Available filtered products:', this.filteredProducts.map(p => ({ id: p.id, name: p.name })));
+        console.log('ProductMenu: Available all products:', this.allProducts.map(p => ({ id: p.id, name: p.name })));
 
-        // Find the product in our filtered products
-        const product = this.filteredProducts.find(p => p.id === productId);
+        // Find the product in our filtered products first
+        let product = this.filteredProducts.find(p => p.id == productId); // Use == for loose comparison
+
+        // If not found in filtered, check all products
+        if (!product) {
+            product = this.allProducts.find(p => p.id == productId);
+            console.log('ProductMenu: Product found in allProducts:', product ? product.name : 'NOT FOUND');
+        }
+
         if (product) {
             this.selectedProduct = product;
             console.log('ProductMenu: Selected product:', product);
@@ -759,7 +768,7 @@ class ProductMenu {
         } else {
             this.filteredProducts.forEach(product => {
                 const isInStock = product.stock > 0;
-                console.log('ProductMenu: Product stock check:', product.name, 'stock:', product.stock, 'isInStock:', isInStock);
+                console.log('ProductMenu: Product stock check:', product.name, 'ID:', product.id, 'ID type:', typeof product.id, 'stock:', product.stock, 'isInStock:', isInStock);
                 html += `
                     <div class="product-item" style="
                         padding: 15px 20px;
