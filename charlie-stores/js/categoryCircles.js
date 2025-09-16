@@ -150,10 +150,18 @@ class CategoryCircles {
 
         // Wait for sliding animation to complete before positioning categories
         setTimeout(() => {
-            this.calculateVignetteGeometry(); // Recalculate in case of changes
+            // Check if we're in product view mode - if so, use product view positions
+            const isProductView = document.body.classList.contains('product-view-mode');
+            let positions;
 
-            // Calculate positions for categories
-            const positions = this.calculateCategoryPositions();
+            if (isProductView) {
+                console.log('CategoryCircles: showCategories in product view mode, using top-right positions');
+                positions = this.calculateProductViewPositions();
+            } else {
+                console.log('CategoryCircles: showCategories in normal mode, using vignette positions');
+                this.calculateVignetteGeometry(); // Recalculate in case of changes
+                positions = this.calculateCategoryPositions();
+            }
 
             // Create and position category elements
             this.categories.forEach((category, index) => {
@@ -364,10 +372,11 @@ class CategoryCircles {
         // Don't reposition if we're in product view - categories should stay in place
         const isProductView = document.body.classList.contains('product-view-mode');
         if (isProductView) {
-            console.log('CategoryCircles: Skipping repositioning - in product view');
+            console.log('CategoryCircles: Skipping repositioning - in product view mode');
             return;
         }
 
+        console.log('CategoryCircles: Repositioning to vignette positions');
         const positions = this.calculateCategoryPositions();
         let index = 0;
 
@@ -392,6 +401,12 @@ class CategoryCircles {
      * Enter product view - hide vignette and move categories to top right
      */
     enterProductView() {
+        // Check if already in product view mode
+        if (document.body.classList.contains('product-view-mode')) {
+            console.log('CategoryCircles: Already in product view, skipping enter');
+            return;
+        }
+
         console.log('CategoryCircles: Entering product view');
 
         // Add product view class to body for global styling
@@ -408,6 +423,12 @@ class CategoryCircles {
      * Exit product view - restore original layout
      */
     exitProductView() {
+        // Check if we're actually in product view mode
+        if (!document.body.classList.contains('product-view-mode')) {
+            console.log('CategoryCircles: Not in product view, skipping exit');
+            return;
+        }
+
         console.log('CategoryCircles: Exiting product view');
 
         // Remove product view class
