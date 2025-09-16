@@ -768,7 +768,7 @@ class ProductMenu {
         } else {
             this.filteredProducts.forEach(product => {
                 const isInStock = product.stock > 0;
-                console.log('ProductMenu: Product stock check:', product.name, 'ID:', product.id, 'ID type:', typeof product.id, 'stock:', product.stock, 'isInStock:', isInStock);
+                console.log('ProductMenu: Product stock check:', product.name, 'ID:', product.id, 'ID type:', typeof product.id, 'stock:', product.stock, 'wc_stock:', product.wc_stock, 'stock_status:', product.stock_status, 'manage_stock:', product.manage_stock, 'isInStock:', isInStock);
                 html += `
                     <div class="product-item" style="
                         padding: 15px 20px;

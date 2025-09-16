@@ -272,7 +272,12 @@ class Charlie_WooCommerce_Integration {
 
             $store_stock = get_post_meta($product->ID, '_charlie_store_stock', true);
             $wc_stock = $wc_product->get_stock_quantity(); // Get actual WooCommerce stock
+            $stock_status = $wc_product->get_stock_status(); // Get stock status
+            $manage_stock = $wc_product->get_manage_stock(); // Check if stock management is enabled
             $actual_stock = $wc_stock ?: ($store_stock ?: 0); // Use WC stock first, fallback to custom
+
+            // Debug logging
+            error_log("Charlie Debug Stock: Product {$product->post_title} (ID: {$product->ID}) - WC Stock: {$wc_stock}, Manage Stock: " . ($manage_stock ? 'YES' : 'NO') . ", Stock Status: {$stock_status}, Store Stock: {$store_stock}");
 
             $formatted_products[] = array(
                 'id' => $product->ID,
@@ -286,6 +291,8 @@ class Charlie_WooCommerce_Integration {
                 'store_stock' => $store_stock ?: 0,
                 'stock' => $actual_stock, // Use actual WooCommerce stock
                 'wc_stock' => $wc_stock, // Include for debugging
+                'stock_status' => $stock_status, // Include for debugging
+                'manage_stock' => $manage_stock, // Include for debugging
                 'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names'))
             );
         }
@@ -330,7 +337,12 @@ class Charlie_WooCommerce_Integration {
 
             $store_stock = get_post_meta($product->ID, '_charlie_store_stock', true);
             $wc_stock = $wc_product->get_stock_quantity(); // Get actual WooCommerce stock
+            $stock_status = $wc_product->get_stock_status(); // Get stock status
+            $manage_stock = $wc_product->get_manage_stock(); // Check if stock management is enabled
             $actual_stock = $wc_stock ?: ($store_stock ?: 0); // Use WC stock first, fallback to custom
+
+            // Debug logging
+            error_log("Charlie Debug Stock: Product {$product->post_title} (ID: {$product->ID}) - WC Stock: {$wc_stock}, Manage Stock: " . ($manage_stock ? 'YES' : 'NO') . ", Stock Status: {$stock_status}, Store Stock: {$store_stock}");
 
             // Get brand information
             $brands = wp_get_post_terms($product->ID, 'product_brand', array('fields' => 'names'));
@@ -350,6 +362,8 @@ class Charlie_WooCommerce_Integration {
                 'store_stock' => $store_stock ?: 0,
                 'stock' => $actual_stock, // Use actual WooCommerce stock
                 'wc_stock' => $wc_stock, // Include for debugging
+                'stock_status' => $stock_status, // Include for debugging
+                'manage_stock' => $manage_stock, // Include for debugging
                 'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names')),
                 'brand' => $brand_name,
                 'sku' => $wc_product->get_sku()
@@ -516,7 +530,12 @@ class Charlie_WooCommerce_Integration {
 
             $store_stock = get_post_meta($product->ID, '_charlie_store_stock', true);
             $wc_stock = $wc_product->get_stock_quantity(); // Get actual WooCommerce stock
+            $stock_status = $wc_product->get_stock_status(); // Get stock status
+            $manage_stock = $wc_product->get_manage_stock(); // Check if stock management is enabled
             $actual_stock = $wc_stock ?: ($store_stock ?: 0); // Use WC stock first, fallback to custom
+
+            // Debug logging
+            error_log("Charlie Debug Stock: Product {$product->post_title} (ID: {$product->ID}) - WC Stock: {$wc_stock}, Manage Stock: " . ($manage_stock ? 'YES' : 'NO') . ", Stock Status: {$stock_status}, Store Stock: {$store_stock}");
 
             // Get brand information
             $brands = wp_get_post_terms($product->ID, 'product_brand', array('fields' => 'names'));
@@ -539,6 +558,8 @@ class Charlie_WooCommerce_Integration {
                 'store_stock' => $store_stock ?: 0,
                 'stock' => $actual_stock, // Use actual WooCommerce stock
                 'wc_stock' => $wc_stock, // Include for debugging
+                'stock_status' => $stock_status, // Include for debugging
+                'manage_stock' => $manage_stock, // Include for debugging
                 'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names')),
                 'brand' => $brand_name,
                 'sku' => $wc_product->get_sku(),
