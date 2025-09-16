@@ -167,41 +167,52 @@ class ProductMenu {
 
         // Handle clicks inside the menu with event delegation
         this.menuElement.addEventListener('click', (e) => {
-            console.log('ProductMenu: Click inside menu');
+            console.log('ProductMenu: *** CLICK DETECTED ***');
+            console.log('ProductMenu: Clicked element:', e.target);
+            console.log('ProductMenu: Element class:', e.target.className);
+            console.log('ProductMenu: Element tag:', e.target.tagName);
 
-            // Handle brand clicks
-            const brandItem = e.target.closest('[data-action]');
-            if (brandItem) {
-                const action = brandItem.getAttribute('data-action');
+            // Look for data-action element
+            const actionElement = e.target.closest('[data-action]');
+            console.log('ProductMenu: Found action element:', actionElement);
+
+            if (actionElement) {
+                const action = actionElement.getAttribute('data-action');
+                console.log('ProductMenu: Action type:', action);
 
                 if (action === 'clear-filter') {
-                    console.log('ProductMenu: Clear brand filter clicked');
+                    console.log('ProductMenu: Executing clear brand filter');
                     this.clearBrandFilter();
                 } else if (action === 'select-brand') {
+                    console.log('ProductMenu: Executing brand selection');
                     const brandData = {
-                        id: parseInt(brandItem.getAttribute('data-brand-id')),
-                        name: brandItem.getAttribute('data-brand-name'),
-                        slug: brandItem.getAttribute('data-brand-slug')
+                        id: parseInt(actionElement.getAttribute('data-brand-id')),
+                        name: actionElement.getAttribute('data-brand-name'),
+                        slug: actionElement.getAttribute('data-brand-slug')
                     };
-                    console.log('ProductMenu: Brand selected via delegation:', brandData);
                     this.handleBrandSelected(brandData);
                 } else if (action === 'select-product') {
-                    const productId = brandItem.getAttribute('data-product-id');
-                    console.log('ProductMenu: Product selected via delegation:', productId);
+                    const productId = actionElement.getAttribute('data-product-id');
+                    console.log('ProductMenu: *** PRODUCT CLICKED! ID:', productId, '***');
                     this.handleProductSelected(productId);
+                } else {
+                    console.log('ProductMenu: Unknown action:', action);
                 }
 
-                // Stop propagation for brand clicks
                 e.stopPropagation();
+                return;
+            } else {
+                console.log('ProductMenu: No action element found');
+            }
+
+            // Check for close button
+            if (e.target.closest('.close-btn')) {
+                console.log('ProductMenu: Close button detected');
                 return;
             }
 
-            // For all other clicks inside menu, prevent closing but don't stop propagation
-            // (this allows product links to work normally)
-            if (!e.target.closest('.close-btn')) {
-                console.log('ProductMenu: General click inside menu, preventing close');
-                e.stopPropagation();
-            }
+            console.log('ProductMenu: Preventing menu close on general click');
+            e.stopPropagation();
         });
 
         document.body.appendChild(this.menuElement);
@@ -748,6 +759,7 @@ class ProductMenu {
         } else {
             this.filteredProducts.forEach(product => {
                 const isInStock = product.stock > 0;
+                console.log('ProductMenu: Product stock check:', product.name, 'stock:', product.stock, 'isInStock:', isInStock);
                 html += `
                     <div class="product-item" style="
                         padding: 15px 20px;
@@ -756,9 +768,10 @@ class ProductMenu {
                         justify-content: space-between;
                         align-items: center;
                         transition: background 0.2s ease;
-                        cursor: ${isInStock ? 'pointer' : 'not-allowed'};
+                        cursor: pointer;
                         opacity: ${isInStock ? '1' : '0.5'};
-                    " onmouseover="if(${isInStock}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="this.style.background='transparent'" data-action="select-product" data-product-id="${product.id}">
+                        pointer-events: auto;
+                    " data-action="select-product" data-product-id="${product.id}">
                         <div style="flex: 1;">
                             <div style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">
                                 ${product.name}
@@ -781,6 +794,23 @@ class ProductMenu {
         }
 
         panel.innerHTML = html;
+
+        // Add hover effects to product items
+        const productItems = panel.querySelectorAll('.product-item[data-action="select-product"]');
+        productItems.forEach(item => {
+            const productId = item.getAttribute('data-product-id');
+            const product = this.filteredProducts.find(p => p.id === productId);
+            const isInStock = product && product.stock > 0;
+
+            if (isInStock) {
+                item.addEventListener('mouseenter', () => {
+                    item.style.background = 'rgba(0,255,0,0.1)';
+                });
+                item.addEventListener('mouseleave', () => {
+                    item.style.background = 'transparent';
+                });
+            }
+        });
     }
 
     /**
