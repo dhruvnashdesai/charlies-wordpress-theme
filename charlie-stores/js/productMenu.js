@@ -75,7 +75,7 @@ class ProductMenu {
             top: 50%;
             right: -1000px;
             width: 950px;
-            height: 500px;
+            height: 80vh;
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(20, 20, 20, 0.95));
             border: 2px solid #00ff00;
             border-radius: 8px;
@@ -995,7 +995,7 @@ class ProductMenu {
                         </div>
                         <div style="text-align: right;">
                             <div style="font-size: 14px; font-weight: bold; color: #00ff00;">
-                                ${product.raw_price_html || '$' + (typeof product.price === 'number' ? product.price.toFixed(2) : product.price)}
+                                ${product.raw_price_html || (typeof product.price === 'number' ? '$' + product.price.toFixed(2) : product.price)}
                             </div>
                         </div>
                     </div>
@@ -1112,7 +1112,7 @@ class ProductMenu {
 
                 <!-- Price -->
                 <div style="font-size: 16px; color: #00ff00; text-align: center; margin-bottom: 15px;">
-                    ${product.raw_price_html || '$' + (typeof product.price === 'number' ? product.price.toFixed(2) : product.price)}
+                    ${product.raw_price_html || (typeof product.price === 'number' ? '$' + product.price.toFixed(2) : product.price)}
                 </div>
 
                 <!-- Stock Status -->
