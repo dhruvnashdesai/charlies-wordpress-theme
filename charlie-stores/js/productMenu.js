@@ -559,7 +559,7 @@ class ProductMenu {
                 stock_status: product.stock_status, // Include debug info
                 manage_stock: product.manage_stock, // Include debug info
                 store_stock: product.store_stock, // Include debug info
-                category: this.currentCategory ? this.currentCategory.name : 'Mixed', // Handle null category
+                category: product.categories && product.categories.length > 0 ? product.categories[0] : (this.currentCategory ? this.currentCategory.name : 'Uncategorized'), // Use actual product category
                 description: product.description || 'No description available',
                 image: product.image,
                 url: product.url,
