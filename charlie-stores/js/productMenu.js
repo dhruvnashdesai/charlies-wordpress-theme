@@ -293,52 +293,78 @@ class ProductMenu {
     }
 
     /**
-     * Load all brands for a store (no category filter)
+     * Load all brands for a store (by getting brands from all categories)
      */
     async loadAllBrandsForStore(storeId) {
-        const formData = new FormData();
-        formData.append('action', 'get_store_brands');
-        formData.append('store_id', storeId);
-        formData.append('nonce', getConfig('nonce'));
+        // Get brands from all categories for this store
+        const allBrands = new Set();
 
-        const response = await fetch(getConfig('ajax_url'), {
-            method: 'POST',
-            body: formData
-        });
+        // Iterate through available categories and collect all brands
+        for (const category of this.availableCategories) {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_store_brands_by_category');
+                formData.append('category_id', category.id);
+                formData.append('store_id', storeId);
+                formData.append('nonce', getConfig('nonce'));
 
-        const data = await response.json();
+                const response = await fetch(getConfig('ajax_url'), {
+                    method: 'POST',
+                    body: formData
+                });
 
-        if (data.success) {
-            this.brands = data.data.brands;
-            console.log('ProductMenu: Loaded all brands for store:', this.brands);
-        } else {
-            throw new Error(data.data || 'Failed to load brands');
+                const data = await response.json();
+                if (data.success && data.data.brands) {
+                    data.data.brands.forEach(brand => {
+                        allBrands.add(JSON.stringify(brand)); // Use JSON to dedupe objects
+                    });
+                }
+            } catch (error) {
+                console.warn('Failed to load brands for category:', category.name, error);
+            }
         }
+
+        // Convert back to objects and remove duplicates
+        this.brands = Array.from(allBrands).map(brandStr => JSON.parse(brandStr));
+        console.log('ProductMenu: Loaded all brands for store:', this.brands);
     }
 
     /**
-     * Load all products for a store (no category filter)
+     * Load all products for a store (from all categories)
      */
     async loadAllProductsForStore(storeId) {
-        const formData = new FormData();
-        formData.append('action', 'get_store_products');
-        formData.append('store_id', storeId);
-        formData.append('nonce', getConfig('nonce'));
+        // Get products from all categories for this store
+        const allProducts = new Map(); // Use Map to dedupe by product ID
 
-        const response = await fetch(getConfig('ajax_url'), {
-            method: 'POST',
-            body: formData
-        });
+        // Iterate through available categories and collect all products
+        for (const category of this.availableCategories) {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'get_store_products_by_category');
+                formData.append('category_id', category.id);
+                formData.append('store_id', storeId);
+                formData.append('nonce', getConfig('nonce'));
 
-        const data = await response.json();
+                const response = await fetch(getConfig('ajax_url'), {
+                    method: 'POST',
+                    body: formData
+                });
 
-        if (data.success) {
-            this.allProducts = data.data.products;
-            this.filteredProducts = [...this.allProducts]; // Show all initially
-            console.log('ProductMenu: Loaded all products for store:', this.allProducts);
-        } else {
-            throw new Error(data.data || 'Failed to load products');
+                const data = await response.json();
+                if (data.success && data.data.products) {
+                    data.data.products.forEach(product => {
+                        allProducts.set(product.id, product); // Dedupe by ID
+                    });
+                }
+            } catch (error) {
+                console.warn('Failed to load products for category:', category.name, error);
+            }
         }
+
+        // Convert to array
+        this.allProducts = Array.from(allProducts.values());
+        this.filteredProducts = [...this.allProducts]; // Show all initially
+        console.log('ProductMenu: Loaded all products for store:', this.allProducts);
     }
 
     /**
