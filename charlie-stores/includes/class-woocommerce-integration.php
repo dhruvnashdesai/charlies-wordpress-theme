@@ -271,6 +271,9 @@ class Charlie_WooCommerce_Integration {
             if (!$wc_product) continue;
 
             $store_stock = get_post_meta($product->ID, '_charlie_store_stock', true);
+            $wc_stock = $wc_product->get_stock_quantity(); // Get actual WooCommerce stock
+            $actual_stock = $wc_stock ?: ($store_stock ?: 0); // Use WC stock first, fallback to custom
+
             $formatted_products[] = array(
                 'id' => $product->ID,
                 'name' => $product->post_title,
@@ -281,7 +284,8 @@ class Charlie_WooCommerce_Integration {
                 'add_to_cart_url' => $wc_product->add_to_cart_url(),
                 'in_stock' => $wc_product->is_in_stock(),
                 'store_stock' => $store_stock ?: 0,
-                'stock' => $store_stock ?: 0, // Add for JavaScript compatibility
+                'stock' => $actual_stock, // Use actual WooCommerce stock
+                'wc_stock' => $wc_stock, // Include for debugging
                 'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names'))
             );
         }
@@ -325,6 +329,8 @@ class Charlie_WooCommerce_Integration {
             if (!$wc_product) continue;
 
             $store_stock = get_post_meta($product->ID, '_charlie_store_stock', true);
+            $wc_stock = $wc_product->get_stock_quantity(); // Get actual WooCommerce stock
+            $actual_stock = $wc_stock ?: ($store_stock ?: 0); // Use WC stock first, fallback to custom
 
             // Get brand information
             $brands = wp_get_post_terms($product->ID, 'product_brand', array('fields' => 'names'));
@@ -342,7 +348,8 @@ class Charlie_WooCommerce_Integration {
                 'add_to_cart_url' => $wc_product->add_to_cart_url(),
                 'in_stock' => $wc_product->is_in_stock(),
                 'store_stock' => $store_stock ?: 0,
-                'stock' => $store_stock ?: 0, // Add for JavaScript compatibility
+                'stock' => $actual_stock, // Use actual WooCommerce stock
+                'wc_stock' => $wc_stock, // Include for debugging
                 'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names')),
                 'brand' => $brand_name,
                 'sku' => $wc_product->get_sku()
@@ -508,6 +515,8 @@ class Charlie_WooCommerce_Integration {
             if (!$wc_product) continue;
 
             $store_stock = get_post_meta($product->ID, '_charlie_store_stock', true);
+            $wc_stock = $wc_product->get_stock_quantity(); // Get actual WooCommerce stock
+            $actual_stock = $wc_stock ?: ($store_stock ?: 0); // Use WC stock first, fallback to custom
 
             // Get brand information
             $brands = wp_get_post_terms($product->ID, 'product_brand', array('fields' => 'names'));
@@ -528,7 +537,8 @@ class Charlie_WooCommerce_Integration {
                 'add_to_cart_url' => $wc_product->add_to_cart_url(),
                 'in_stock' => $wc_product->is_in_stock(),
                 'store_stock' => $store_stock ?: 0,
-                'stock' => $store_stock ?: 0, // Add for JavaScript compatibility
+                'stock' => $actual_stock, // Use actual WooCommerce stock
+                'wc_stock' => $wc_stock, // Include for debugging
                 'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names')),
                 'brand' => $brand_name,
                 'sku' => $wc_product->get_sku(),
