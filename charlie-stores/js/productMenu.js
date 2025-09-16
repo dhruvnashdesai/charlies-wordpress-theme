@@ -13,6 +13,7 @@ class ProductMenu {
         this.brands = [];
         this.allProducts = []; // All products in category
         this.filteredProducts = []; // Filtered by selected brand
+        this.selectedProduct = null; // Currently selected product for details
         this.menuElement = null;
 
         this.init();
@@ -66,8 +67,8 @@ class ProductMenu {
         this.menuElement.style.cssText = `
             position: fixed;
             top: 50%;
-            right: -800px;
-            width: 750px;
+            right: -1000px;
+            width: 950px;
             height: 500px;
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(20, 20, 20, 0.95));
             border: 2px solid #00ff00;
@@ -93,7 +94,7 @@ class ProductMenu {
             background: linear-gradient(90deg, rgba(0, 255, 0, 0.2), rgba(0, 0, 0, 0.8));
         `;
 
-        // Add dual-panel container
+        // Add three-panel container
         const panelContainer = document.createElement('div');
         panelContainer.className = 'panel-container';
         panelContainer.style.cssText = `
@@ -111,33 +112,47 @@ class ProductMenu {
             padding: 0;
         `;
 
-        // Right panel - Products
+        // Middle panel - Products
         const productsPanel = document.createElement('div');
         productsPanel.className = 'products-panel';
         productsPanel.style.cssText = `
+            width: 400px;
+            border-right: 1px solid #444;
+            overflow-y: auto;
+            padding: 0;
+        `;
+
+        // Right panel - Product Details
+        const detailsPanel = document.createElement('div');
+        detailsPanel.className = 'details-panel';
+        detailsPanel.style.cssText = `
             flex: 1;
             overflow-y: auto;
             padding: 0;
         `;
 
-        // Custom scrollbar styling for both panels
+        // Custom scrollbar styling for all panels
         const scrollbarStyle = document.createElement('style');
         scrollbarStyle.innerHTML = `
             .brands-panel::-webkit-scrollbar,
-            .products-panel::-webkit-scrollbar {
+            .products-panel::-webkit-scrollbar,
+            .details-panel::-webkit-scrollbar {
                 width: 8px;
             }
             .brands-panel::-webkit-scrollbar-track,
-            .products-panel::-webkit-scrollbar-track {
+            .products-panel::-webkit-scrollbar-track,
+            .details-panel::-webkit-scrollbar-track {
                 background: rgba(0, 0, 0, 0.5);
             }
             .brands-panel::-webkit-scrollbar-thumb,
-            .products-panel::-webkit-scrollbar-thumb {
+            .products-panel::-webkit-scrollbar-thumb,
+            .details-panel::-webkit-scrollbar-thumb {
                 background: #00ff00;
                 border-radius: 4px;
             }
             .brands-panel::-webkit-scrollbar-thumb:hover,
-            .products-panel::-webkit-scrollbar-thumb:hover {
+            .products-panel::-webkit-scrollbar-thumb:hover,
+            .details-panel::-webkit-scrollbar-thumb:hover {
                 background: #00cc00;
             }
         `;
@@ -145,6 +160,7 @@ class ProductMenu {
         // Assemble the menu
         panelContainer.appendChild(brandsPanel);
         panelContainer.appendChild(productsPanel);
+        panelContainer.appendChild(detailsPanel);
         this.menuElement.appendChild(header);
         this.menuElement.appendChild(panelContainer);
         this.menuElement.appendChild(scrollbarStyle);
@@ -169,6 +185,10 @@ class ProductMenu {
                     };
                     console.log('ProductMenu: Brand selected via delegation:', brandData);
                     this.handleBrandSelected(brandData);
+                } else if (action === 'select-product') {
+                    const productId = brandItem.getAttribute('data-product-id');
+                    console.log('ProductMenu: Product selected via delegation:', productId);
+                    this.handleProductSelected(productId);
                 }
 
                 // Stop propagation for brand clicks
@@ -346,13 +366,20 @@ class ProductMenu {
     }
 
     /**
-     * Handle product selection (Level 2 → Level 3)
+     * Handle product selection for details panel
      */
-    handleProductSelected(product) {
-        console.log('ProductMenu: Product selected:', product);
-        this.currentProduct = product;
-        this.menuLevel = 3;
-        this.updateMenuLayout();
+    handleProductSelected(productId) {
+        console.log('ProductMenu: Product selected for details:', productId);
+
+        // Find the product in our filtered products
+        const product = this.filteredProducts.find(p => p.id === productId);
+        if (product) {
+            this.selectedProduct = product;
+            console.log('ProductMenu: Selected product:', product);
+            this.updateMenuLayout();
+        } else {
+            console.error('ProductMenu: Product not found:', productId);
+        }
     }
 
     /**
@@ -473,7 +500,7 @@ class ProductMenu {
      * Position the menu on screen
      */
     positionMenu() {
-        const menuWidth = 750; // Fixed width for dual-panel layout
+        const menuWidth = 950; // Fixed width for three-panel layout
 
         this.menuElement.style.width = menuWidth + 'px';
         this.menuElement.style.right = '20px';
@@ -494,7 +521,7 @@ class ProductMenu {
     }
 
     /**
-     * Update menu layout (dual-panel)
+     * Update menu layout (three-panel)
      */
     updateMenuLayout() {
         if (!this.menuElement) return;
@@ -502,17 +529,21 @@ class ProductMenu {
         const header = this.menuElement.querySelector('.menu-header');
         const brandsPanel = this.menuElement.querySelector('.brands-panel');
         const productsPanel = this.menuElement.querySelector('.products-panel');
+        const detailsPanel = this.menuElement.querySelector('.details-panel');
 
-        if (!header || !brandsPanel || !productsPanel) return;
+        if (!header || !brandsPanel || !productsPanel || !detailsPanel) return;
 
         // Update header
-        this.updateDualPanelHeader(header);
+        this.updateThreePanelHeader(header);
 
         // Update brands panel
         this.updateBrandsPanel(brandsPanel);
 
         // Update products panel
         this.updateProductsPanel(productsPanel);
+
+        // Update details panel
+        this.updateDetailsPanel(detailsPanel);
     }
 
     /**
@@ -532,7 +563,7 @@ class ProductMenu {
 
         // Ensure we're using right property consistently
         this.menuElement.style.left = 'auto';
-        this.menuElement.style.right = '-800px';
+        this.menuElement.style.right = '-1000px';
         this.isVisible = false;
 
         console.log('ProductMenu: Position set to -800px for hiding animation');
@@ -552,9 +583,9 @@ class ProductMenu {
     }
 
     /**
-     * Update dual-panel header
+     * Update three-panel header
      */
-    updateDualPanelHeader(header) {
+    updateThreePanelHeader(header) {
         const selectedBrandText = this.selectedBrand ?
             ` - ${this.selectedBrand.name}` : '';
 
@@ -727,7 +758,7 @@ class ProductMenu {
                         transition: background 0.2s ease;
                         cursor: ${isInStock ? 'pointer' : 'not-allowed'};
                         opacity: ${isInStock ? '1' : '0.5'};
-                    " onmouseover="if(${isInStock}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="this.style.background='transparent'" onclick="window.open('${product.url}', '_blank')">
+                    " onmouseover="if(${isInStock}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="this.style.background='transparent'" data-action="select-product" data-product-id="${product.id}">
                         <div style="flex: 1;">
                             <div style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">
                                 ${product.name}
@@ -760,6 +791,91 @@ class ProductMenu {
         this.filteredProducts = [...this.allProducts];
         console.log('ProductMenu: Cleared brand filter, showing all products');
         this.updateMenuLayout();
+    }
+
+    /**
+     * Update details panel (right side)
+     */
+    updateDetailsPanel(panel) {
+        if (!this.selectedProduct) {
+            // No product selected, show placeholder
+            panel.innerHTML = `
+                <div style="padding: 20px; text-align: center; color: #888;">
+                    <div style="font-size: 16px; margin-bottom: 10px;">Select a product</div>
+                    <div style="font-size: 12px;">Click on a product from the list to view details</div>
+                </div>
+            `;
+            return;
+        }
+
+        const product = this.selectedProduct;
+        const isInStock = product.stock > 0;
+
+        panel.innerHTML = `
+            <div style="padding: 20px;">
+                <!-- Product Image -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    ${product.image ?
+                        `<img src="${product.image}" alt="${product.name}" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid #444;">` :
+                        `<div style="width: 200px; height: 200px; background: #333; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 0 auto; color: #666; font-size: 14px;">No Image</div>`
+                    }
+                </div>
+
+                <!-- Product Name -->
+                <div style="font-size: 18px; font-weight: bold; color: #00ff00; margin-bottom: 10px; text-align: center;">
+                    ${product.name}
+                </div>
+
+                <!-- Price -->
+                <div style="font-size: 16px; color: #00ff00; text-align: center; margin-bottom: 15px;">
+                    ${product.raw_price_html || '$' + product.price.toFixed(2)}
+                </div>
+
+                <!-- Stock Status -->
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <span style="padding: 4px 12px; border-radius: 4px; font-size: 12px; ${isInStock ? 'background: rgba(0,255,0,0.2); color: #00ff00;' : 'background: rgba(255,0,0,0.2); color: #ff4444;'}">
+                        ${isInStock ? `In Stock (${product.stock})` : 'Out of Stock'}
+                    </span>
+                </div>
+
+                <!-- Brand -->
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #888; margin-bottom: 4px;">BRAND</div>
+                    <div style="font-size: 14px;">${product.brand || 'Unknown'}</div>
+                </div>
+
+                <!-- Category -->
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #888; margin-bottom: 4px;">CATEGORY</div>
+                    <div style="font-size: 14px;">${product.category}</div>
+                </div>
+
+                <!-- Description -->
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 12px; color: #888; margin-bottom: 4px;">DESCRIPTION</div>
+                    <div style="font-size: 14px; line-height: 1.4;">${product.description}</div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 10px;">
+                    ${isInStock ?
+                        `<button onclick="window.open('${product.url}', '_blank')" style="
+                            flex: 1; padding: 10px; background: rgba(0,255,0,0.2); border: 1px solid #00ff00;
+                            color: #00ff00; border-radius: 4px; cursor: pointer; font-family: 'Courier New', monospace;
+                            transition: background 0.2s ease;
+                        " onmouseover="this.style.background='rgba(0,255,0,0.3)'" onmouseout="this.style.background='rgba(0,255,0,0.2)'">
+                            VIEW PRODUCT
+                        </button>` :
+                        `<button style="
+                            flex: 1; padding: 10px; background: rgba(255,0,0,0.2); border: 1px solid #ff4444;
+                            color: #ff4444; border-radius: 4px; cursor: not-allowed; font-family: 'Courier New', monospace;
+                        ">
+                            OUT OF STOCK
+                        </button>`
+                    }
+                </div>
+            </div>
+        `;
     }
 
 
