@@ -35,11 +35,17 @@ class ProductMenu {
      * Setup event listeners
      */
     setupEventListeners() {
-        console.log('ProductMenu: Setting up categorySelected event listener...');
-        // Listen for category selection
+        console.log('ProductMenu: Setting up event listeners...');
+        // Listen for category selection (legacy)
         document.addEventListener('categorySelected', (e) => {
             console.log('ProductMenu: categorySelected event received!', e.detail);
             this.handleCategorySelected(e.detail);
+        });
+
+        // Listen for warehouse selection (new simplified flow)
+        document.addEventListener('warehouseSelectedForMenu', (e) => {
+            console.log('ProductMenu: warehouseSelectedForMenu event received!', e.detail);
+            this.handleWarehouseSelectedForMenu(e.detail);
         });
 
         // Close menu on escape key
@@ -195,6 +201,16 @@ class ProductMenu {
                     const productId = actionElement.getAttribute('data-product-id');
                     console.log('ProductMenu: *** PRODUCT CLICKED! ID:', productId, '***');
                     this.handleProductSelected(productId);
+                } else if (action === 'clear-category-filter') {
+                    console.log('ProductMenu: Executing clear category filter');
+                    this.clearCategoryFilter();
+                } else if (action === 'select-category-filter') {
+                    console.log('ProductMenu: Executing category filter selection');
+                    const categoryData = {
+                        id: parseInt(actionElement.getAttribute('data-category-id')),
+                        name: actionElement.getAttribute('data-category-name')
+                    };
+                    this.handleCategoryFilterSelected(categoryData);
                 } else {
                     console.log('ProductMenu: Unknown action:', action);
                 }
@@ -219,7 +235,37 @@ class ProductMenu {
     }
 
     /**
-     * Handle category selection
+     * Handle warehouse selection (new simplified flow)
+     */
+    async handleWarehouseSelectedForMenu(detail) {
+        console.log('ProductMenu: Warehouse selected for menu:', detail);
+
+        this.currentWarehouse = detail.warehouse;
+        this.currentStoreId = detail.storeId;
+        this.availableCategories = detail.categories;
+        this.selectedCategory = null; // No category filter initially
+
+        try {
+            console.log('ProductMenu: Loading all brands and products for store:', detail.storeId);
+
+            // Load all brands and products for this store (no category filter initially)
+            await Promise.all([
+                this.loadAllBrandsForStore(detail.storeId),
+                this.loadAllProductsForStore(detail.storeId)
+            ]);
+
+            console.log('ProductMenu: Data loaded, showing menu with category filters');
+            this.selectedBrand = null; // No brand filter initially
+            this.showMenu();
+
+        } catch (error) {
+            console.error('ProductMenu: Failed to load menu data:', error);
+            this.showErrorMenu();
+        }
+    }
+
+    /**
+     * Handle category selection (legacy)
      */
     async handleCategorySelected(detail) {
         console.log('ProductMenu: Category selected for product menu:', detail);
@@ -243,6 +289,55 @@ class ProductMenu {
         } catch (error) {
             console.error('ProductMenu: Failed to load menu data:', error);
             this.showErrorMenu();
+        }
+    }
+
+    /**
+     * Load all brands for a store (no category filter)
+     */
+    async loadAllBrandsForStore(storeId) {
+        const formData = new FormData();
+        formData.append('action', 'get_store_brands');
+        formData.append('store_id', storeId);
+        formData.append('nonce', getConfig('nonce'));
+
+        const response = await fetch(getConfig('ajax_url'), {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            this.brands = data.data.brands;
+            console.log('ProductMenu: Loaded all brands for store:', this.brands);
+        } else {
+            throw new Error(data.data || 'Failed to load brands');
+        }
+    }
+
+    /**
+     * Load all products for a store (no category filter)
+     */
+    async loadAllProductsForStore(storeId) {
+        const formData = new FormData();
+        formData.append('action', 'get_store_products');
+        formData.append('store_id', storeId);
+        formData.append('nonce', getConfig('nonce'));
+
+        const response = await fetch(getConfig('ajax_url'), {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            this.allProducts = data.data.products;
+            this.filteredProducts = [...this.allProducts]; // Show all initially
+            console.log('ProductMenu: Loaded all products for store:', this.allProducts);
+        } else {
+            throw new Error(data.data || 'Failed to load products');
         }
     }
 
@@ -599,6 +694,13 @@ class ProductMenu {
             document.body.classList.remove('product-view-mode');
             document.dispatchEvent(new CustomEvent('menuClosed'));
             console.log('ProductMenu: Menu hidden and menuClosed event dispatched');
+
+            // Reset state for next use
+            this.selectedCategory = null;
+            this.selectedBrand = null;
+            this.selectedProduct = null;
+            this.availableCategories = null;
+            this.currentWarehouse = null;
         }, 400);
     }
 
@@ -609,25 +711,75 @@ class ProductMenu {
         const selectedBrandText = this.selectedBrand ?
             ` - ${this.selectedBrand.name}` : '';
 
-        header.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div style="font-size: 18px; font-weight: bold; text-transform: uppercase;">
-                        ${this.currentCategory.name}${selectedBrandText}
+        // Check if we're in the new simplified flow (warehouse selection)
+        const isWarehouseFlow = this.availableCategories && this.currentWarehouse;
+
+        if (isWarehouseFlow) {
+            // New flow: Show warehouse name and category filters
+            const warehouseName = this.currentWarehouse.name || `Store ${this.currentStoreId}`;
+            const selectedCategoryText = this.selectedCategory ? ` - ${this.selectedCategory.name}` : '';
+
+            header.innerHTML = `
+                <div style="display: flex; flex-direction: column; flex: 1; margin-right: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div>
+                            <div style="font-size: 18px; font-weight: bold; text-transform: uppercase;">
+                                ${warehouseName}${selectedCategoryText}${selectedBrandText}
+                            </div>
+                            <div style="font-size: 12px; opacity: 0.7; margin-top: 2px;">
+                                Showing ${this.filteredProducts.length} of ${this.allProducts.length} products
+                            </div>
+                        </div>
+                        <button class="close-btn" style="
+                            background: none; border: 1px solid #00ff00; color: #00ff00;
+                            width: 30px; height: 30px; border-radius: 4px; cursor: pointer;
+                            font-family: 'Courier New', monospace; font-size: 18px;
+                            display: flex; align-items: center; justify-content: center;
+                            transition: all 0.2s ease;
+                        ">×</button>
                     </div>
-                    <div style="font-size: 12px; opacity: 0.7; margin-top: 2px;">
-                        Showing ${this.filteredProducts.length} of ${this.allProducts.length} products
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button data-action="clear-category-filter" style="
+                            background: ${!this.selectedCategory ? 'rgba(0,255,0,0.2)' : 'transparent'};
+                            border: 1px solid #00ff00; color: #00ff00;
+                            padding: 4px 12px; border-radius: 4px; cursor: pointer;
+                            font-family: 'Courier New', monospace; font-size: 12px;
+                            transition: all 0.2s ease; text-transform: uppercase;
+                        ">All Categories</button>
+                        ${this.availableCategories.map(category => `
+                            <button data-action="select-category-filter" data-category-id="${category.id}" data-category-name="${category.name}" style="
+                                background: ${this.selectedCategory && this.selectedCategory.id === category.id ? 'rgba(0,255,0,0.2)' : 'transparent'};
+                                border: 1px solid ${category.color || '#00ff00'}; color: ${category.color || '#00ff00'};
+                                padding: 4px 12px; border-radius: 4px; cursor: pointer;
+                                font-family: 'Courier New', monospace; font-size: 12px;
+                                transition: all 0.2s ease; text-transform: uppercase;
+                            ">${category.name}</button>
+                        `).join('')}
                     </div>
                 </div>
-                <button class="close-btn" style="
-                    background: none; border: 1px solid #00ff00; color: #00ff00;
-                    width: 30px; height: 30px; border-radius: 4px; cursor: pointer;
-                    font-family: 'Courier New', monospace; font-size: 18px;
-                    display: flex; align-items: center; justify-content: center;
-                    transition: all 0.2s ease;
-                ">×</button>
-            </div>
-        `;
+            `;
+        } else {
+            // Legacy flow: Show category name
+            header.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 18px; font-weight: bold; text-transform: uppercase;">
+                            ${this.currentCategory.name}${selectedBrandText}
+                        </div>
+                        <div style="font-size: 12px; opacity: 0.7; margin-top: 2px;">
+                            Showing ${this.filteredProducts.length} of ${this.allProducts.length} products
+                        </div>
+                    </div>
+                    <button class="close-btn" style="
+                        background: none; border: 1px solid #00ff00; color: #00ff00;
+                        width: 30px; height: 30px; border-radius: 4px; cursor: pointer;
+                        font-family: 'Courier New', monospace; font-size: 18px;
+                        display: flex; align-items: center; justify-content: center;
+                        transition: all 0.2s ease;
+                    ">×</button>
+                </div>
+            `;
+        }
 
         // Add event listener to close button
         const closeBtn = header.querySelector('.close-btn');
@@ -820,6 +972,36 @@ class ProductMenu {
                 });
             }
         });
+    }
+
+    /**
+     * Clear category filter (show all products from all categories)
+     */
+    clearCategoryFilter() {
+        this.selectedCategory = null;
+        this.selectedBrand = null;
+        // Reset products to all products for the store (reload needed)
+        this.loadAllProductsForStore(this.currentStoreId).then(() => {
+            this.updateMenuLayout();
+        });
+        console.log('ProductMenu: Cleared category filter, showing all products');
+    }
+
+    /**
+     * Handle category filter selection
+     */
+    async handleCategoryFilterSelected(categoryData) {
+        this.selectedCategory = categoryData;
+        this.selectedBrand = null; // Clear brand filter when changing categories
+
+        try {
+            // Load products for the selected category
+            await this.loadAllProductsForCategory(categoryData.id, this.currentStoreId);
+            this.updateMenuLayout();
+            console.log('ProductMenu: Category filter applied:', categoryData.name);
+        } catch (error) {
+            console.error('ProductMenu: Failed to load products for category:', error);
+        }
     }
 
     /**

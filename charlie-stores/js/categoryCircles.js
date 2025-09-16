@@ -96,19 +96,28 @@ class CategoryCircles {
      * Handle warehouse marker click
      */
     async handleWarehouseClick(warehouse) {
-        console.log('Warehouse clicked, loading categories...', warehouse);
+        console.log('Warehouse clicked, entering direct product view...', warehouse);
 
         this.currentStoreId = warehouse.id;
 
         try {
-            // Hide existing categories first
+            // Hide any existing categories
             this.hideCategories();
 
             // Load categories for this warehouse/store
             await this.loadCategories(warehouse.id);
 
-            // Show category circles
-            this.showCategories();
+            // Enter product view immediately (no category circles)
+            this.enterProductView();
+
+            // Dispatch event to open product menu with all categories
+            document.dispatchEvent(new CustomEvent('warehouseSelectedForMenu', {
+                detail: {
+                    warehouse: warehouse,
+                    storeId: warehouse.id,
+                    categories: this.categories
+                }
+            }));
 
         } catch (error) {
             console.error('Error loading categories:', error);
