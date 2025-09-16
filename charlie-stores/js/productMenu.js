@@ -554,13 +554,17 @@ class ProductMenu {
                 name: product.name,
                 price: this.extractPriceFromHTML(product.price),
                 currency: 'CAD',
-                stock: parseInt(product.store_stock) || 0,
-                category: this.currentCategory.name,
+                stock: parseInt(product.stock) || parseInt(product.store_stock) || 0, // Use the fixed stock field
+                wc_stock: product.wc_stock, // Include debug info
+                stock_status: product.stock_status, // Include debug info
+                manage_stock: product.manage_stock, // Include debug info
+                store_stock: product.store_stock, // Include debug info
+                category: this.currentCategory ? this.currentCategory.name : 'Mixed', // Handle null category
                 description: product.description || 'No description available',
                 image: product.image,
                 url: product.url,
                 add_to_cart_url: product.add_to_cart_url,
-                in_stock: product.in_stock && parseInt(product.store_stock) > 0,
+                in_stock: product.in_stock && parseInt(product.stock || product.store_stock) > 0,
                 raw_price_html: product.price, // Keep original price HTML
                 brand: product.brand || 'No Brand' // Add brand information
             };
