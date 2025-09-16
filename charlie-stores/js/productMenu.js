@@ -186,7 +186,7 @@ class ProductMenu {
                 const action = actionElement.getAttribute('data-action');
                 console.log('ProductMenu: Action type:', action);
 
-                if (action === 'clear-filter') {
+                if (action === 'clear-filter' || action === 'clear-brand-filter') {
                     console.log('ProductMenu: Executing clear brand filter');
                     this.clearBrandFilter();
                 } else if (action === 'select-brand') {
@@ -865,51 +865,64 @@ class ProductMenu {
             <div style="padding: 15px 15px 10px 15px; border-bottom: 1px solid #333;">
                 <div style="font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #00ff00;">
                     BRANDS
+                    ${!this.selectedCategory ?
+                        '<span style="font-size: 11px; opacity: 0.6; font-weight: normal;">(All categories)</span>' :
+                        `<span style="font-size: 11px; opacity: 0.6; font-weight: normal;">(${this.selectedCategory.name})</span>`
+                    }
                 </div>
             </div>
         `;
 
-        // Add "All Brands" option
-        const allSelected = !this.selectedBrand;
-        html += `
-            <div class="brand-item" style="
-                padding: 12px 15px;
-                border-bottom: 1px solid #333;
-                cursor: pointer;
-                transition: background 0.2s ease;
-                background: ${allSelected ? 'rgba(0,255,0,0.2)' : 'transparent'};
-                border-left: ${allSelected ? '3px solid #00ff00' : '3px solid transparent'};
-            " onmouseover="if(!${allSelected}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="if(!${allSelected}) this.style.background='transparent'" data-action="clear-filter">
-                <div style="font-size: 14px; font-weight: bold;">
-                    All Brands
+        if (this.brands.length === 0) {
+            html += `
+                <div style="padding: 40px 20px; text-align: center; opacity: 0.5;">
+                    <div style="font-size: 14px; margin-bottom: 8px;">No brands available</div>
+                    <div style="font-size: 12px;">No products found for this selection</div>
                 </div>
-                <div style="font-size: 11px; opacity: 0.7;">
-                    ${this.allProducts.length} products
-                </div>
-            </div>
-        `;
-
-        // Add individual brands
-        this.brands.forEach(brand => {
-            const isSelected = this.selectedBrand && this.selectedBrand.id === brand.id;
+            `;
+        } else {
+            // Add "All Brands" option
+            const allSelected = !this.selectedBrand;
             html += `
                 <div class="brand-item" style="
                     padding: 12px 15px;
                     border-bottom: 1px solid #333;
                     cursor: pointer;
                     transition: background 0.2s ease;
-                    background: ${isSelected ? 'rgba(0,255,0,0.2)' : 'transparent'};
-                    border-left: ${isSelected ? '3px solid #00ff00' : '3px solid transparent'};
-                " onmouseover="if(!${isSelected}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="if(!${isSelected}) this.style.background='transparent'" data-action="select-brand" data-brand-id="${brand.id}" data-brand-name="${brand.name}" data-brand-slug="${brand.slug}">
+                    background: ${allSelected ? 'rgba(0,255,0,0.2)' : 'transparent'};
+                    border-left: ${allSelected ? '3px solid #00ff00' : '3px solid transparent'};
+                " onmouseover="if(!${allSelected}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="if(!${allSelected}) this.style.background='transparent'" data-action="clear-brand-filter">
                     <div style="font-size: 14px; font-weight: bold;">
-                        ${brand.name}
+                        All Brands
                     </div>
                     <div style="font-size: 11px; opacity: 0.7;">
-                        ${brand.product_count} products
+                        ${this.allProducts.length} products
                     </div>
                 </div>
             `;
-        });
+
+            // Add individual brands
+            this.brands.forEach(brand => {
+                const isSelected = this.selectedBrand && this.selectedBrand.id === brand.id;
+                html += `
+                    <div class="brand-item" style="
+                        padding: 12px 15px;
+                        border-bottom: 1px solid #333;
+                        cursor: pointer;
+                        transition: background 0.2s ease;
+                        background: ${isSelected ? 'rgba(0,255,0,0.2)' : 'transparent'};
+                        border-left: ${isSelected ? '3px solid #00ff00' : '3px solid transparent'};
+                    " onmouseover="if(!${isSelected}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="if(!${isSelected}) this.style.background='transparent'" data-action="select-brand" data-brand-id="${brand.id}" data-brand-name="${brand.name}" data-brand-slug="${brand.slug}">
+                        <div style="font-size: 14px; font-weight: bold;">
+                            ${brand.name}
+                        </div>
+                        <div style="font-size: 11px; opacity: 0.7;">
+                            ${brand.product_count} products
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
         if (this.brands.length === 0) {
             html += `
@@ -1013,14 +1026,21 @@ class ProductMenu {
     /**
      * Clear category filter (show all products from all categories)
      */
-    clearCategoryFilter() {
+    async clearCategoryFilter() {
         this.selectedCategory = null;
         this.selectedBrand = null;
-        // Reset products to all products for the store (reload needed)
-        this.loadAllProductsForStore(this.currentStoreId).then(() => {
+
+        try {
+            // Reload all brands and products for the store
+            await Promise.all([
+                this.loadAllBrandsForStore(this.currentStoreId),
+                this.loadAllProductsForStore(this.currentStoreId)
+            ]);
             this.updateMenuLayout();
-        });
-        console.log('ProductMenu: Cleared category filter, showing all products');
+            console.log('ProductMenu: Cleared category filter, showing all products');
+        } catch (error) {
+            console.error('ProductMenu: Failed to reload all data:', error);
+        }
     }
 
     /**
@@ -1031,12 +1051,19 @@ class ProductMenu {
         this.selectedBrand = null; // Clear brand filter when changing categories
 
         try {
-            // Load products for the selected category
-            await this.loadAllProductsForCategory(categoryData.id, this.currentStoreId);
+            console.log('ProductMenu: Loading brands and products for category:', categoryData.name, 'ID:', categoryData.id);
+
+            // Load both brands and products for the selected category
+            await Promise.all([
+                this.loadBrands(categoryData.id, this.currentStoreId),
+                this.loadAllProductsForCategory(categoryData.id, this.currentStoreId)
+            ]);
+
+            console.log('ProductMenu: After category selection - brands:', this.brands?.length, 'products:', this.allProducts?.length);
             this.updateMenuLayout();
             console.log('ProductMenu: Category filter applied:', categoryData.name);
         } catch (error) {
-            console.error('ProductMenu: Failed to load products for category:', error);
+            console.error('ProductMenu: Failed to load data for category:', error);
         }
     }
 
