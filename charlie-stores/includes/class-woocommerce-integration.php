@@ -270,6 +270,7 @@ class Charlie_WooCommerce_Integration {
             $wc_product = wc_get_product($product->ID);
             if (!$wc_product) continue;
 
+            $store_stock = get_post_meta($product->ID, '_charlie_store_stock', true);
             $formatted_products[] = array(
                 'id' => $product->ID,
                 'name' => $product->post_title,
@@ -279,7 +280,8 @@ class Charlie_WooCommerce_Integration {
                 'url' => get_permalink($product->ID),
                 'add_to_cart_url' => $wc_product->add_to_cart_url(),
                 'in_stock' => $wc_product->is_in_stock(),
-                'store_stock' => get_post_meta($product->ID, '_charlie_store_stock', true),
+                'store_stock' => $store_stock ?: 0,
+                'stock' => $store_stock ?: 0, // Add for JavaScript compatibility
                 'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names'))
             );
         }
@@ -340,6 +342,7 @@ class Charlie_WooCommerce_Integration {
                 'add_to_cart_url' => $wc_product->add_to_cart_url(),
                 'in_stock' => $wc_product->is_in_stock(),
                 'store_stock' => $store_stock ?: 0,
+                'stock' => $store_stock ?: 0, // Add for JavaScript compatibility
                 'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names')),
                 'brand' => $brand_name,
                 'sku' => $wc_product->get_sku()
@@ -525,6 +528,7 @@ class Charlie_WooCommerce_Integration {
                 'add_to_cart_url' => $wc_product->add_to_cart_url(),
                 'in_stock' => $wc_product->is_in_stock(),
                 'store_stock' => $store_stock ?: 0,
+                'stock' => $store_stock ?: 0, // Add for JavaScript compatibility
                 'categories' => wp_get_post_terms($product->ID, 'product_cat', array('fields' => 'names')),
                 'brand' => $brand_name,
                 'sku' => $wc_product->get_sku(),
