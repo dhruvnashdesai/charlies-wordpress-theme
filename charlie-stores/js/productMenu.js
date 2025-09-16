@@ -995,7 +995,7 @@ class ProductMenu {
                         </div>
                         <div style="text-align: right;">
                             <div style="font-size: 14px; font-weight: bold; color: #00ff00;">
-                                ${product.raw_price_html || '$' + product.price.toFixed(2)}
+                                ${product.raw_price_html || '$' + (typeof product.price === 'number' ? product.price.toFixed(2) : product.price)}
                             </div>
                         </div>
                     </div>
@@ -1112,7 +1112,7 @@ class ProductMenu {
 
                 <!-- Price -->
                 <div style="font-size: 16px; color: #00ff00; text-align: center; margin-bottom: 15px;">
-                    ${product.raw_price_html || '$' + product.price.toFixed(2)}
+                    ${product.raw_price_html || '$' + (typeof product.price === 'number' ? product.price.toFixed(2) : product.price)}
                 </div>
 
                 <!-- Stock Status -->
