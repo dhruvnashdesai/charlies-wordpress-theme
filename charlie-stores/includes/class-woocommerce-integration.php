@@ -94,25 +94,51 @@ class Charlie_WooCommerce_Integration {
             $store_options[''] = __('No stores found - Please create a store first', 'charlies-stores');
         }
 
-        woocommerce_wp_select(array(
-            'id' => '_charlie_store_location',
-            'label' => __('Available at Store', 'charlies-stores'),
-            'description' => __('Select which store this product is available at.', 'charlies-stores'),
-            'desc_tip' => true,
-            'options' => $store_options
-        ));
+        // Check if WooCommerce admin functions are available
+        if (function_exists('woocommerce_wp_select')) {
+            woocommerce_wp_select(array(
+                'id' => '_charlie_store_location',
+                'label' => __('Available at Store', 'charlies-stores'),
+                'description' => __('Select which store this product is available at.', 'charlies-stores'),
+                'desc_tip' => true,
+                'options' => $store_options
+            ));
+        } else {
+            // Fallback to manual HTML if WooCommerce functions aren't available
+            $current_store = get_post_meta(get_the_ID(), '_charlie_store_location', true);
+            echo '<p class="form-field _charlie_store_location_field">';
+            echo '<label for="_charlie_store_location">' . __('Available at Store', 'charlies-stores') . '</label>';
+            echo '<select id="_charlie_store_location" name="_charlie_store_location" class="select short">';
+            foreach ($store_options as $value => $label) {
+                echo '<option value="' . esc_attr($value) . '"' . selected($current_store, $value, false) . '>' . esc_html($label) . '</option>';
+            }
+            echo '</select>';
+            echo '<span class="description">' . __('Select which store this product is available at.', 'charlies-stores') . '</span>';
+            echo '</p>';
+        }
 
-        woocommerce_wp_text_field(array(
-            'id' => '_charlie_store_stock',
-            'label' => __('Store Stock Quantity', 'charlies-stores'),
-            'description' => __('Stock quantity at this specific store.', 'charlies-stores'),
-            'desc_tip' => true,
-            'type' => 'number',
-            'custom_attributes' => array(
-                'step' => '1',
-                'min' => '0'
-            )
-        ));
+        // Check if WooCommerce admin functions are available
+        if (function_exists('woocommerce_wp_text_field')) {
+            woocommerce_wp_text_field(array(
+                'id' => '_charlie_store_stock',
+                'label' => __('Store Stock Quantity', 'charlies-stores'),
+                'description' => __('Stock quantity at this specific store.', 'charlies-stores'),
+                'desc_tip' => true,
+                'type' => 'number',
+                'custom_attributes' => array(
+                    'step' => '1',
+                    'min' => '0'
+                )
+            ));
+        } else {
+            // Fallback to manual HTML if WooCommerce functions aren't available
+            $current_stock = get_post_meta(get_the_ID(), '_charlie_store_stock', true);
+            echo '<p class="form-field _charlie_store_stock_field">';
+            echo '<label for="_charlie_store_stock">' . __('Store Stock Quantity', 'charlies-stores') . '</label>';
+            echo '<input type="number" id="_charlie_store_stock" name="_charlie_store_stock" value="' . esc_attr($current_stock) . '" step="1" min="0" class="short" />';
+            echo '<span class="description">' . __('Stock quantity at this specific store.', 'charlies-stores') . '</span>';
+            echo '</p>';
+        }
 
         echo '</div>';
     }
