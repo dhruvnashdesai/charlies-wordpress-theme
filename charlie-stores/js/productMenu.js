@@ -922,6 +922,12 @@ class ProductMenu {
      * Update products panel (right side)
      */
     updateProductsPanel(panel) {
+        console.log('ProductMenu: updateProductsPanel called');
+        console.log('ProductMenu: allProducts.length:', this.allProducts ? this.allProducts.length : 'undefined');
+        console.log('ProductMenu: filteredProducts.length:', this.filteredProducts ? this.filteredProducts.length : 'undefined');
+        console.log('ProductMenu: selectedBrand:', this.selectedBrand);
+        console.log('ProductMenu: selectedCategory:', this.selectedCategory);
+
         let html = `
             <div style="padding: 15px 15px 10px 15px; border-bottom: 1px solid #333;">
                 <div style="font-size: 14px; font-weight: bold; color: #00ff00;">
@@ -931,7 +937,7 @@ class ProductMenu {
             </div>
         `;
 
-        if (this.filteredProducts.length === 0) {
+        if (!this.filteredProducts || this.filteredProducts.length === 0) {
             html += `
                 <div style="padding: 40px 20px; text-align: center; opacity: 0.7;">
                     <div style="font-size: 16px; margin-bottom: 8px;">No Products Available</div>
