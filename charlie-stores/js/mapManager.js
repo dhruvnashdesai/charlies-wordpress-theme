@@ -1666,8 +1666,8 @@ class MapManager {
         const currentCenterPixel = this.map.project(currentCenter);
 
         if (isMobile) {
-            // Mobile: slide up (move marker up in viewport)
-            slideDistance = window.innerHeight * 0.2; // 20% of screen height
+            // Mobile: slide up (move marker up in viewport to near top of screen)
+            slideDistance = window.innerHeight * 0.6; // 60% of screen height for top positioning
             newCenterPixel = {
                 x: currentCenterPixel.x,
                 y: currentCenterPixel.y + slideDistance // Pan down to move marker up
