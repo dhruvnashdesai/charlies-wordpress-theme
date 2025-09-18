@@ -1666,11 +1666,11 @@ class MapManager {
         const currentCenterPixel = this.map.project(currentCenter);
 
         if (isMobile) {
-            // Mobile: slide up (move marker down in viewport)
+            // Mobile: slide up (move marker up in viewport)
             slideDistance = window.innerHeight * 0.2; // 20% of screen height
             newCenterPixel = {
                 x: currentCenterPixel.x,
-                y: currentCenterPixel.y - slideDistance // Pan up to move marker down
+                y: currentCenterPixel.y + slideDistance // Pan down to move marker up
             };
         } else {
             // Desktop: slide left (existing logic)
