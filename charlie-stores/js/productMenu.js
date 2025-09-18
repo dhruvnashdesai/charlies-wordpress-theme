@@ -1782,11 +1782,13 @@ class ProductMenu {
             if (actualCategories && actualCategories.length > 0) {
                 actualCategories.forEach(category => {
                     const option = document.createElement('option');
-                    option.value = category.id || category.name || category;
+                    // Use the category name as the value for filtering (not ID)
+                    option.value = category.name || category;
                     option.textContent = category.name || category;
                     this.categoryFilter.appendChild(option);
                 });
                 console.log('ProductMenu: Category filter populated with', actualCategories.length, 'options');
+                console.log('ProductMenu: Category options:', Array.from(this.categoryFilter.options).map(opt => ({ value: opt.value, text: opt.textContent })));
             } else {
                 console.log('ProductMenu: No categories available for filter');
             }
@@ -1798,11 +1800,13 @@ class ProductMenu {
             if (actualBrands && actualBrands.length > 0) {
                 actualBrands.forEach(brand => {
                     const option = document.createElement('option');
-                    option.value = brand.id || brand.name || brand;
+                    // Use the brand name as the value for filtering (not ID)
+                    option.value = brand.name || brand;
                     option.textContent = brand.name || brand;
                     this.brandFilter.appendChild(option);
                 });
                 console.log('ProductMenu: Brand filter populated with', actualBrands.length, 'options');
+                console.log('ProductMenu: Brand options:', Array.from(this.brandFilter.options).map(opt => ({ value: opt.value, text: opt.textContent })));
             } else {
                 console.log('ProductMenu: No brands available for filter');
             }
