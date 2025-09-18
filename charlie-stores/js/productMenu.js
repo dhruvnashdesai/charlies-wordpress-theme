@@ -276,14 +276,17 @@ class ProductMenu {
 
         // Add filter event listeners
         categoryFilter.addEventListener('change', (e) => {
+            console.log('CategoryFilter change event fired! Value:', e.target.value);
             this.handleCategoryFilter(e.target.value);
         });
 
         brandFilter.addEventListener('change', (e) => {
+            console.log('BrandFilter change event fired! Value:', e.target.value);
             this.handleBrandFilter(e.target.value);
         });
 
         clearFilters.addEventListener('click', () => {
+            console.log('Clear filters button clicked!');
             this.clearAllFilters();
         });
 
@@ -1586,7 +1589,21 @@ class ProductMenu {
      * Handle category filter change
      */
     handleCategoryFilter(categoryId) {
-        console.log('Category filter changed:', categoryId);
+        console.log('=== CATEGORY FILTER DEBUG ===');
+        console.log('Category filter changed to:', categoryId);
+        console.log('Type of categoryId:', typeof categoryId);
+        console.log('CategoryId length:', categoryId?.length);
+
+        // Debug first few products
+        if (this.allProducts && this.allProducts.length > 0) {
+            console.log('Sample product categories structure:');
+            this.allProducts.slice(0, 3).forEach((product, index) => {
+                console.log(`Product ${index + 1} - "${product.name}":`);
+                console.log('  categories:', product.categories, typeof product.categories);
+                console.log('  category:', product.category, typeof product.category);
+            });
+        }
+
         this.selectedCategory = categoryId;
         this.filterProducts();
     }
@@ -1595,7 +1612,21 @@ class ProductMenu {
      * Handle brand filter change
      */
     handleBrandFilter(brandId) {
-        console.log('Brand filter changed:', brandId);
+        console.log('=== BRAND FILTER DEBUG ===');
+        console.log('Brand filter changed to:', brandId);
+        console.log('Type of brandId:', typeof brandId);
+        console.log('BrandId length:', brandId?.length);
+
+        // Debug first few products
+        if (this.allProducts && this.allProducts.length > 0) {
+            console.log('Sample product brands structure:');
+            this.allProducts.slice(0, 3).forEach((product, index) => {
+                console.log(`Product ${index + 1} - "${product.name}":`);
+                console.log('  brand:', product.brand, typeof product.brand);
+                console.log('  brands:', product.brands, typeof product.brands);
+            });
+        }
+
         this.selectedBrand = brandId;
         this.filterProducts();
     }
