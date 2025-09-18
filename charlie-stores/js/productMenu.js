@@ -117,28 +117,56 @@ class ProductMenu {
         const categoryFilter = document.createElement('select');
         categoryFilter.className = 'category-filter';
         categoryFilter.style.cssText = `
-            background: rgba(0, 255, 0, 0.1);
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 200, 0, 0.2));
             border: 1px solid #00ff00;
             color: #00ff00;
-            padding: 8px 12px;
-            border-radius: 4px;
+            padding: 8px 30px 8px 12px;
+            border-radius: 6px;
             font-family: 'Courier New', monospace;
             font-size: 14px;
             min-width: 150px;
+            cursor: pointer;
+            appearance: none;
+            background-image:
+                linear-gradient(45deg, transparent 50%, #00ff00 50%),
+                linear-gradient(135deg, #00ff00 50%, transparent 50%);
+            background-position:
+                calc(100% - 15px) calc(1em + 2px),
+                calc(100% - 10px) calc(1em + 2px);
+            background-size:
+                5px 5px,
+                5px 5px;
+            background-repeat: no-repeat;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 255, 0, 0.2);
         `;
 
         // Brand filter dropdown
         const brandFilter = document.createElement('select');
         brandFilter.className = 'brand-filter';
         brandFilter.style.cssText = `
-            background: rgba(0, 255, 0, 0.1);
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 200, 0, 0.2));
             border: 1px solid #00ff00;
             color: #00ff00;
-            padding: 8px 12px;
-            border-radius: 4px;
+            padding: 8px 30px 8px 12px;
+            border-radius: 6px;
             font-family: 'Courier New', monospace;
             font-size: 14px;
             min-width: 150px;
+            cursor: pointer;
+            appearance: none;
+            background-image:
+                linear-gradient(45deg, transparent 50%, #00ff00 50%),
+                linear-gradient(135deg, #00ff00 50%, transparent 50%);
+            background-position:
+                calc(100% - 15px) calc(1em + 2px),
+                calc(100% - 10px) calc(1em + 2px);
+            background-size:
+                5px 5px,
+                5px 5px;
+            background-repeat: no-repeat;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 255, 0, 0.2);
         `;
 
         // Clear filters button
@@ -179,6 +207,40 @@ class ProductMenu {
         // Add mobile responsive CSS for the grid
         const mobileGridStyle = document.createElement('style');
         mobileGridStyle.innerHTML = `
+            /* Dropdown styling and interactions */
+            .category-filter:hover,
+            .brand-filter:hover {
+                border-color: #00ff00 !important;
+                box-shadow: 0 4px 12px rgba(0, 255, 0, 0.3) !important;
+                background: linear-gradient(135deg, rgba(0, 255, 0, 0.2), rgba(0, 200, 0, 0.3)) !important;
+            }
+
+            .category-filter:focus,
+            .brand-filter:focus {
+                outline: none !important;
+                border-color: #00ff00 !important;
+                box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.3) !important;
+                background: linear-gradient(135deg, rgba(0, 255, 0, 0.2), rgba(0, 200, 0, 0.3)) !important;
+            }
+
+            /* Style dropdown options */
+            .category-filter option,
+            .brand-filter option {
+                background-color: #1a1a1a !important;
+                color: #00ff00 !important;
+                padding: 8px 12px !important;
+                border: none !important;
+                font-family: 'Courier New', monospace !important;
+            }
+
+            .category-filter option:hover,
+            .brand-filter option:hover,
+            .category-filter option:checked,
+            .brand-filter option:checked {
+                background-color: rgba(0, 255, 0, 0.2) !important;
+                color: #ffffff !important;
+            }
+
             @media (max-width: 768px) {
                 .product-grid {
                     grid-template-columns: 1fr !important;
@@ -229,6 +291,12 @@ class ProductMenu {
 
                 .menu-header {
                     padding: 10px 15px !important;
+                }
+
+                .category-filter,
+                .brand-filter {
+                    font-size: 16px !important;
+                    padding: 12px 30px 12px 16px !important;
                 }
             }
         `;
