@@ -525,6 +525,25 @@ class ProductMenu {
         this.productGrid = productGrid;
         this.productGridContainer = productGridContainer;
 
+        // Store dropdown state and arrows for class-level access
+        this.categoryOpen = categoryOpen;
+        this.brandOpen = brandOpen;
+        this.categoryArrow = categoryArrow;
+        this.brandArrow = brandArrow;
+
+        // Bind the close functions to this context
+        this.closeCategoryDropdown = () => {
+            this.categoryDropdown.style.display = 'none';
+            this.categoryArrow.style.transform = 'translateY(-50%) rotate(0deg)';
+            categoryOpen = false;
+        };
+
+        this.closeBrandDropdown = () => {
+            this.brandDropdown.style.display = 'none';
+            this.brandArrow.style.transform = 'translateY(-50%) rotate(0deg)';
+            brandOpen = false;
+        };
+
         // Set up infinite scroll
         this.setupInfiniteScroll();
 
@@ -2024,7 +2043,7 @@ class ProductMenu {
             allCategoriesOption.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.categoryDisplay.textContent = 'All Categories';
-                closeCategoryDropdown();
+                this.closeCategoryDropdown();
                 this.handleCategoryFilter('');
             });
             allCategoriesOption.addEventListener('mouseover', () => {
@@ -2054,7 +2073,7 @@ class ProductMenu {
                     option.addEventListener('click', (e) => {
                         e.stopPropagation();
                         this.categoryDisplay.textContent = category.name || category;
-                        closeCategoryDropdown();
+                        this.closeCategoryDropdown();
                         this.handleCategoryFilter(category.name || category);
                     });
                     option.addEventListener('mouseover', () => {
@@ -2092,7 +2111,7 @@ class ProductMenu {
             allBrandsOption.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.brandDisplay.textContent = 'All Brands';
-                closeBrandDropdown();
+                this.closeBrandDropdown();
                 this.handleBrandFilter('');
             });
             allBrandsOption.addEventListener('mouseover', () => {
@@ -2122,7 +2141,7 @@ class ProductMenu {
                     option.addEventListener('click', (e) => {
                         e.stopPropagation();
                         this.brandDisplay.textContent = brand.name || brand;
-                        closeBrandDropdown();
+                        this.closeBrandDropdown();
                         this.handleBrandFilter(brand.name || brand);
                     });
                     option.addEventListener('mouseover', () => {
