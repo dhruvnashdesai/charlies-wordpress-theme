@@ -895,9 +895,16 @@ class MapManager {
         const metersPerPixel = earthCircumference * Math.cos(markerCoords.lat * Math.PI / 180) / Math.pow(2, currentZoom + 8);
         const tenKmInPixels = (10 * 1000) / metersPerPixel; // 10km in pixels
 
+        // Mobile-responsive radius calculation
+        const isMobile = window.innerWidth <= 768;
+        const mobileRadiusMultiplier = isMobile ? 0.45 : 1.0; // Even tighter circle on mobile
+
         // Create dynamic gradient based on calculated radius
-        const innerRadius = Math.max(tenKmInPixels * 0.7, 150); // Inner clear area
-        const outerRadius = Math.max(tenKmInPixels * 1.2, 300);  // Outer fade area
+        const baseInnerRadius = tenKmInPixels * 0.7 * mobileRadiusMultiplier;
+        const baseOuterRadius = tenKmInPixels * 1.2 * mobileRadiusMultiplier;
+
+        const innerRadius = Math.max(baseInnerRadius, isMobile ? 120 : 150); // Smaller minimum on mobile
+        const outerRadius = Math.max(baseOuterRadius, isMobile ? 200 : 300); // Smaller minimum on mobile
 
         // Use same pixel positioning as working charlies_site implementation
         const centerX = markerCenterX;

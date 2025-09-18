@@ -233,7 +233,11 @@ class CharlieStoreApp {
         const currentZoom = this.mapManager ? this.mapManager.map.getZoom() : 12;
         const metersPerPixel = earthCircumference * Math.cos(centerLat * Math.PI / 180) / Math.pow(2, currentZoom + 8);
         const tenKmInPixels = (10 * 1000) / metersPerPixel;
-        const exclusionRadius = Math.max(tenKmInPixels * 1.2, isMobile ? 200 : 300); // Smaller radius on mobile
+
+        // Match the mobile vignette radius logic
+        const mobileRadiusMultiplier = isMobile ? 0.45 : 1.0; // Same multiplier as vignette
+        const baseOuterRadius = tenKmInPixels * 1.2 * mobileRadiusMultiplier;
+        const exclusionRadius = Math.max(baseOuterRadius, isMobile ? 200 : 300);
 
         // Find a random position in a tight ring just outside the circle
         const centerX = screenWidth / 2;
