@@ -235,7 +235,7 @@ class CharlieStoreApp {
         const tenKmInPixels = (10 * 1000) / metersPerPixel;
 
         // Match the mobile vignette radius logic
-        const mobileRadiusMultiplier = isMobile ? 0.45 : 1.0; // Same multiplier as vignette
+        const mobileRadiusMultiplier = isMobile ? 0.25 : 1.0; // Same multiplier as vignette
         const baseOuterRadius = tenKmInPixels * 1.2 * mobileRadiusMultiplier;
         const exclusionRadius = Math.max(baseOuterRadius, isMobile ? 200 : 300);
 
