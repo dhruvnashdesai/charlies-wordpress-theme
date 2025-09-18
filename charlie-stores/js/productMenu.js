@@ -462,13 +462,24 @@ class ProductMenu {
         let categoryOpen = false;
         let brandOpen = false;
 
+        // Helper functions to properly close dropdowns
+        const closeCategoryDropdown = () => {
+            categoryDropdown.style.display = 'none';
+            categoryArrow.style.transform = 'translateY(-50%) rotate(0deg)';
+            categoryOpen = false;
+        };
+
+        const closeBrandDropdown = () => {
+            brandDropdown.style.display = 'none';
+            brandArrow.style.transform = 'translateY(-50%) rotate(0deg)';
+            brandOpen = false;
+        };
+
         // Category dropdown click handler
         categoryDisplay.addEventListener('click', (e) => {
             e.stopPropagation();
             if (brandOpen) {
-                brandDropdown.style.display = 'none';
-                brandArrow.style.transform = 'translateY(-50%) rotate(0deg)';
-                brandOpen = false;
+                closeBrandDropdown();
             }
 
             categoryOpen = !categoryOpen;
@@ -480,9 +491,7 @@ class ProductMenu {
         brandDisplay.addEventListener('click', (e) => {
             e.stopPropagation();
             if (categoryOpen) {
-                categoryDropdown.style.display = 'none';
-                categoryArrow.style.transform = 'translateY(-50%) rotate(0deg)';
-                categoryOpen = false;
+                closeCategoryDropdown();
             }
 
             brandOpen = !brandOpen;
@@ -493,14 +502,10 @@ class ProductMenu {
         // Close dropdowns when clicking outside
         document.addEventListener('click', () => {
             if (categoryOpen) {
-                categoryDropdown.style.display = 'none';
-                categoryArrow.style.transform = 'translateY(-50%) rotate(0deg)';
-                categoryOpen = false;
+                closeCategoryDropdown();
             }
             if (brandOpen) {
-                brandDropdown.style.display = 'none';
-                brandArrow.style.transform = 'translateY(-50%) rotate(0deg)';
-                brandOpen = false;
+                closeBrandDropdown();
             }
         });
 
@@ -2019,7 +2024,7 @@ class ProductMenu {
             allCategoriesOption.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.categoryDisplay.textContent = 'All Categories';
-                this.categoryDropdown.style.display = 'none';
+                closeCategoryDropdown();
                 this.handleCategoryFilter('');
             });
             allCategoriesOption.addEventListener('mouseover', () => {
@@ -2049,7 +2054,7 @@ class ProductMenu {
                     option.addEventListener('click', (e) => {
                         e.stopPropagation();
                         this.categoryDisplay.textContent = category.name || category;
-                        this.categoryDropdown.style.display = 'none';
+                        closeCategoryDropdown();
                         this.handleCategoryFilter(category.name || category);
                     });
                     option.addEventListener('mouseover', () => {
@@ -2087,7 +2092,7 @@ class ProductMenu {
             allBrandsOption.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.brandDisplay.textContent = 'All Brands';
-                this.brandDropdown.style.display = 'none';
+                closeBrandDropdown();
                 this.handleBrandFilter('');
             });
             allBrandsOption.addEventListener('mouseover', () => {
@@ -2117,7 +2122,7 @@ class ProductMenu {
                     option.addEventListener('click', (e) => {
                         e.stopPropagation();
                         this.brandDisplay.textContent = brand.name || brand;
-                        this.brandDropdown.style.display = 'none';
+                        closeBrandDropdown();
                         this.handleBrandFilter(brand.name || brand);
                     });
                     option.addEventListener('mouseover', () => {
