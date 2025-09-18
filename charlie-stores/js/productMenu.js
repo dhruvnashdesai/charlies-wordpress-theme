@@ -100,41 +100,137 @@ class ProductMenu {
             background: linear-gradient(90deg, rgba(0, 255, 0, 0.2), rgba(0, 0, 0, 0.8));
         `;
 
-        // Add three-panel container
-        const panelContainer = document.createElement('div');
-        panelContainer.className = 'panel-container';
-        panelContainer.style.cssText = `
+        // Add filter controls container
+        const filterContainer = document.createElement('div');
+        filterContainer.className = 'filter-container';
+        filterContainer.style.cssText = `
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+            background: rgba(0, 0, 0, 0.8);
             display: flex;
-            height: calc(100% - 60px);
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
         `;
 
-        // Left panel - Brands
-        const brandsPanel = document.createElement('div');
-        brandsPanel.className = 'brands-panel';
-        brandsPanel.style.cssText = `
-            width: 250px;
-            border-right: 1px solid #444;
-            overflow-y: auto;
-            padding: 0;
+        // Category filter dropdown
+        const categoryFilter = document.createElement('select');
+        categoryFilter.className = 'category-filter';
+        categoryFilter.style.cssText = `
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            min-width: 150px;
         `;
 
-        // Middle panel - Products
-        const productsPanel = document.createElement('div');
-        productsPanel.className = 'products-panel';
-        productsPanel.style.cssText = `
-            width: 400px;
-            border-right: 1px solid #444;
-            overflow-y: auto;
-            padding: 0;
+        // Brand filter dropdown
+        const brandFilter = document.createElement('select');
+        brandFilter.className = 'brand-filter';
+        brandFilter.style.cssText = `
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            min-width: 150px;
         `;
 
-        // Right panel - Product Details
-        const detailsPanel = document.createElement('div');
-        detailsPanel.className = 'details-panel';
-        detailsPanel.style.cssText = `
-            flex: 1;
+        // Clear filters button
+        const clearFilters = document.createElement('button');
+        clearFilters.className = 'clear-filters-btn';
+        clearFilters.textContent = 'Clear Filters';
+        clearFilters.style.cssText = `
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+        `;
+
+        // Single main panel - Product Grid
+        const productGridContainer = document.createElement('div');
+        productGridContainer.className = 'product-grid-container';
+        productGridContainer.style.cssText = `
+            height: calc(100% - 120px);
             overflow-y: auto;
-            padding: 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.9);
+        `;
+
+        // Product grid
+        const productGrid = document.createElement('div');
+        productGrid.className = 'product-grid';
+        productGrid.style.cssText = `
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 100%;
+        `;
+
+        // Add mobile responsive CSS for the grid
+        const mobileGridStyle = document.createElement('style');
+        mobileGridStyle.innerHTML = `
+            @media (max-width: 768px) {
+                .product-grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 15px !important;
+                }
+
+                .product-card {
+                    font-size: 14px !important;
+                }
+
+                .filter-container {
+                    flex-direction: column !important;
+                    gap: 10px !important;
+                    align-items: stretch !important;
+                }
+
+                .category-filter,
+                .brand-filter,
+                .clear-filters-btn {
+                    width: 100% !important;
+                    min-width: auto !important;
+                }
+
+                .gta-product-menu {
+                    border-radius: 20px 20px 0 0 !important;
+                    border: none !important;
+                    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5) !important;
+                }
+
+                .product-grid-container {
+                    padding: 15px !important;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .product-grid {
+                    gap: 10px !important;
+                }
+
+                .product-card {
+                    padding: 10px !important;
+                    font-size: 13px !important;
+                }
+
+                .filter-container {
+                    padding: 10px 15px !important;
+                }
+
+                .menu-header {
+                    padding: 10px 15px !important;
+                }
+            }
         `;
 
         // Custom scrollbar styling for all panels
@@ -163,13 +259,43 @@ class ProductMenu {
             }
         `;
 
-        // Assemble the menu
-        panelContainer.appendChild(brandsPanel);
-        panelContainer.appendChild(productsPanel);
-        panelContainer.appendChild(detailsPanel);
+        // Assemble filter elements
+        filterContainer.appendChild(categoryFilter);
+        filterContainer.appendChild(brandFilter);
+        filterContainer.appendChild(clearFilters);
+
+        // Assemble product grid
+        productGridContainer.appendChild(productGrid);
+
+        // Assemble the menu with new structure
         this.menuElement.appendChild(header);
-        this.menuElement.appendChild(panelContainer);
+        this.menuElement.appendChild(filterContainer);
+        this.menuElement.appendChild(productGridContainer);
         this.menuElement.appendChild(scrollbarStyle);
+        this.menuElement.appendChild(mobileGridStyle);
+
+        // Add filter event listeners
+        categoryFilter.addEventListener('change', (e) => {
+            this.handleCategoryFilter(e.target.value);
+        });
+
+        brandFilter.addEventListener('change', (e) => {
+            this.handleBrandFilter(e.target.value);
+        });
+
+        clearFilters.addEventListener('click', () => {
+            this.clearAllFilters();
+        });
+
+        // Store references for easy access
+        this.filterContainer = filterContainer;
+        this.categoryFilter = categoryFilter;
+        this.brandFilter = brandFilter;
+        this.productGrid = productGrid;
+        this.productGridContainer = productGridContainer;
+
+        // Set up infinite scroll
+        this.setupInfiniteScroll();
 
         // Handle clicks inside the menu with event delegation
         this.menuElement.addEventListener('click', (e) => {
@@ -645,50 +771,102 @@ class ProductMenu {
      * Position the menu on screen
      */
     positionMenu() {
-        const menuWidth = 950; // Fixed width for three-panel layout
+        const isMobile = window.innerWidth <= 768;
 
-        this.menuElement.style.width = menuWidth + 'px';
-        this.menuElement.style.right = '20px';
-        this.menuElement.style.left = 'auto';
+        if (isMobile) {
+            // Mobile: Full width, slide up from bottom
+            this.menuElement.style.width = '100vw';
+            this.menuElement.style.height = '70vh';
+            this.menuElement.style.right = '0';
+            this.menuElement.style.top = '100vh'; // Start below screen
+            this.menuElement.style.left = '0';
+            this.menuElement.style.transform = 'none';
+            this.menuElement.style.borderRadius = '20px 20px 0 0';
+
+            // Animate slide up
+            setTimeout(() => {
+                this.menuElement.style.top = '30vh';
+                this.menuElement.style.transition = 'top 0.4s ease-out';
+            }, 10);
+        } else {
+            // Desktop: Fixed width on right side
+            const menuWidth = 600; // Reduced width for single panel
+            this.menuElement.style.width = menuWidth + 'px';
+            this.menuElement.style.height = '80vh';
+            this.menuElement.style.right = '20px';
+            this.menuElement.style.top = '50%';
+            this.menuElement.style.left = 'auto';
+            this.menuElement.style.transform = 'translateY(-50%)';
+            this.menuElement.style.borderRadius = '8px';
+        }
+
         this.menuElement.style.display = 'block';
         this.menuElement.style.visibility = 'visible';
 
-        // Ensure menu content is visible
-        const panelContainer = this.menuElement.querySelector('.panel-container');
-        if (panelContainer) {
-            panelContainer.style.display = 'flex';
-            panelContainer.style.height = 'calc(100% - 60px)';
-        }
-
-        console.log('ProductMenu: Menu positioned with right: 20px');
-        console.log('ProductMenu: Brands loaded:', this.brands.length);
-        console.log('ProductMenu: Products loaded:', this.allProducts.length);
+        console.log('ProductMenu: Menu positioned for', isMobile ? 'mobile' : 'desktop');
+        console.log('ProductMenu: Categories available:', this.availableCategories?.length || 0);
+        console.log('ProductMenu: Products loaded:', this.allProducts?.length || 0);
     }
 
     /**
-     * Update menu layout (three-panel)
+     * Update menu layout (new grid system)
      */
     updateMenuLayout() {
         if (!this.menuElement) return;
 
         const header = this.menuElement.querySelector('.menu-header');
-        const brandsPanel = this.menuElement.querySelector('.brands-panel');
-        const productsPanel = this.menuElement.querySelector('.products-panel');
-        const detailsPanel = this.menuElement.querySelector('.details-panel');
+        if (header) {
+            this.updateHeader(header);
+        }
 
-        if (!header || !brandsPanel || !productsPanel || !detailsPanel) return;
+        // Populate filter dropdowns with available data
+        if (this.availableCategories && this.brands) {
+            this.populateFilters(this.availableCategories, this.brands);
+        }
 
-        // Update header
-        this.updateThreePanelHeader(header);
+        // Render products in grid
+        if (this.allProducts) {
+            this.renderProductGrid(this.allProducts);
+        }
+    }
 
-        // Update brands panel
-        this.updateBrandsPanel(brandsPanel);
+    /**
+     * Update header with store information
+     */
+    updateHeader(header) {
+        const storeName = this.currentWarehouse?.name || `Store ${this.currentStoreId}`;
+        const productCount = this.allProducts?.length || 0;
 
-        // Update products panel
-        this.updateProductsPanel(productsPanel);
+        header.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="margin: 0; color: #00ff00; font-size: 16px;">
+                        🏭 ${storeName}
+                    </h3>
+                    <div style="color: #00aa00; font-size: 12px; margin-top: 4px;">
+                        ${productCount} products available
+                    </div>
+                </div>
+                <button class="close-menu-btn" style="
+                    background: rgba(255, 0, 0, 0.2);
+                    border: 1px solid #ff4444;
+                    color: #ff4444;
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-family: 'Courier New', monospace;
+                    font-size: 12px;
+                ">✕ Close</button>
+            </div>
+        `;
 
-        // Update details panel
-        this.updateDetailsPanel(detailsPanel);
+        // Add close button handler
+        const closeBtn = header.querySelector('.close-menu-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.hideMenu();
+            });
+        }
     }
 
     /**
@@ -696,27 +874,25 @@ class ProductMenu {
      */
     hideMenu() {
         console.log('ProductMenu: hideMenu() called');
-        console.log('ProductMenu: menuElement exists:', !!this.menuElement);
 
         if (!this.menuElement) {
             console.error('ProductMenu: Cannot hide menu - menuElement is null');
             return;
         }
 
-        console.log('ProductMenu: Current position before hide:', this.menuElement.style.right);
-        console.log('ProductMenu: Current computed position before hide:', window.getComputedStyle(this.menuElement).right);
+        const isMobile = window.innerWidth <= 768;
 
-        // Ensure we're using right property consistently
-        this.menuElement.style.left = 'auto';
-        this.menuElement.style.right = '-1000px';
+        if (isMobile) {
+            // Mobile: Slide down
+            this.menuElement.style.transition = 'top 0.4s ease-in';
+            this.menuElement.style.top = '100vh';
+        } else {
+            // Desktop: Slide right
+            this.menuElement.style.transition = 'right 0.4s ease-in';
+            this.menuElement.style.right = '-700px';
+        }
+
         this.isVisible = false;
-
-        console.log('ProductMenu: Position set to -800px for hiding animation');
-
-        // Check if transition is working
-        setTimeout(() => {
-            console.log('ProductMenu: Computed position after 200ms:', window.getComputedStyle(this.menuElement).right);
-        }, 200);
 
         // Wait for animation to complete, then dispatch close event
         setTimeout(() => {
@@ -731,6 +907,9 @@ class ProductMenu {
             this.selectedProduct = null;
             this.availableCategories = null;
             this.currentWarehouse = null;
+
+            // Reset menu position for next show
+            this.menuElement.style.transition = '';
         }, 400);
     }
 
@@ -1230,6 +1409,459 @@ class ProductMenu {
      */
     isMenuVisible() {
         return this.isVisible;
+    }
+
+    /**
+     * Create a product card element
+     */
+    createProductCard(product) {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.setAttribute('data-product-id', product.id);
+
+        card.style.cssText = `
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        `;
+
+        // Product image
+        const imageContainer = document.createElement('div');
+        imageContainer.style.cssText = `
+            width: 100%;
+            height: 120px;
+            background: #222;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
+
+        if (product.image) {
+            const image = document.createElement('img');
+            image.src = product.image;
+            image.alt = product.name;
+            image.style.cssText = `
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            `;
+            imageContainer.appendChild(image);
+        } else {
+            imageContainer.innerHTML = '<div style="color: #666; font-size: 12px;">No Image</div>';
+        }
+
+        // Product name
+        const name = document.createElement('h4');
+        name.textContent = product.name;
+        name.style.cssText = `
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: bold;
+            color: #00ff00;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        `;
+
+        // Product price
+        const price = document.createElement('div');
+        price.innerHTML = product.price || 'Price not available';
+        price.style.cssText = `
+            font-size: 13px;
+            color: #00cc00;
+            margin-bottom: 8px;
+            font-weight: bold;
+        `;
+
+        // Stock indicator
+        const stock = document.createElement('div');
+        stock.textContent = product.in_stock ? `Stock: ${product.stock || 'Available'}` : 'Out of Stock';
+        stock.style.cssText = `
+            font-size: 11px;
+            color: ${product.in_stock ? '#00aa00' : '#aa0000'};
+            margin-bottom: 10px;
+        `;
+
+        // Add to cart button
+        const addToCartBtn = document.createElement('button');
+        addToCartBtn.textContent = product.in_stock ? 'Add to Cart' : 'Out of Stock';
+        addToCartBtn.disabled = !product.in_stock;
+        addToCartBtn.style.cssText = `
+            width: 100%;
+            padding: 8px;
+            background: ${product.in_stock ? 'rgba(0, 255, 0, 0.2)' : 'rgba(100, 100, 100, 0.2)'};
+            border: 1px solid ${product.in_stock ? '#00ff00' : '#666'};
+            color: ${product.in_stock ? '#00ff00' : '#666'};
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            cursor: ${product.in_stock ? 'pointer' : 'not-allowed'};
+            transition: all 0.3s ease;
+        `;
+
+        // Hover effects
+        card.addEventListener('mouseenter', () => {
+            card.style.borderColor = '#00ff00';
+            card.style.background = 'rgba(0, 255, 0, 0.05)';
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.borderColor = '#444';
+            card.style.background = 'rgba(0, 0, 0, 0.8)';
+        });
+
+        // Add to cart click handler
+        addToCartBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (product.in_stock) {
+                this.handleAddToCart(product);
+            }
+        });
+
+        // Assemble card
+        card.appendChild(imageContainer);
+        card.appendChild(name);
+        card.appendChild(price);
+        card.appendChild(stock);
+        card.appendChild(addToCartBtn);
+
+        return card;
+    }
+
+    /**
+     * Render products in the grid (with infinite scroll support)
+     */
+    renderProductGrid(products) {
+        if (!this.productGrid) return;
+
+        // Store all products for infinite scroll
+        this.filteredProducts = products;
+
+        // Reset infinite scroll state
+        this.resetInfiniteScroll();
+
+        // Clear existing products
+        this.productGrid.innerHTML = '';
+
+        if (!products || products.length === 0) {
+            const noProducts = document.createElement('div');
+            noProducts.style.cssText = `
+                grid-column: 1 / -1;
+                text-align: center;
+                color: #666;
+                font-family: 'Courier New', monospace;
+                padding: 40px;
+                font-size: 16px;
+            `;
+            noProducts.textContent = 'No products found matching your filters.';
+            this.productGrid.appendChild(noProducts);
+            return;
+        }
+
+        // Show initial batch of products (for infinite scroll)
+        const initialBatch = products.slice(0, this.itemsPerPage);
+        initialBatch.forEach(product => {
+            const card = this.createProductCard(product);
+            this.productGrid.appendChild(card);
+        });
+
+        // Check if we have more products to load
+        if (products.length <= this.itemsPerPage) {
+            this.hasMoreItems = false;
+            if (products.length > 0) {
+                this.showEndMessage();
+            }
+        }
+    }
+
+    /**
+     * Handle category filter change
+     */
+    handleCategoryFilter(categoryId) {
+        console.log('Category filter changed:', categoryId);
+        this.selectedCategory = categoryId;
+        this.filterProducts();
+    }
+
+    /**
+     * Handle brand filter change
+     */
+    handleBrandFilter(brandId) {
+        console.log('Brand filter changed:', brandId);
+        this.selectedBrand = brandId;
+        this.filterProducts();
+    }
+
+    /**
+     * Clear all filters
+     */
+    clearAllFilters() {
+        this.selectedCategory = null;
+        this.selectedBrand = null;
+        if (this.categoryFilter) this.categoryFilter.value = '';
+        if (this.brandFilter) this.brandFilter.value = '';
+        this.filterProducts();
+    }
+
+    /**
+     * Filter products based on selected filters
+     */
+    filterProducts() {
+        if (!this.allProducts) return;
+
+        let filtered = [...this.allProducts];
+
+        // Filter by category
+        if (this.selectedCategory) {
+            filtered = filtered.filter(product =>
+                product.categories && product.categories.includes(this.selectedCategory)
+            );
+        }
+
+        // Filter by brand
+        if (this.selectedBrand) {
+            filtered = filtered.filter(product =>
+                product.brand === this.selectedBrand ||
+                (product.brands && product.brands.includes(this.selectedBrand))
+            );
+        }
+
+        this.filteredProducts = filtered;
+        this.renderProductGrid(filtered);
+    }
+
+    /**
+     * Handle add to cart action
+     */
+    handleAddToCart(product) {
+        console.log('Add to cart:', product);
+
+        // Add visual feedback
+        const message = document.createElement('div');
+        message.textContent = `${product.name} added to cart!`;
+        message.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 255, 0, 0.9);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+        `;
+
+        document.body.appendChild(message);
+
+        // Remove message after 3 seconds
+        setTimeout(() => {
+            message.remove();
+        }, 3000);
+
+        // TODO: Implement actual cart functionality
+        if (product.add_to_cart_url) {
+            window.location.href = product.add_to_cart_url;
+        }
+    }
+
+    /**
+     * Populate filter dropdowns
+     */
+    populateFilters(categories, brands) {
+        // Populate category filter
+        if (this.categoryFilter && categories) {
+            this.categoryFilter.innerHTML = '<option value="">All Categories</option>';
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.textContent = category.name;
+                this.categoryFilter.appendChild(option);
+            });
+        }
+
+        // Populate brand filter
+        if (this.brandFilter && brands) {
+            this.brandFilter.innerHTML = '<option value="">All Brands</option>';
+            brands.forEach(brand => {
+                const option = document.createElement('option');
+                option.value = brand.id || brand.name;
+                option.textContent = brand.name;
+                this.brandFilter.appendChild(option);
+            });
+        }
+    }
+
+    /**
+     * Set up infinite scroll functionality
+     */
+    setupInfiniteScroll() {
+        this.currentPage = 1;
+        this.itemsPerPage = 20;
+        this.isLoading = false;
+        this.hasMoreItems = true;
+
+        // Add scroll listener to the product grid container
+        if (this.productGridContainer) {
+            this.productGridContainer.addEventListener('scroll', () => {
+                this.handleScroll();
+            });
+        }
+    }
+
+    /**
+     * Handle scroll event for infinite loading
+     */
+    handleScroll() {
+        if (!this.productGridContainer || this.isLoading || !this.hasMoreItems) return;
+
+        const container = this.productGridContainer;
+        const scrollTop = container.scrollTop;
+        const scrollHeight = container.scrollHeight;
+        const clientHeight = container.clientHeight;
+
+        // Load more when user scrolls to within 100px of bottom
+        if (scrollTop + clientHeight >= scrollHeight - 100) {
+            this.loadMoreProducts();
+        }
+    }
+
+    /**
+     * Load more products (infinite scroll)
+     */
+    loadMoreProducts() {
+        if (this.isLoading || !this.hasMoreItems) return;
+
+        this.isLoading = true;
+        this.currentPage++;
+
+        // Show loading indicator
+        this.showLoadingIndicator();
+
+        // Simulate loading delay (replace with actual API call)
+        setTimeout(() => {
+            this.appendMoreProducts();
+            this.hideLoadingIndicator();
+            this.isLoading = false;
+        }, 1000);
+    }
+
+    /**
+     * Show loading indicator at bottom of product grid
+     */
+    showLoadingIndicator() {
+        if (this.loadingIndicator) return;
+
+        this.loadingIndicator = document.createElement('div');
+        this.loadingIndicator.className = 'loading-indicator';
+        this.loadingIndicator.style.cssText = `
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            color: #00aa00;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        `;
+        this.loadingIndicator.innerHTML = '⟳ Loading more products...';
+
+        if (this.productGrid) {
+            this.productGrid.appendChild(this.loadingIndicator);
+        }
+    }
+
+    /**
+     * Hide loading indicator
+     */
+    hideLoadingIndicator() {
+        if (this.loadingIndicator) {
+            this.loadingIndicator.remove();
+            this.loadingIndicator = null;
+        }
+    }
+
+    /**
+     * Append more products to existing grid (for infinite scroll)
+     */
+    appendMoreProducts() {
+        // In a real implementation, this would load more products from the API
+        // For now, we'll just check if we have more filtered products to show
+
+        if (!this.filteredProducts) return;
+
+        const currentDisplayCount = this.productGrid.children.length;
+        const totalProducts = this.filteredProducts.length;
+
+        if (currentDisplayCount >= totalProducts) {
+            this.hasMoreItems = false;
+            this.showEndMessage();
+            return;
+        }
+
+        // Get next batch of products
+        const nextBatch = this.filteredProducts.slice(
+            currentDisplayCount,
+            currentDisplayCount + this.itemsPerPage
+        );
+
+        // Append new product cards
+        nextBatch.forEach(product => {
+            const card = this.createProductCard(product);
+            this.productGrid.appendChild(card);
+        });
+
+        // Check if we've shown all products
+        if (this.productGrid.children.length >= totalProducts) {
+            this.hasMoreItems = false;
+            this.showEndMessage();
+        }
+    }
+
+    /**
+     * Show end of products message
+     */
+    showEndMessage() {
+        if (this.endMessage) return;
+
+        this.endMessage = document.createElement('div');
+        this.endMessage.className = 'end-message';
+        this.endMessage.style.cssText = `
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border-top: 1px solid #444;
+            margin-top: 20px;
+        `;
+        this.endMessage.textContent = '── End of products ──';
+
+        if (this.productGrid) {
+            this.productGrid.appendChild(this.endMessage);
+        }
+    }
+
+    /**
+     * Reset infinite scroll state
+     */
+    resetInfiniteScroll() {
+        this.currentPage = 1;
+        this.isLoading = false;
+        this.hasMoreItems = true;
+        this.hideLoadingIndicator();
+
+        if (this.endMessage) {
+            this.endMessage.remove();
+            this.endMessage = null;
+        }
     }
 }
 
