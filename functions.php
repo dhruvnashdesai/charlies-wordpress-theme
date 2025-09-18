@@ -90,8 +90,8 @@ add_action('wp_enqueue_scripts', 'charlies_enqueue_assets');
  * Enqueue Charlie's Store scripts and styles
  */
 function charlie_enqueue_store_assets() {
-    // Only load on store-related pages
-    if (!is_page_template('page-store-finder.php') && !is_singular('charlie_store')) {
+    // Only load on store-related pages or homepage (if it's the store finder)
+    if (!is_page_template('page-store-finder.php') && !is_singular('charlie_store') && !is_front_page()) {
         return;
     }
 
