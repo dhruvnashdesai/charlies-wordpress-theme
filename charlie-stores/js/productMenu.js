@@ -685,6 +685,7 @@ class ProductMenu {
                 stock_status: product.stock_status, // Include debug info
                 manage_stock: product.manage_stock, // Include debug info
                 store_stock: product.store_stock, // Include debug info
+                categories: product.categories || [], // Keep as array for filtering
                 category: product.categories && product.categories.length > 0 ? product.categories[0] : (this.currentCategory ? this.currentCategory.name : 'Uncategorized'), // Use actual product category
                 description: product.description || 'No description available',
                 image: product.image,
@@ -692,7 +693,8 @@ class ProductMenu {
                 add_to_cart_url: product.add_to_cart_url,
                 in_stock: product.in_stock && parseInt(product.stock || product.store_stock) > 0,
                 raw_price_html: product.price, // Keep original price HTML
-                brand: product.brand || 'No Brand' // Add brand information
+                brand: product.brand || 'No Brand', // Add brand information
+                brands: product.brands || [] // Support for multiple brands
             };
         });
     }
@@ -819,14 +821,12 @@ class ProductMenu {
             this.updateHeader(header);
         }
 
-        // Populate filter dropdowns with available data
-        if (this.availableCategories && this.brands) {
-            this.populateFilters(this.availableCategories, this.brands);
-        }
-
-        // Render products in grid
+        // Render products in grid first
         if (this.allProducts) {
             this.renderProductGrid(this.allProducts);
+
+            // Then populate filter dropdowns (this can extract from products if needed)
+            this.populateFilters(this.availableCategories, this.brands);
         }
     }
 
@@ -1615,26 +1615,50 @@ class ProductMenu {
      * Filter products based on selected filters
      */
     filterProducts() {
-        if (!this.allProducts) return;
+        console.log('ProductMenu: Filtering products...');
+        console.log('ProductMenu: Selected category:', this.selectedCategory);
+        console.log('ProductMenu: Selected brand:', this.selectedBrand);
+        console.log('ProductMenu: Total products:', this.allProducts?.length || 0);
+
+        if (!this.allProducts) {
+            console.log('ProductMenu: No products to filter');
+            return;
+        }
 
         let filtered = [...this.allProducts];
 
         // Filter by category
-        if (this.selectedCategory) {
-            filtered = filtered.filter(product =>
-                product.categories && product.categories.includes(this.selectedCategory)
-            );
+        if (this.selectedCategory && this.selectedCategory !== '') {
+            console.log('ProductMenu: Filtering by category:', this.selectedCategory);
+            filtered = filtered.filter(product => {
+                // Check multiple category fields for compatibility
+                const categoryMatches =
+                    (product.categories && product.categories.includes(this.selectedCategory)) ||
+                    (product.category === this.selectedCategory) ||
+                    (typeof product.categories === 'string' && product.categories === this.selectedCategory);
+
+                console.log(`Product "${product.name}" categories:`, product.categories, 'category:', product.category, 'matches:', categoryMatches);
+                return categoryMatches;
+            });
+            console.log('ProductMenu: After category filter:', filtered.length, 'products');
         }
 
         // Filter by brand
-        if (this.selectedBrand) {
-            filtered = filtered.filter(product =>
-                product.brand === this.selectedBrand ||
-                (product.brands && product.brands.includes(this.selectedBrand))
-            );
+        if (this.selectedBrand && this.selectedBrand !== '') {
+            console.log('ProductMenu: Filtering by brand:', this.selectedBrand);
+            filtered = filtered.filter(product => {
+                const brandMatches =
+                    product.brand === this.selectedBrand ||
+                    (product.brands && product.brands.includes(this.selectedBrand));
+
+                console.log(`Product "${product.name}" brand:`, product.brand, 'brands:', product.brands, 'matches:', brandMatches);
+                return brandMatches;
+            });
+            console.log('ProductMenu: After brand filter:', filtered.length, 'products');
         }
 
         this.filteredProducts = filtered;
+        console.log('ProductMenu: Final filtered products:', filtered.length);
         this.renderProductGrid(filtered);
     }
 
@@ -1677,26 +1701,80 @@ class ProductMenu {
      * Populate filter dropdowns
      */
     populateFilters(categories, brands) {
-        // Populate category filter
-        if (this.categoryFilter && categories) {
-            this.categoryFilter.innerHTML = '<option value="">All Categories</option>';
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.id;
-                option.textContent = category.name;
-                this.categoryFilter.appendChild(option);
+        console.log('ProductMenu: Populating filters...');
+        console.log('ProductMenu: Categories provided:', categories);
+        console.log('ProductMenu: Brands provided:', brands);
+
+        // Extract categories from actual product data if not provided
+        let actualCategories = categories;
+        if (!actualCategories && this.allProducts) {
+            const categorySet = new Set();
+            this.allProducts.forEach(product => {
+                // Handle multiple category formats
+                if (product.categories && Array.isArray(product.categories)) {
+                    product.categories.forEach(cat => categorySet.add(cat));
+                } else if (product.category) {
+                    categorySet.add(product.category);
+                } else if (typeof product.categories === 'string') {
+                    categorySet.add(product.categories);
+                }
             });
+            actualCategories = Array.from(categorySet).map(cat => ({
+                id: cat,
+                name: cat
+            }));
+            console.log('ProductMenu: Extracted categories from products:', actualCategories);
+        }
+
+        // Extract brands from actual product data if not provided
+        let actualBrands = brands;
+        if (!actualBrands && this.allProducts) {
+            const brandSet = new Set();
+            this.allProducts.forEach(product => {
+                if (product.brand && product.brand !== 'No Brand') {
+                    brandSet.add(product.brand);
+                }
+                if (product.brands && Array.isArray(product.brands)) {
+                    product.brands.forEach(brand => brandSet.add(brand));
+                }
+            });
+            actualBrands = Array.from(brandSet).map(brand => ({
+                id: brand,
+                name: brand
+            }));
+            console.log('ProductMenu: Extracted brands from products:', actualBrands);
+        }
+
+        // Populate category filter
+        if (this.categoryFilter) {
+            this.categoryFilter.innerHTML = '<option value="">All Categories</option>';
+            if (actualCategories && actualCategories.length > 0) {
+                actualCategories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id || category.name || category;
+                    option.textContent = category.name || category;
+                    this.categoryFilter.appendChild(option);
+                });
+                console.log('ProductMenu: Category filter populated with', actualCategories.length, 'options');
+            } else {
+                console.log('ProductMenu: No categories available for filter');
+            }
         }
 
         // Populate brand filter
-        if (this.brandFilter && brands) {
+        if (this.brandFilter) {
             this.brandFilter.innerHTML = '<option value="">All Brands</option>';
-            brands.forEach(brand => {
-                const option = document.createElement('option');
-                option.value = brand.id || brand.name;
-                option.textContent = brand.name;
-                this.brandFilter.appendChild(option);
-            });
+            if (actualBrands && actualBrands.length > 0) {
+                actualBrands.forEach(brand => {
+                    const option = document.createElement('option');
+                    option.value = brand.id || brand.name || brand;
+                    option.textContent = brand.name || brand;
+                    this.brandFilter.appendChild(option);
+                });
+                console.log('ProductMenu: Brand filter populated with', actualBrands.length, 'options');
+            } else {
+                console.log('ProductMenu: No brands available for filter');
+            }
         }
     }
 
