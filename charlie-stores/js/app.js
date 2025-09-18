@@ -222,34 +222,63 @@ class CharlieStoreApp {
     generateFakeWarehouseLocation(centerLat, centerLng) {
         // Generate warehouse outside the 10km circle
         // We'll place it in the black area at a random screen position
-        
+
         // Get screen dimensions
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
-        
+        const isMobile = screenWidth <= 768;
+
         // Calculate 10km radius in pixels (similar to vignette calculation)
         const earthCircumference = 40075017;
         const currentZoom = this.mapManager ? this.mapManager.map.getZoom() : 12;
         const metersPerPixel = earthCircumference * Math.cos(centerLat * Math.PI / 180) / Math.pow(2, currentZoom + 8);
         const tenKmInPixels = (10 * 1000) / metersPerPixel;
-        const exclusionRadius = Math.max(tenKmInPixels * 1.2, 300); // Same as vignette outer radius
-        
+        const exclusionRadius = Math.max(tenKmInPixels * 1.2, isMobile ? 200 : 300); // Smaller radius on mobile
+
         // Find a random position in a tight ring just outside the circle
         const centerX = screenWidth / 2;
         const centerY = screenHeight / 2;
-        
-        // Define tight spawn area - just outside the visible circle
-        const minSpawnDistance = exclusionRadius + 20; // Just outside the fade
-        const maxSpawnDistance = exclusionRadius + 120; // Tight ring, not too far out
-        
-        // Generate random angle and distance within the tight ring
-        const angle = Math.random() * 2 * Math.PI;
-        const distance = minSpawnDistance + Math.random() * (maxSpawnDistance - minSpawnDistance);
-        
-        // Calculate position in the tight ring
-        const screenX = centerX + Math.cos(angle) * distance;
-        const screenY = centerY + Math.sin(angle) * distance;
-        
+
+        let screenX, screenY;
+
+        if (isMobile) {
+            // Mobile-specific positioning: place in visible corners/edges
+            const mobilePositions = [
+                { x: screenWidth - 80, y: screenHeight - 150 }, // Bottom-right (primary)
+                { x: 80, y: screenHeight - 150 }, // Bottom-left
+                { x: screenWidth - 80, y: 150 }, // Top-right
+                { x: 80, y: 150 } // Top-left
+            ];
+
+            // Filter positions that are outside the vignette circle
+            const validPositions = mobilePositions.filter(pos => {
+                const distanceFromCenter = Math.sqrt(
+                    Math.pow(pos.x - centerX, 2) + Math.pow(pos.y - centerY, 2)
+                );
+                return distanceFromCenter > exclusionRadius;
+            });
+
+            // Use valid position or fallback to bottom-right
+            const selectedPosition = validPositions.length > 0
+                ? validPositions[Math.floor(Math.random() * validPositions.length)]
+                : { x: screenWidth - 80, y: screenHeight - 150 };
+
+            screenX = selectedPosition.x;
+            screenY = selectedPosition.y;
+        } else {
+            // Desktop logic (existing)
+            const minSpawnDistance = exclusionRadius + 20; // Just outside the fade
+            const maxSpawnDistance = exclusionRadius + 120; // Tight ring, not too far out
+
+            // Generate random angle and distance within the tight ring
+            const angle = Math.random() * 2 * Math.PI;
+            const distance = minSpawnDistance + Math.random() * (maxSpawnDistance - minSpawnDistance);
+
+            // Calculate position in the tight ring
+            screenX = centerX + Math.cos(angle) * distance;
+            screenY = centerY + Math.sin(angle) * distance;
+        }
+
         // Clamp to screen bounds if necessary
         const clampedX = Math.max(50, Math.min(screenWidth - 50, screenX));
         const clampedY = Math.max(50, Math.min(screenHeight - 50, screenY));
