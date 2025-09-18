@@ -113,61 +113,93 @@ class ProductMenu {
             flex-wrap: wrap;
         `;
 
-        // Category filter dropdown
+        // Category filter dropdown with wrapper
+        const categoryWrapper = document.createElement('div');
+        categoryWrapper.className = 'dropdown-wrapper';
+        categoryWrapper.style.cssText = `
+            position: relative !important;
+            display: inline-block !important;
+        `;
+
         const categoryFilter = document.createElement('select');
         categoryFilter.className = 'category-filter';
         categoryFilter.style.cssText = `
-            background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 200, 0, 0.2));
-            border: 1px solid #00ff00;
-            color: #00ff00;
-            padding: 8px 30px 8px 12px;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            min-width: 150px;
-            cursor: pointer;
-            appearance: none;
-            background-image:
-                linear-gradient(45deg, transparent 50%, #00ff00 50%),
-                linear-gradient(135deg, #00ff00 50%, transparent 50%);
-            background-position:
-                calc(100% - 15px) calc(1em + 2px),
-                calc(100% - 10px) calc(1em + 2px);
-            background-size:
-                5px 5px,
-                5px 5px;
-            background-repeat: no-repeat;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 255, 0, 0.2);
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 200, 0, 0.2)) !important;
+            border: 1px solid #00ff00 !important;
+            color: #00ff00 !important;
+            padding: 8px 30px 8px 12px !important;
+            border-radius: 6px !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 14px !important;
+            min-width: 150px !important;
+            cursor: pointer !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            box-shadow: 0 2px 8px rgba(0, 255, 0, 0.2) !important;
+            width: 100% !important;
         `;
 
-        // Brand filter dropdown
+        const categoryArrow = document.createElement('div');
+        categoryArrow.className = 'dropdown-arrow';
+        categoryArrow.innerHTML = '▼';
+        categoryArrow.style.cssText = `
+            position: absolute !important;
+            right: 8px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: #00ff00 !important;
+            pointer-events: none !important;
+            font-size: 10px !important;
+            transition: transform 0.2s ease !important;
+        `;
+
+        categoryWrapper.appendChild(categoryFilter);
+        categoryWrapper.appendChild(categoryArrow);
+
+        // Brand filter dropdown with wrapper
+        const brandWrapper = document.createElement('div');
+        brandWrapper.className = 'dropdown-wrapper';
+        brandWrapper.style.cssText = `
+            position: relative !important;
+            display: inline-block !important;
+        `;
+
         const brandFilter = document.createElement('select');
         brandFilter.className = 'brand-filter';
         brandFilter.style.cssText = `
-            background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 200, 0, 0.2));
-            border: 1px solid #00ff00;
-            color: #00ff00;
-            padding: 8px 30px 8px 12px;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            min-width: 150px;
-            cursor: pointer;
-            appearance: none;
-            background-image:
-                linear-gradient(45deg, transparent 50%, #00ff00 50%),
-                linear-gradient(135deg, #00ff00 50%, transparent 50%);
-            background-position:
-                calc(100% - 15px) calc(1em + 2px),
-                calc(100% - 10px) calc(1em + 2px);
-            background-size:
-                5px 5px,
-                5px 5px;
-            background-repeat: no-repeat;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 255, 0, 0.2);
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 200, 0, 0.2)) !important;
+            border: 1px solid #00ff00 !important;
+            color: #00ff00 !important;
+            padding: 8px 30px 8px 12px !important;
+            border-radius: 6px !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 14px !important;
+            min-width: 150px !important;
+            cursor: pointer !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            box-shadow: 0 2px 8px rgba(0, 255, 0, 0.2) !important;
+            width: 100% !important;
         `;
+
+        const brandArrow = document.createElement('div');
+        brandArrow.className = 'dropdown-arrow';
+        brandArrow.innerHTML = '▼';
+        brandArrow.style.cssText = `
+            position: absolute !important;
+            right: 8px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: #00ff00 !important;
+            pointer-events: none !important;
+            font-size: 10px !important;
+            transition: transform 0.2s ease !important;
+        `;
+
+        brandWrapper.appendChild(brandFilter);
+        brandWrapper.appendChild(brandArrow);
 
         // Clear filters button
         const clearFilters = document.createElement('button');
@@ -207,12 +239,36 @@ class ProductMenu {
         // Add mobile responsive CSS for the grid
         const mobileGridStyle = document.createElement('style');
         mobileGridStyle.innerHTML = `
-            /* Dropdown styling and interactions */
+            /* Force dropdown styling across all browsers */
+            .category-filter,
+            .brand-filter {
+                -webkit-appearance: none !important;
+                -moz-appearance: none !important;
+                appearance: none !important;
+                background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 200, 0, 0.2)) !important;
+                border: 1px solid #00ff00 !important;
+                color: #00ff00 !important;
+                padding: 8px 24px 8px 12px !important;
+                border-radius: 6px !important;
+                font-family: 'Courier New', monospace !important;
+                font-size: 14px !important;
+                cursor: pointer !important;
+                background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%2300ff00" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>') !important;
+                background-position: right 8px center !important;
+                background-size: 12px !important;
+                background-repeat: no-repeat !important;
+                box-shadow: 0 2px 8px rgba(0, 255, 0, 0.2) !important;
+            }
+
             .category-filter:hover,
             .brand-filter:hover {
                 border-color: #00ff00 !important;
                 box-shadow: 0 4px 12px rgba(0, 255, 0, 0.3) !important;
                 background: linear-gradient(135deg, rgba(0, 255, 0, 0.2), rgba(0, 200, 0, 0.3)) !important;
+                background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%2300ff00" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>') !important;
+                background-position: right 8px center !important;
+                background-size: 12px !important;
+                background-repeat: no-repeat !important;
             }
 
             .category-filter:focus,
@@ -221,6 +277,10 @@ class ProductMenu {
                 border-color: #00ff00 !important;
                 box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.3) !important;
                 background: linear-gradient(135deg, rgba(0, 255, 0, 0.2), rgba(0, 200, 0, 0.3)) !important;
+                background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%2300ff00" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>') !important;
+                background-position: right 8px center !important;
+                background-size: 12px !important;
+                background-repeat: no-repeat !important;
             }
 
             /* Style dropdown options */
@@ -233,8 +293,6 @@ class ProductMenu {
                 font-family: 'Courier New', monospace !important;
             }
 
-            .category-filter option:hover,
-            .brand-filter option:hover,
             .category-filter option:checked,
             .brand-filter option:checked {
                 background-color: rgba(0, 255, 0, 0.2) !important;
@@ -328,8 +386,8 @@ class ProductMenu {
         `;
 
         // Assemble filter elements
-        filterContainer.appendChild(categoryFilter);
-        filterContainer.appendChild(brandFilter);
+        filterContainer.appendChild(categoryWrapper);
+        filterContainer.appendChild(brandWrapper);
         filterContainer.appendChild(clearFilters);
 
         // Assemble product grid
@@ -356,6 +414,23 @@ class ProductMenu {
         clearFilters.addEventListener('click', () => {
             console.log('Clear filters button clicked!');
             this.clearAllFilters();
+        });
+
+        // Add arrow animation event listeners
+        categoryFilter.addEventListener('focus', () => {
+            categoryArrow.style.transform = 'translateY(-50%) rotate(180deg)';
+        });
+
+        categoryFilter.addEventListener('blur', () => {
+            categoryArrow.style.transform = 'translateY(-50%) rotate(0deg)';
+        });
+
+        brandFilter.addEventListener('focus', () => {
+            brandArrow.style.transform = 'translateY(-50%) rotate(180deg)';
+        });
+
+        brandFilter.addEventListener('blur', () => {
+            brandArrow.style.transform = 'translateY(-50%) rotate(0deg)';
         });
 
         // Store references for easy access
