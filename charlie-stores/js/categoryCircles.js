@@ -209,22 +209,42 @@ class CategoryCircles {
             numCategories: numCategories
         });
 
-        // Position circles only along the right edge of the vignette
-        // Angles from -90° (top-right) to +90° (bottom-right), with 0° being due right
+        // Mobile vs Desktop positioning
+        const isMobile = window.innerWidth <= 768;
         let angles = [];
 
-        if (numCategories === 1) {
-            angles = [0]; // Due right
-        } else if (numCategories === 2) {
-            angles = [-20, 20]; // Closer to middle
-        } else if (numCategories === 3) {
-            angles = [-30, 0, 30]; // Tighter cluster around middle
-        } else if (numCategories === 4) {
-            angles = [-40, -15, 15, 40]; // Closer to center
-        } else if (numCategories === 5) {
-            angles = [-45, -25, 0, 25, 45]; // Tighter spread
+        if (isMobile) {
+            // Mobile: Position circles along the top edge of the vignette
+            // Angles from -135° (top-left) to -45° (top-right), with -90° being due up
+            if (numCategories === 1) {
+                angles = [-90]; // Due up
+            } else if (numCategories === 2) {
+                angles = [-110, -70]; // Closer to middle
+            } else if (numCategories === 3) {
+                angles = [-120, -90, -60]; // Tighter cluster around top
+            } else if (numCategories === 4) {
+                angles = [-130, -105, -75, -50]; // Closer to center
+            } else if (numCategories === 5) {
+                angles = [-135, -115, -90, -65, -45]; // Tighter spread
+            } else {
+                angles = [-140, -120, -100, -80, -60, -40]; // Six positions along top
+            }
         } else {
-            angles = [-50, -30, -10, 10, 30, 50]; // Six positions closer to middle
+            // Desktop: Position circles along the right edge of the vignette
+            // Angles from -90° (top-right) to +90° (bottom-right), with 0° being due right
+            if (numCategories === 1) {
+                angles = [0]; // Due right
+            } else if (numCategories === 2) {
+                angles = [-20, 20]; // Closer to middle
+            } else if (numCategories === 3) {
+                angles = [-30, 0, 30]; // Tighter cluster around middle
+            } else if (numCategories === 4) {
+                angles = [-40, -15, 15, 40]; // Closer to center
+            } else if (numCategories === 5) {
+                angles = [-45, -25, 0, 25, 45]; // Tighter spread
+            } else {
+                angles = [-50, -30, -10, 10, 30, 50]; // Six positions closer to middle
+            }
         }
 
         for (let i = 0; i < numCategories; i++) {
@@ -248,13 +268,18 @@ class CategoryCircles {
         element.className = 'category-circle';
         element.setAttribute('data-category-id', category.id);
 
+        // Mobile-responsive sizing
+        const isMobile = window.innerWidth <= 768;
+        const circleSize = isMobile ? 100 : 120; // Smaller on mobile
+        const offset = circleSize / 2;
+
         // Style the category circle
         element.style.cssText = `
             position: fixed;
-            left: ${position.x - 60}px;
-            top: ${position.y - 60}px;
-            width: 120px;
-            height: 120px;
+            left: ${position.x - offset}px;
+            top: ${position.y - offset}px;
+            width: ${circleSize}px;
+            height: ${circleSize}px;
             background: radial-gradient(circle, ${category.color}22, ${category.color}44);
             border: 3px solid ${category.color};
             border-radius: 50%;

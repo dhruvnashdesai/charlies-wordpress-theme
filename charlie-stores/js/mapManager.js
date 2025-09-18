@@ -897,7 +897,7 @@ class MapManager {
 
         // Mobile-responsive radius calculation
         const isMobile = window.innerWidth <= 768;
-        const mobileRadiusMultiplier = isMobile ? 0.45 : 1.0; // Even tighter circle on mobile
+        const mobileRadiusMultiplier = isMobile ? 0.25 : 1.0; // Even tighter circle on mobile
 
         // Create dynamic gradient based on calculated radius
         const baseInnerRadius = tenKmInPixels * 0.7 * mobileRadiusMultiplier;
@@ -1658,16 +1658,28 @@ class MapManager {
             return;
         }
 
-        // Calculate slide distance - increased for more movement
-        const slideDistance = window.innerWidth * 0.25; // 25% of screen width in pixels
+        // Mobile vs Desktop slide logic
+        const isMobile = window.innerWidth <= 768;
 
-        // Pan the map so the marker moves left
+        let slideDistance, newCenterPixel;
         const currentCenter = this.map.getCenter();
         const currentCenterPixel = this.map.project(currentCenter);
-        const newCenterPixel = {
-            x: currentCenterPixel.x + slideDistance, // Pan right to move marker left
-            y: currentCenterPixel.y
-        };
+
+        if (isMobile) {
+            // Mobile: slide up (move marker down in viewport)
+            slideDistance = window.innerHeight * 0.2; // 20% of screen height
+            newCenterPixel = {
+                x: currentCenterPixel.x,
+                y: currentCenterPixel.y - slideDistance // Pan up to move marker down
+            };
+        } else {
+            // Desktop: slide left (existing logic)
+            slideDistance = window.innerWidth * 0.25; // 25% of screen width
+            newCenterPixel = {
+                x: currentCenterPixel.x + slideDistance, // Pan right to move marker left
+                y: currentCenterPixel.y
+            };
+        }
         const newCenter = this.map.unproject(newCenterPixel);
 
         // Add CSS class for state tracking
