@@ -113,17 +113,18 @@ class ProductMenu {
             flex-wrap: wrap;
         `;
 
-        // Category filter dropdown with wrapper
+        // Category filter custom dropdown
         const categoryWrapper = document.createElement('div');
-        categoryWrapper.className = 'dropdown-wrapper';
+        categoryWrapper.className = 'custom-dropdown-wrapper';
         categoryWrapper.style.cssText = `
             position: relative !important;
             display: inline-block !important;
+            min-width: 150px !important;
         `;
 
-        const categoryFilter = document.createElement('select');
-        categoryFilter.className = 'category-filter';
-        categoryFilter.style.cssText = `
+        const categoryDisplay = document.createElement('div');
+        categoryDisplay.className = 'dropdown-display';
+        categoryDisplay.style.cssText = `
             background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 200, 0, 0.2)) !important;
             border: 1px solid #00ff00 !important;
             color: #00ff00 !important;
@@ -131,14 +132,12 @@ class ProductMenu {
             border-radius: 6px !important;
             font-family: 'Courier New', monospace !important;
             font-size: 14px !important;
-            min-width: 150px !important;
             cursor: pointer !important;
-            -webkit-appearance: none !important;
-            -moz-appearance: none !important;
-            appearance: none !important;
             box-shadow: 0 2px 8px rgba(0, 255, 0, 0.2) !important;
-            width: 100% !important;
+            user-select: none !important;
+            transition: all 0.2s ease !important;
         `;
+        categoryDisplay.textContent = 'All Categories';
 
         const categoryArrow = document.createElement('div');
         categoryArrow.className = 'dropdown-arrow';
@@ -154,20 +153,62 @@ class ProductMenu {
             transition: transform 0.2s ease !important;
         `;
 
-        categoryWrapper.appendChild(categoryFilter);
-        categoryWrapper.appendChild(categoryArrow);
+        const categoryDropdown = document.createElement('div');
+        categoryDropdown.className = 'dropdown-options';
+        categoryDropdown.style.cssText = `
+            position: absolute !important;
+            top: 100% !important;
+            left: 0 !important;
+            right: 0 !important;
+            background: rgba(0, 0, 0, 0.9) !important;
+            border: 1px solid #00ff00 !important;
+            border-radius: 6px !important;
+            box-shadow: 0 4px 20px rgba(0, 255, 0, 0.3) !important;
+            z-index: 1000 !important;
+            max-height: 200px !important;
+            overflow-y: auto !important;
+            display: none !important;
+            backdrop-filter: blur(5px) !important;
+            scrollbar-width: thin !important;
+            scrollbar-color: #00ff00 rgba(0, 255, 0, 0.1) !important;
+        `;
 
-        // Brand filter dropdown with wrapper
+        // Add scrollbar styling for webkit browsers
+        const categoryScrollbarStyle = document.createElement('style');
+        categoryScrollbarStyle.innerHTML = `
+            .dropdown-options::-webkit-scrollbar {
+                width: 6px;
+            }
+            .dropdown-options::-webkit-scrollbar-track {
+                background: rgba(0, 255, 0, 0.1);
+                border-radius: 3px;
+            }
+            .dropdown-options::-webkit-scrollbar-thumb {
+                background: #00ff00;
+                border-radius: 3px;
+            }
+            .dropdown-options::-webkit-scrollbar-thumb:hover {
+                background: #00cc00;
+            }
+        `;
+        document.head.appendChild(categoryScrollbarStyle);
+
+        categoryWrapper.appendChild(categoryDisplay);
+        categoryWrapper.appendChild(categoryArrow);
+        categoryWrapper.appendChild(categoryDropdown);
+
+        // Brand filter custom dropdown
         const brandWrapper = document.createElement('div');
-        brandWrapper.className = 'dropdown-wrapper';
+        brandWrapper.className = 'custom-dropdown-wrapper';
         brandWrapper.style.cssText = `
             position: relative !important;
             display: inline-block !important;
+            min-width: 150px !important;
         `;
 
-        const brandFilter = document.createElement('select');
-        brandFilter.className = 'brand-filter';
-        brandFilter.style.cssText = `
+        const brandDisplay = document.createElement('div');
+        brandDisplay.className = 'dropdown-display';
+        brandDisplay.style.cssText = `
             background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 200, 0, 0.2)) !important;
             border: 1px solid #00ff00 !important;
             color: #00ff00 !important;
@@ -175,14 +216,12 @@ class ProductMenu {
             border-radius: 6px !important;
             font-family: 'Courier New', monospace !important;
             font-size: 14px !important;
-            min-width: 150px !important;
             cursor: pointer !important;
-            -webkit-appearance: none !important;
-            -moz-appearance: none !important;
-            appearance: none !important;
             box-shadow: 0 2px 8px rgba(0, 255, 0, 0.2) !important;
-            width: 100% !important;
+            user-select: none !important;
+            transition: all 0.2s ease !important;
         `;
+        brandDisplay.textContent = 'All Brands';
 
         const brandArrow = document.createElement('div');
         brandArrow.className = 'dropdown-arrow';
@@ -198,8 +237,27 @@ class ProductMenu {
             transition: transform 0.2s ease !important;
         `;
 
-        brandWrapper.appendChild(brandFilter);
+        const brandDropdown = document.createElement('div');
+        brandDropdown.className = 'dropdown-options';
+        brandDropdown.style.cssText = `
+            position: absolute !important;
+            top: 100% !important;
+            left: 0 !important;
+            right: 0 !important;
+            background: rgba(0, 0, 0, 0.9) !important;
+            border: 1px solid #00ff00 !important;
+            border-radius: 6px !important;
+            box-shadow: 0 4px 20px rgba(0, 255, 0, 0.3) !important;
+            z-index: 1000 !important;
+            max-height: 200px !important;
+            overflow-y: auto !important;
+            display: none !important;
+            backdrop-filter: blur(5px) !important;
+        `;
+
+        brandWrapper.appendChild(brandDisplay);
         brandWrapper.appendChild(brandArrow);
+        brandWrapper.appendChild(brandDropdown);
 
         // Clear filters button
         const clearFilters = document.createElement('button');
@@ -400,43 +458,65 @@ class ProductMenu {
         this.menuElement.appendChild(scrollbarStyle);
         this.menuElement.appendChild(mobileGridStyle);
 
-        // Add filter event listeners
-        categoryFilter.addEventListener('change', (e) => {
-            console.log('CategoryFilter change event fired! Value:', e.target.value);
-            this.handleCategoryFilter(e.target.value);
+        // Custom dropdown functionality
+        let categoryOpen = false;
+        let brandOpen = false;
+
+        // Category dropdown click handler
+        categoryDisplay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (brandOpen) {
+                brandDropdown.style.display = 'none';
+                brandArrow.style.transform = 'translateY(-50%) rotate(0deg)';
+                brandOpen = false;
+            }
+
+            categoryOpen = !categoryOpen;
+            categoryDropdown.style.display = categoryOpen ? 'block' : 'none';
+            categoryArrow.style.transform = categoryOpen ? 'translateY(-50%) rotate(180deg)' : 'translateY(-50%) rotate(0deg)';
         });
 
-        brandFilter.addEventListener('change', (e) => {
-            console.log('BrandFilter change event fired! Value:', e.target.value);
-            this.handleBrandFilter(e.target.value);
+        // Brand dropdown click handler
+        brandDisplay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (categoryOpen) {
+                categoryDropdown.style.display = 'none';
+                categoryArrow.style.transform = 'translateY(-50%) rotate(0deg)';
+                categoryOpen = false;
+            }
+
+            brandOpen = !brandOpen;
+            brandDropdown.style.display = brandOpen ? 'block' : 'none';
+            brandArrow.style.transform = brandOpen ? 'translateY(-50%) rotate(180deg)' : 'translateY(-50%) rotate(0deg)';
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            if (categoryOpen) {
+                categoryDropdown.style.display = 'none';
+                categoryArrow.style.transform = 'translateY(-50%) rotate(0deg)';
+                categoryOpen = false;
+            }
+            if (brandOpen) {
+                brandDropdown.style.display = 'none';
+                brandArrow.style.transform = 'translateY(-50%) rotate(0deg)';
+                brandOpen = false;
+            }
         });
 
         clearFilters.addEventListener('click', () => {
             console.log('Clear filters button clicked!');
             this.clearAllFilters();
-        });
-
-        // Add arrow animation event listeners
-        categoryFilter.addEventListener('focus', () => {
-            categoryArrow.style.transform = 'translateY(-50%) rotate(180deg)';
-        });
-
-        categoryFilter.addEventListener('blur', () => {
-            categoryArrow.style.transform = 'translateY(-50%) rotate(0deg)';
-        });
-
-        brandFilter.addEventListener('focus', () => {
-            brandArrow.style.transform = 'translateY(-50%) rotate(180deg)';
-        });
-
-        brandFilter.addEventListener('blur', () => {
-            brandArrow.style.transform = 'translateY(-50%) rotate(0deg)';
+            categoryDisplay.textContent = 'All Categories';
+            brandDisplay.textContent = 'All Brands';
         });
 
         // Store references for easy access
         this.filterContainer = filterContainer;
-        this.categoryFilter = categoryFilter;
-        this.brandFilter = brandFilter;
+        this.categoryDisplay = categoryDisplay;
+        this.categoryDropdown = categoryDropdown;
+        this.brandDisplay = brandDisplay;
+        this.brandDropdown = brandDropdown;
         this.productGrid = productGrid;
         this.productGridContainer = productGridContainer;
 
@@ -1920,36 +2000,136 @@ class ProductMenu {
         }
 
         // Populate category filter
-        if (this.categoryFilter) {
-            this.categoryFilter.innerHTML = '<option value="">All Categories</option>';
+        if (this.categoryDropdown) {
+            this.categoryDropdown.innerHTML = '';
+
+            // Add "All Categories" option
+            const allCategoriesOption = document.createElement('div');
+            allCategoriesOption.className = 'dropdown-option';
+            allCategoriesOption.style.cssText = `
+                padding: 8px 12px !important;
+                color: #00ff00 !important;
+                font-family: 'Courier New', monospace !important;
+                font-size: 14px !important;
+                cursor: pointer !important;
+                transition: background-color 0.2s ease !important;
+                border-bottom: 1px solid rgba(0, 255, 0, 0.2) !important;
+            `;
+            allCategoriesOption.textContent = 'All Categories';
+            allCategoriesOption.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.categoryDisplay.textContent = 'All Categories';
+                this.categoryDropdown.style.display = 'none';
+                this.handleCategoryFilter('');
+            });
+            allCategoriesOption.addEventListener('mouseover', () => {
+                allCategoriesOption.style.background = 'rgba(0, 255, 0, 0.1)';
+            });
+            allCategoriesOption.addEventListener('mouseout', () => {
+                allCategoriesOption.style.background = 'transparent';
+            });
+            this.categoryDropdown.appendChild(allCategoriesOption);
+
             if (actualCategories && actualCategories.length > 0) {
                 actualCategories.forEach(category => {
-                    const option = document.createElement('option');
-                    // Use the category name as the value for filtering (not ID)
-                    option.value = category.name || category;
+                    const option = document.createElement('div');
+                    option.className = 'dropdown-option';
+                    option.style.cssText = `
+                        padding: 8px 12px !important;
+                        color: #00ff00 !important;
+                        font-family: 'Courier New', monospace !important;
+                        font-size: 14px !important;
+                        cursor: pointer !important;
+                        transition: background-color 0.2s ease !important;
+                        border-bottom: 1px solid rgba(0, 255, 0, 0.2) !important;
+                    `;
                     option.textContent = category.name || category;
-                    this.categoryFilter.appendChild(option);
+                    option.dataset.value = category.name || category;
+
+                    option.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.categoryDisplay.textContent = category.name || category;
+                        this.categoryDropdown.style.display = 'none';
+                        this.handleCategoryFilter(category.name || category);
+                    });
+                    option.addEventListener('mouseover', () => {
+                        option.style.background = 'rgba(0, 255, 0, 0.1)';
+                    });
+                    option.addEventListener('mouseout', () => {
+                        option.style.background = 'transparent';
+                    });
+
+                    this.categoryDropdown.appendChild(option);
                 });
                 console.log('ProductMenu: Category filter populated with', actualCategories.length, 'options');
-                console.log('ProductMenu: Category options:', Array.from(this.categoryFilter.options).map(opt => ({ value: opt.value, text: opt.textContent })));
             } else {
                 console.log('ProductMenu: No categories available for filter');
             }
         }
 
         // Populate brand filter
-        if (this.brandFilter) {
-            this.brandFilter.innerHTML = '<option value="">All Brands</option>';
+        if (this.brandDropdown) {
+            this.brandDropdown.innerHTML = '';
+
+            // Add "All Brands" option
+            const allBrandsOption = document.createElement('div');
+            allBrandsOption.className = 'dropdown-option';
+            allBrandsOption.style.cssText = `
+                padding: 8px 12px !important;
+                color: #00ff00 !important;
+                font-family: 'Courier New', monospace !important;
+                font-size: 14px !important;
+                cursor: pointer !important;
+                transition: background-color 0.2s ease !important;
+                border-bottom: 1px solid rgba(0, 255, 0, 0.2) !important;
+            `;
+            allBrandsOption.textContent = 'All Brands';
+            allBrandsOption.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.brandDisplay.textContent = 'All Brands';
+                this.brandDropdown.style.display = 'none';
+                this.handleBrandFilter('');
+            });
+            allBrandsOption.addEventListener('mouseover', () => {
+                allBrandsOption.style.background = 'rgba(0, 255, 0, 0.1)';
+            });
+            allBrandsOption.addEventListener('mouseout', () => {
+                allBrandsOption.style.background = 'transparent';
+            });
+            this.brandDropdown.appendChild(allBrandsOption);
+
             if (actualBrands && actualBrands.length > 0) {
                 actualBrands.forEach(brand => {
-                    const option = document.createElement('option');
-                    // Use the brand name as the value for filtering (not ID)
-                    option.value = brand.name || brand;
+                    const option = document.createElement('div');
+                    option.className = 'dropdown-option';
+                    option.style.cssText = `
+                        padding: 8px 12px !important;
+                        color: #00ff00 !important;
+                        font-family: 'Courier New', monospace !important;
+                        font-size: 14px !important;
+                        cursor: pointer !important;
+                        transition: background-color 0.2s ease !important;
+                        border-bottom: 1px solid rgba(0, 255, 0, 0.2) !important;
+                    `;
                     option.textContent = brand.name || brand;
-                    this.brandFilter.appendChild(option);
+                    option.dataset.value = brand.name || brand;
+
+                    option.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.brandDisplay.textContent = brand.name || brand;
+                        this.brandDropdown.style.display = 'none';
+                        this.handleBrandFilter(brand.name || brand);
+                    });
+                    option.addEventListener('mouseover', () => {
+                        option.style.background = 'rgba(0, 255, 0, 0.1)';
+                    });
+                    option.addEventListener('mouseout', () => {
+                        option.style.background = 'transparent';
+                    });
+
+                    this.brandDropdown.appendChild(option);
                 });
                 console.log('ProductMenu: Brand filter populated with', actualBrands.length, 'options');
-                console.log('ProductMenu: Brand options:', Array.from(this.brandFilter.options).map(opt => ({ value: opt.value, text: opt.textContent })));
             } else {
                 console.log('ProductMenu: No brands available for filter');
             }
