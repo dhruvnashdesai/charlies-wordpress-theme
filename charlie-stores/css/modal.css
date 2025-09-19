@@ -21,7 +21,7 @@
 }
 
 .modal-content {
-    background: #ff0000; /* TESTING - RED BACKGROUND TO CHECK CACHE */
+    background: white;
     border-radius: 12px;
     padding: 2rem;
     max-width: 500px;

@@ -436,11 +436,12 @@
 
     /* Mobile-optimized GTA Crosshair - Adjusted positioning */
     .gta-crosshair {
-        width: 300px;
-        height: 300px;
-        left: 50%;
-        top: calc(50% + 20px); /* Moved down 20px to account for visual center */
-        transform: translate(-50%, -50%);
+        width: 300px !important;
+        height: 300px !important;
+        left: 50% !important;
+        top: calc(50% + 50px) !important; /* TESTING - Very obvious offset */
+        transform: translate(-50%, -50%) !important;
+        border: 5px solid red !important; /* TESTING - Make crosshair visible */
     }
 
     .gta-crosshair::before,
