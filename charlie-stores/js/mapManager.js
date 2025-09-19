@@ -1873,10 +1873,10 @@ class MapManager {
         const compactLeft = 20;
         const compactBottom = 20;
 
-        // Account for safe areas on mobile devices
-        const safeAreaBottom = this.getSafeAreaInset('bottom');
-        const actualBottom = compactBottom + safeAreaBottom;
-        const compactTop = window.innerHeight - actualBottom - compactMapSize;
+        // Account for safe areas on mobile devices - simple mobile offset
+        const isMobile = window.innerWidth <= 768;
+        const mobileOffset = isMobile ? 80 : 0; // Move up 80px on mobile
+        const compactTop = window.innerHeight - compactBottom - compactMapSize - mobileOffset;
 
         // Center point of the compact circular map
         const compactCenterX = compactLeft + (compactMapSize / 2);
