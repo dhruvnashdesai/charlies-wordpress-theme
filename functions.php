@@ -116,21 +116,21 @@ function charlie_enqueue_store_assets() {
         'charlie-styles',
         get_template_directory_uri() . '/charlie-stores/css/styles.css',
         array(),
-        '1.0.0'
+        '1.0.2'
     );
 
     wp_enqueue_style(
         'charlie-modal',
         get_template_directory_uri() . '/charlie-stores/css/modal.css',
         array('charlie-styles'),
-        '1.0.0'
+        '1.0.2'
     );
 
     wp_enqueue_style(
         'charlie-map',
         get_template_directory_uri() . '/charlie-stores/css/map.css',
         array('mapbox-gl'),
-        '1.0.0'
+        '1.0.2'
     );
 
     // WooCommerce integration styles
