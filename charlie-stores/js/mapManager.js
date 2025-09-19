@@ -1905,9 +1905,11 @@ class MapManager {
                 markerElement.style.position = 'fixed';
                 markerElement.style.left = `${compactCenterX}px`;
                 markerElement.style.top = `${compactCenterY}px`;
-                markerElement.style.transform = 'translate(-50%, -50%) scale(0.6)';
+                markerElement.style.transform = 'translate(-50%, -50%) scale(1.2)'; // Bigger on mobile
                 markerElement.style.zIndex = '601'; // Above crosshair
                 markerElement.style.pointerEvents = 'none'; // Don't interfere with map
+                markerElement.style.opacity = '1'; // Ensure visible
+                markerElement.style.display = 'block'; // Force display
             }
         }
 

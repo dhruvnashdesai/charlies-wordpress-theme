@@ -101,17 +101,14 @@ p {
 /* Full Screen Map */
 #app {
     position: fixed;
-    top: 0;
+    top: 44px; /* Force safe area top */
     left: 0;
+    right: 0;
+    bottom: 34px; /* Force safe area bottom */
     width: 100vw;
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile browsers */
+    height: calc(100vh - 78px); /* Subtract top + bottom safe areas */
+    height: calc(100dvh - 78px); /* Dynamic viewport height for mobile browsers */
     z-index: 1;
-    /* Safe area support - fallback approach for mobile */
-    padding-top: max(env(safe-area-inset-top), 44px); /* iPhone notch fallback */
-    padding-bottom: max(env(safe-area-inset-bottom), 34px); /* Home indicator fallback */
-    padding-left: max(env(safe-area-inset-left), 0px);
-    padding-right: max(env(safe-area-inset-right), 0px);
     box-sizing: border-box;
     /* DEBUG - Visible safe area borders */
     border-top: 5px solid red;
