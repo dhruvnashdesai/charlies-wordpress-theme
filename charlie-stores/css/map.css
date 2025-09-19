@@ -416,23 +416,29 @@
 
 /* MOBILE OPTIMIZATIONS */
 
-/* Mobile Map Container */
+/* Mobile Map Container with Safe Area Support */
 @media (max-width: 768px) {
     .fullscreen-map {
         width: 100vw;
         height: 100vh;
+        height: 100dvh; /* Dynamic viewport height for mobile browsers */
         position: fixed;
         top: 0;
         left: 0;
         z-index: 1;
+        /* Safe area support for devices with notches */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
     }
 
-    /* Mobile-optimized GTA Crosshair */
+    /* Mobile-optimized GTA Crosshair - Adjusted positioning */
     .gta-crosshair {
         width: 300px;
         height: 300px;
         left: 50%;
-        top: 50%;
+        top: calc(50% + 20px); /* Moved down 20px to account for visual center */
         transform: translate(-50%, -50%);
     }
 
@@ -522,9 +528,15 @@
 
 /* Extra Small Mobile (iPhone SE, etc.) */
 @media (max-width: 480px) {
+    .fullscreen-map {
+        /* Additional safe area adjustments for smaller screens */
+        box-sizing: border-box;
+    }
+
     .gta-crosshair {
         width: 250px;
         height: 250px;
+        top: calc(50% + 15px); /* Slightly less offset for smaller screens */
     }
 
     .gta-crosshair::before,
@@ -568,9 +580,18 @@
 
 /* Landscape Mobile Orientation */
 @media (max-width: 896px) and (orientation: landscape) {
+    .fullscreen-map {
+        /* Safe area for landscape mode */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+
     .gta-crosshair {
         width: 200px;
         height: 200px;
+        top: calc(50% + 10px); /* Smaller offset for landscape */
     }
 
     .custom-marker {
