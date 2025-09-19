@@ -116,21 +116,21 @@ function charlie_enqueue_store_assets() {
         'charlie-styles',
         get_template_directory_uri() . '/charlie-stores/css/styles.css',
         array(),
-        '1.0.2'
+        '1.0.3'
     );
 
     wp_enqueue_style(
         'charlie-modal',
         get_template_directory_uri() . '/charlie-stores/css/modal.css',
         array('charlie-styles'),
-        '1.0.2'
+        '1.0.3'
     );
 
     wp_enqueue_style(
         'charlie-map',
         get_template_directory_uri() . '/charlie-stores/css/map.css',
         array('mapbox-gl'),
-        '1.0.2'
+        '1.0.3'
     );
 
     // WooCommerce integration styles
@@ -164,7 +164,7 @@ function charlie_enqueue_store_assets() {
         'charlie-geocoding',
         get_template_directory_uri() . '/charlie-stores/js/geocoding.js',
         array('charlie-config'),
-        '1.0.2',
+        '1.0.3',
         true
     );
 
