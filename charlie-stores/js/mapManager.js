@@ -1875,7 +1875,7 @@ class MapManager {
 
         // Account for safe areas on mobile devices - simple mobile offset
         const isMobile = window.innerWidth <= 768;
-        const mobileOffset = isMobile ? 80 : 0; // Move up 80px on mobile
+        const mobileOffset = isMobile ? 150 : 0; // Move up 150px on mobile for safe areas
         const compactTop = window.innerHeight - compactBottom - compactMapSize - mobileOffset;
 
         // Center point of the compact circular map

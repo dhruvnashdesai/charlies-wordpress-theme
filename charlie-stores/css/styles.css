@@ -107,11 +107,11 @@ p {
     height: 100vh;
     height: 100dvh; /* Dynamic viewport height for mobile browsers */
     z-index: 1;
-    /* Safe area support for devices with notches/home indicators */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+    /* Safe area support - fallback approach for mobile */
+    padding-top: max(env(safe-area-inset-top), 44px); /* iPhone notch fallback */
+    padding-bottom: max(env(safe-area-inset-bottom), 34px); /* Home indicator fallback */
+    padding-left: max(env(safe-area-inset-left), 0px);
+    padding-right: max(env(safe-area-inset-right), 0px);
     box-sizing: border-box;
     /* DEBUG - Visible safe area borders */
     border-top: 5px solid red;
