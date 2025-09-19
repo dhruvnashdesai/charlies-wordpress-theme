@@ -172,7 +172,7 @@ function charlie_enqueue_store_assets() {
         'charlie-map',
         get_template_directory_uri() . '/charlie-stores/js/mapManager.js',
         array('mapbox-gl', 'charlie-config'),
-        '1.0.0',
+        '1.0.5',
         true
     );
 

@@ -1872,7 +1872,11 @@ class MapManager {
         const compactMapSize = 200;
         const compactLeft = 20;
         const compactBottom = 20;
-        const compactTop = window.innerHeight - compactBottom - compactMapSize;
+
+        // Account for safe areas on mobile devices
+        const safeAreaBottom = this.getSafeAreaInset('bottom');
+        const actualBottom = compactBottom + safeAreaBottom;
+        const compactTop = window.innerHeight - actualBottom - compactMapSize;
 
         // Center point of the compact circular map
         const compactCenterX = compactLeft + (compactMapSize / 2);
@@ -1908,6 +1912,37 @@ class MapManager {
         }
 
         console.log('MapManager: Updated vignette for compact mode - centered at', { compactCenterX, compactCenterY });
+    }
+
+    /**
+     * Get safe area inset value for mobile devices
+     * @param {string} side - 'top', 'right', 'bottom', 'left'
+     * @returns {number} Safe area inset in pixels
+     */
+    getSafeAreaInset(side) {
+        if (typeof CSS !== 'undefined' && CSS.supports && CSS.supports('padding', 'env(safe-area-inset-top)')) {
+            // Create a temporary element to measure the safe area
+            const testElement = document.createElement('div');
+            testElement.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 1px;
+                height: 1px;
+                padding-${side}: env(safe-area-inset-${side});
+                visibility: hidden;
+                pointer-events: none;
+            `;
+            document.body.appendChild(testElement);
+
+            const computedStyle = getComputedStyle(testElement);
+            const paddingValue = computedStyle.getPropertyValue(`padding-${side}`);
+            const safeAreaValue = parseInt(paddingValue) || 0;
+
+            document.body.removeChild(testElement);
+            return safeAreaValue;
+        }
+        return 0;
     }
 }
 
