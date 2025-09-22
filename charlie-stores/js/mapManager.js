@@ -1878,21 +1878,23 @@ class MapManager {
         let compactCenterX, compactCenterY;
 
         if (isMobile) {
-            // New approach: map extends into safe area, but position marker in visible area
-            const safeAreaTop = 47; // Safe area height for positioning calculations
+            // Hybrid approach: #app has padding, map has negative margins, position in content area
+            const appElement = document.getElementById('app');
+            const computedStyle = getComputedStyle(appElement);
+            const safeAreaTop = parseInt(computedStyle.paddingTop) || 47;
 
-            // Calculate position in the visible content area (below status bar)
-            const visibleHeight = window.innerHeight - safeAreaTop;
-            const compactTop = safeAreaTop + (visibleHeight - compactBottom - compactMapSize);
+            // Position marker in the content area (within the padding)
+            const contentHeight = window.innerHeight - safeAreaTop;
+            const compactTop = contentHeight - compactBottom - compactMapSize;
 
-            // Center point in visible area
+            // Center point accounting for safe area
             compactCenterX = compactLeft + (compactMapSize / 2);
-            compactCenterY = compactTop + (compactMapSize / 2);
+            compactCenterY = safeAreaTop + compactTop + (compactMapSize / 2);
 
-            console.log('Compact mode positioning:', {
+            console.log('Hybrid positioning mode:', {
                 windowHeight: window.innerHeight,
                 safeAreaTop,
-                visibleHeight,
+                contentHeight,
                 compactTop,
                 compactCenterY
             });

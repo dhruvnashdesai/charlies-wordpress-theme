@@ -13,17 +13,14 @@
     z-index: 1;
 }
 
-/* Mobile map extends into safe areas seamlessly */
+/* Mobile map extends behind safe areas */
 @media (max-width: 768px) {
     .fullscreen-map {
-        /* Extend map into safe area for seamless experience */
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100vw;
-        height: var(--vh, 100vh);
-        min-height: -webkit-fill-available;
+        /* Map positioning handled by negative margins in styles.css */
+        position: relative; /* Change from fixed to relative for margin approach */
+        width: 100%;
+        /* Height handled by negative margin calculation in styles.css */
+        z-index: 0; /* Behind safe area content */
     }
 }
 
