@@ -110,11 +110,7 @@ p {
     height: calc(100dvh - 78px); /* Dynamic viewport height for mobile browsers */
     z-index: 1;
     box-sizing: border-box;
-    /* DEBUG - Visible safe area borders */
-    border-top: 5px solid red;
-    border-bottom: 5px solid blue;
-    border-left: 5px solid green;
-    border-right: 5px solid yellow;
+    /* Safe area borders removed - working correctly */
 }
 
 .fullscreen-map {
