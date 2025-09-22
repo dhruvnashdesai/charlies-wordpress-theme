@@ -112,11 +112,11 @@ p {
 /* Mobile Safe Area Support */
 @media (max-width: 768px) {
     #app {
-        top: 0; /* Complete elimination of white gap */
+        top: 47px; /* Just below the status bar/notch area */
         bottom: 0;
-        height: 100vh;
-        height: 100dvh; /* Dynamic viewport height */
-        /* DEBUG - See the safe area - should see orange at very top now */
+        height: calc(100vh - 47px);
+        height: calc(100dvh - 47px); /* Dynamic viewport height */
+        /* Final positioning - should be perfect now */
         border-top: 2px solid orange;
         border-bottom: 2px solid purple;
     }
