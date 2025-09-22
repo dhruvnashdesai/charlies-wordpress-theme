@@ -128,31 +128,43 @@ p {
     box-sizing: border-box;
 }
 
-/* Mobile Safe Area Support - Blended Approach */
+/* Mobile Safe Area Support - Direct Mapbox Extension */
 @media (max-width: 768px) {
     #app {
-        /* Extend map container into safe area but apply smart content positioning */
+        /* Remove all padding - let everything extend fully */
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        padding-top: max(env(safe-area-inset-top), 47px);
-        padding-bottom: env(safe-area-inset-bottom, 0px);
-        padding-left: env(safe-area-inset-left, 0px);
-        padding-right: env(safe-area-inset-right, 0px);
-        /* Critical: Make the padding area show map content, not background */
+        padding: 0;
         background: transparent;
     }
 
-    /* Make the actual map extend beyond the padding */
-    .fullscreen-map {
-        /* Use negative margins to extend map behind safe area padding */
-        margin-top: calc(-1 * max(env(safe-area-inset-top), 47px));
-        margin-bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
-        margin-left: calc(-1 * env(safe-area-inset-left, 0px));
-        margin-right: calc(-1 * env(safe-area-inset-right, 0px));
-        /* Expand height to compensate for negative margins */
-        height: calc(100% + max(env(safe-area-inset-top), 47px) + env(safe-area-inset-bottom, 0px));
+    /* Direct Mapbox container manipulation for safe area extension */
+    .mapboxgl-map {
+        /* Extend Mapbox canvas into safe area */
+        position: fixed !important;
+        top: calc(-1 * max(env(safe-area-inset-top), 47px)) !important;
+        left: calc(-1 * env(safe-area-inset-left, 0px)) !important;
+        width: calc(100vw + env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px)) !important;
+        height: calc(100vh + max(env(safe-area-inset-top), 47px) + env(safe-area-inset-bottom, 0px)) !important;
+        height: calc(100dvh + max(env(safe-area-inset-top), 47px) + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    /* Ensure map controls stay in safe area */
+    .mapboxgl-ctrl-top-right {
+        top: max(env(safe-area-inset-top), 47px) !important;
+        right: max(env(safe-area-inset-right), 10px) !important;
+    }
+
+    .mapboxgl-ctrl-bottom-left {
+        bottom: max(env(safe-area-inset-bottom), 10px) !important;
+        left: max(env(safe-area-inset-left), 10px) !important;
+    }
+
+    .mapboxgl-ctrl-bottom-right {
+        bottom: max(env(safe-area-inset-bottom), 10px) !important;
+        right: max(env(safe-area-inset-right), 10px) !important;
     }
 }
 

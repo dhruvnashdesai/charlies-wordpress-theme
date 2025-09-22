@@ -13,14 +13,31 @@
     z-index: 1;
 }
 
-/* Mobile map extends behind safe areas */
+/* Mobile map extends behind safe areas - Direct Mapbox approach */
 @media (max-width: 768px) {
     .fullscreen-map {
-        /* Map positioning handled by negative margins in styles.css */
-        position: relative; /* Change from fixed to relative for margin approach */
-        width: 100%;
-        /* Height handled by negative margin calculation in styles.css */
-        z-index: 0; /* Behind safe area content */
+        /* Let Mapbox container handle the positioning via .mapboxgl-map rules */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        z-index: 0;
+    }
+
+    /* Ensure our overlays respect safe areas */
+    .gta-crosshair {
+        /* Position crosshair in safe content area */
+        top: calc(50% + max(env(safe-area-inset-top), 47px) / 2) !important;
+    }
+
+    .radius-vignette {
+        /* Vignette positioning should account for safe area */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
     }
 }
 

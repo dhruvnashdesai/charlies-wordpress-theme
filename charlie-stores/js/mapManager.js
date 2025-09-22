@@ -1878,20 +1878,18 @@ class MapManager {
         let compactCenterX, compactCenterY;
 
         if (isMobile) {
-            // Hybrid approach: #app has padding, map has negative margins, position in content area
-            const appElement = document.getElementById('app');
-            const computedStyle = getComputedStyle(appElement);
-            const safeAreaTop = parseInt(computedStyle.paddingTop) || 47;
+            // Direct Mapbox approach: position marker in visible content area
+            const safeAreaTop = 47; // Fixed safe area for mobile calculations
 
-            // Position marker in the content area (within the padding)
+            // Calculate available content height (excluding safe area)
             const contentHeight = window.innerHeight - safeAreaTop;
             const compactTop = contentHeight - compactBottom - compactMapSize;
 
-            // Center point accounting for safe area
+            // Position marker in visible content area (below safe area)
             compactCenterX = compactLeft + (compactMapSize / 2);
             compactCenterY = safeAreaTop + compactTop + (compactMapSize / 2);
 
-            console.log('Hybrid positioning mode:', {
+            console.log('Direct Mapbox positioning:', {
                 windowHeight: window.innerHeight,
                 safeAreaTop,
                 contentHeight,
@@ -1899,7 +1897,7 @@ class MapManager {
                 compactCenterY
             });
         } else {
-            // Desktop - no safe area adjustments
+            // Desktop - no safe area adjustments needed
             const compactTop = window.innerHeight - compactBottom - compactMapSize;
             compactCenterX = compactLeft + (compactMapSize / 2);
             compactCenterY = compactTop + (compactMapSize / 2);
