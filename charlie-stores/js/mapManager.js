@@ -1879,7 +1879,7 @@ class MapManager {
 
         if (isMobile) {
             // Direct Mapbox approach: position marker in visible content area
-            const safeAreaTop = 20; // Reduced from 47px to 20px for less upward movement
+            const safeAreaTop = 0; // Minimal offset - keep marker closer to center
 
             // Calculate available content height (excluding safe area)
             const contentHeight = window.innerHeight - safeAreaTop;
