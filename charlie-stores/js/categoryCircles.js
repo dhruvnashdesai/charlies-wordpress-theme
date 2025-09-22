@@ -98,6 +98,9 @@ class CategoryCircles {
     async handleWarehouseClick(warehouse) {
         console.log('Warehouse clicked, entering direct product view...', warehouse);
 
+        // Add warehouse mode class for safe area background handling
+        document.body.classList.add('warehouse-mode');
+
         this.currentStoreId = warehouse.id;
 
         try {
@@ -394,6 +397,9 @@ class CategoryCircles {
             });
             this.categoryElements.clear();
             this.isVisible = false;
+
+            // Remove warehouse mode class when exiting warehouse view
+            document.body.classList.remove('warehouse-mode');
         }, 300);
     }
 

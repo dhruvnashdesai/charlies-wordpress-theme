@@ -11,8 +11,17 @@ html, body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #000; /* Match map background */
+    background-color: #1a1a1a; /* Dark map background color */
     -webkit-overflow-scrolling: touch;
+}
+
+/* Dynamic background for different app states */
+body.charlie-full-screen {
+    background-color: #1a1a1a; /* Dark background for map */
+}
+
+body.warehouse-mode {
+    background-color: #1a1a1a; /* Keep dark background in warehouse mode */
 }
 
 body {

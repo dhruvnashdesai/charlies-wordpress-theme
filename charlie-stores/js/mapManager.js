@@ -1873,14 +1873,31 @@ class MapManager {
         const compactLeft = 20;
         const compactBottom = 20;
 
-        // Account for safe areas on mobile devices - simple mobile offset
+        // Account for safe areas on mobile devices
         const isMobile = window.innerWidth <= 768;
-        const mobileOffset = isMobile ? 150 : 0; // Move up 150px on mobile for safe areas
-        const compactTop = window.innerHeight - compactBottom - compactMapSize - mobileOffset;
+        let compactCenterX, compactCenterY;
 
-        // Center point of the compact circular map
-        const compactCenterX = compactLeft + (compactMapSize / 2);
-        const compactCenterY = compactTop + (compactMapSize / 2);
+        if (isMobile) {
+            // Get actual safe area padding from CSS
+            const appElement = document.getElementById('app');
+            const computedStyle = getComputedStyle(appElement);
+            const safeAreaTop = parseInt(computedStyle.paddingTop) || 47; // fallback to 47px
+
+            // Calculate available height (excluding safe area)
+            const availableHeight = window.innerHeight - safeAreaTop;
+            const compactTop = availableHeight - compactBottom - compactMapSize;
+
+            // Center point accounting for safe area
+            compactCenterX = compactLeft + (compactMapSize / 2);
+            compactCenterY = safeAreaTop + compactTop + (compactMapSize / 2);
+
+            console.log('Compact mode safe area adjustment:', { safeAreaTop, availableHeight, compactCenterY });
+        } else {
+            // Desktop - no safe area adjustments
+            const compactTop = window.innerHeight - compactBottom - compactMapSize;
+            compactCenterX = compactLeft + (compactMapSize / 2);
+            compactCenterY = compactTop + (compactMapSize / 2);
+        }
 
         // Scale calculations for compact view - smaller radius for circular view
         const compactRadius = compactMapSize * 0.3; // 30% of map size for inner radius
