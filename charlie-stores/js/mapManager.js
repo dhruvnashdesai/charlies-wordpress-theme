@@ -1878,20 +1878,24 @@ class MapManager {
         let compactCenterX, compactCenterY;
 
         if (isMobile) {
-            // Get actual safe area padding from CSS
-            const appElement = document.getElementById('app');
-            const computedStyle = getComputedStyle(appElement);
-            const safeAreaTop = parseInt(computedStyle.paddingTop) || 47; // fallback to 47px
+            // New approach: map extends into safe area, but position marker in visible area
+            const safeAreaTop = 47; // Safe area height for positioning calculations
 
-            // Calculate available height (excluding safe area)
-            const availableHeight = window.innerHeight - safeAreaTop;
-            const compactTop = availableHeight - compactBottom - compactMapSize;
+            // Calculate position in the visible content area (below status bar)
+            const visibleHeight = window.innerHeight - safeAreaTop;
+            const compactTop = safeAreaTop + (visibleHeight - compactBottom - compactMapSize);
 
-            // Center point accounting for safe area
+            // Center point in visible area
             compactCenterX = compactLeft + (compactMapSize / 2);
-            compactCenterY = safeAreaTop + compactTop + (compactMapSize / 2);
+            compactCenterY = compactTop + (compactMapSize / 2);
 
-            console.log('Compact mode safe area adjustment:', { safeAreaTop, availableHeight, compactCenterY });
+            console.log('Compact mode positioning:', {
+                windowHeight: window.innerHeight,
+                safeAreaTop,
+                visibleHeight,
+                compactTop,
+                compactCenterY
+            });
         } else {
             // Desktop - no safe area adjustments
             const compactTop = window.innerHeight - compactBottom - compactMapSize;

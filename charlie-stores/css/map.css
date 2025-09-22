@@ -2,6 +2,7 @@
 .fullscreen-map {
     width: 100vw;
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height */
     border-radius: 0;
     overflow: hidden;
     box-shadow: none;
@@ -10,6 +11,20 @@
     top: 0;
     left: 0;
     z-index: 1;
+}
+
+/* Mobile map extends into safe areas seamlessly */
+@media (max-width: 768px) {
+    .fullscreen-map {
+        /* Extend map into safe area for seamless experience */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: var(--vh, 100vh);
+        min-height: -webkit-fill-available;
+    }
 }
 
 /* GTA-style Crosshair Overlay - Same level as circle vignette */
