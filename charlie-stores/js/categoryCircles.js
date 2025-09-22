@@ -39,7 +39,7 @@ class CategoryCircles {
                 y: vignetteInfo.centerY
             };
             this.vignetteRadius = vignetteInfo.innerRadius; // Use innerRadius for positioning right at the edge
-            console.log('CategoryCircles using actual vignette center:', this.centerPoint, 'radius:', this.vignetteRadius);
+            // Vignette center debug removed
             return;
         }
 
@@ -57,7 +57,7 @@ class CategoryCircles {
         };
         this.vignetteRadius = Math.min(window.innerWidth, window.innerHeight) * 0.25;
 
-        console.log('CategoryCircles using fallback center:', this.centerPoint, 'radius:', this.vignetteRadius);
+        // Fallback center debug removed
     }
 
     /**
@@ -96,7 +96,7 @@ class CategoryCircles {
      * Handle warehouse marker click
      */
     async handleWarehouseClick(warehouse) {
-        console.log('Warehouse clicked, entering direct product view...', warehouse);
+        console.log('Warehouse clicked - opening product menu:', warehouse.name);
 
         // Add warehouse mode class for safe area background handling
         document.body.classList.add('warehouse-mode');
@@ -110,8 +110,14 @@ class CategoryCircles {
             // Load categories for this warehouse/store
             await this.loadCategories(warehouse.id);
 
-            // Enter product view immediately (no category circles)
-            this.enterProductView();
+            // Skip category circles entirely - just set up for product menu
+            // this.enterProductView(); // DISABLED - we don't want category circles
+
+            // Just add the product view class without the category positioning
+            document.body.classList.add('product-view-mode');
+
+            // Hide vignette but skip category repositioning
+            this.hideVignette();
 
             // Dispatch event to open product menu with all categories
             document.dispatchEvent(new CustomEvent('warehouseSelectedForMenu', {

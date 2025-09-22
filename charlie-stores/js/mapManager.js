@@ -929,8 +929,8 @@ class MapManager {
             this.crosshair.style.zIndex = '600';
         }
 
-        console.log('Vignette tracking - Screen point:', { x: screenPoint.x, y: screenPoint.y }, 'Marker center:', { markerCenterX, markerCenterY }, 'Vignette center:', { centerX, centerY }, 'Viewport:', { width: window.innerWidth, height: window.innerHeight });
-        console.log('Vignette radius debug - tenKmInPixels:', tenKmInPixels, 'innerRadius:', innerRadius, 'outerRadius:', outerRadius);
+        // Vignette tracking debug removed for cleaner console
+        // Debug log removed for cleaner console output
 
         // Store current vignette info for other systems to access
         this.currentVignetteInfo = {
@@ -1865,13 +1865,7 @@ class MapManager {
             compactCenterX = compactLeft + (compactMapSize / 2);
             compactCenterY = compactTop + (compactMapSize / 2); // Remove safeAreaTop addition
 
-            console.log('Direct Mapbox positioning:', {
-                windowHeight: window.innerHeight,
-                safeAreaTop,
-                contentHeight,
-                compactTop,
-                compactCenterY
-            });
+            // Positioning debug removed
         } else {
             // Desktop - no safe area adjustments needed
             const compactTop = window.innerHeight - compactBottom - compactMapSize;
@@ -1910,7 +1904,7 @@ class MapManager {
             }
         }
 
-        console.log('MapManager: Updated vignette for compact mode - centered at', { compactCenterX, compactCenterY });
+        // Compact mode debug removed - mode is disabled anyway
     }
 
     /**
