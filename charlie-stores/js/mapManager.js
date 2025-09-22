@@ -1767,11 +1767,12 @@ class MapManager {
      * Enter compact mode - DISABLED: Keep map in normal state, just show product menu
      */
     enterCompactMode() {
-        console.log('MapManager: Compact mode disabled - keeping map in normal state');
+        console.error('🚫 COMPACT MODE DISABLED - VERSION 1.5.0 - NO MAP MOVEMENT!');
+        console.error('🚫 IF YOU SEE THIS, THE NEW CODE IS LOADING');
         // Don't change anything about the map positioning or marker locations
         // The product menu will handle its own display logic
         this.isCompactMode = false; // Always keep in normal mode
-        return;
+        return; // EXIT IMMEDIATELY - DO NOT PROCEED
     }
 
     /**
