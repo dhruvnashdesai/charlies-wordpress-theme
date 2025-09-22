@@ -112,10 +112,10 @@ p {
 /* Mobile Safe Area Support */
 @media (max-width: 768px) {
     #app {
-        top: 10px; /* Move up more to eliminate thin white gap */
+        top: 5px; /* Final adjustment to eliminate white gap */
         bottom: 0; /* No bottom constraint - let it go to edge */
-        height: calc(100vh - 10px); /* Only subtract top offset */
-        height: calc(100dvh - 10px); /* Dynamic viewport height */
+        height: calc(100vh - 5px); /* Only subtract top offset */
+        height: calc(100dvh - 5px); /* Dynamic viewport height */
         /* DEBUG - See the safe area */
         border-top: 2px solid orange;
         border-bottom: 2px solid purple;
