@@ -989,8 +989,8 @@ class MapManager {
             // Hide the warehouse marker immediately
             markerElement.style.display = 'none';
 
-            // Trigger sliding animation to left side
-            this.slideToProductMode();
+            // Skip sliding animation - keep map static
+            // this.slideToProductMode(); // DISABLED
 
             // Dispatch event for category circles
             document.dispatchEvent(new CustomEvent('warehouseClicked', {
@@ -1698,7 +1698,7 @@ class MapManager {
 
         // Update vignette continuously during animation for smooth tracking
         const animationInterval = setInterval(() => {
-            console.log('Animation interval tick - calling updateRadiusVignette');
+            // Animation tick removed from logs
             this.updateRadiusVignette();
         }, 16); // ~60fps updates
 
@@ -1708,12 +1708,12 @@ class MapManager {
             this.updateRadiusVignette();
             // Re-enable map event tracking
             this.setupVignetteTracking();
-            console.log('Animation complete - re-enabled map event tracking');
+            // Animation complete log removed
         }, 650); // After pan completes
 
         // Don't use transform on crosshair - let positionCrosshairOnMarker handle it
 
-        console.log('Sliding to product mode with map pan and vignette tracking');
+        // Sliding log removed
     }
 
     /**

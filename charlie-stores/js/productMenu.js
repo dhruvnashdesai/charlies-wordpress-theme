@@ -1979,9 +1979,7 @@ class ProductMenu {
      * Populate filter dropdowns
      */
     populateFilters(categories, brands) {
-        console.log('ProductMenu: Populating filters...');
-        console.log('ProductMenu: Categories provided:', categories);
-        console.log('ProductMenu: Brands provided:', brands);
+        // Filter population logs removed for cleaner console
 
         // Extract categories from actual product data if not provided
         let actualCategories = categories;
