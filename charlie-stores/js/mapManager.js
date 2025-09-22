@@ -1764,49 +1764,23 @@ class MapManager {
     }
 
     /**
-     * Enter compact mode - shrink map to bottom left corner
+     * Enter compact mode - DISABLED: Keep map in normal state, just show product menu
      */
     enterCompactMode() {
-        if (this.isCompactMode) {
-            console.log('MapManager: Already in compact mode, skipping enter');
-            return;
-        }
-
-        console.log('MapManager: Entering compact mode');
-        this.isCompactMode = true;
-
-        // Add compact mode class to trigger CSS transitions
-        if (this.mapContainer) {
-            this.mapContainer.classList.add('compact-mode-map');
-        }
-
-        // Center the map on user location for compact view
-        if (this.map && this.userLocationMarker) {
-            const userCoords = this.userLocationMarker.getLngLat();
-            this.map.easeTo({
-                center: userCoords,
-                zoom: Math.max(12, this.map.getZoom() - 1), // Good zoom for compact view
-                duration: 600
-            });
-
-            // Update vignette after map movement and CSS transition
-            setTimeout(() => {
-                this.updateVignetteForCompactMode();
-            }, 700); // Wait for both map animation and CSS transition
-        } else {
-            // Fallback if no user location
-            this.updateVignetteForCompactMode();
-        }
+        console.log('MapManager: Compact mode disabled - keeping map in normal state');
+        // Don't change anything about the map positioning or marker locations
+        // The product menu will handle its own display logic
+        this.isCompactMode = false; // Always keep in normal mode
+        return;
     }
 
     /**
-     * Exit compact mode - restore original layout
+     * Exit compact mode - DISABLED: Already in normal state
      */
     exitCompactMode() {
-        if (!this.isCompactMode) return;
-
-        console.log('MapManager: Exiting compact mode');
+        console.log('MapManager: Exit compact mode called but already in normal state');
         this.isCompactMode = false;
+        return;
 
         // Remove compact mode class
         if (this.mapContainer) {
