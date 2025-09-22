@@ -112,10 +112,13 @@ p {
 /* Mobile Safe Area Support */
 @media (max-width: 768px) {
     #app {
-        top: 44px; /* Force safe area top on mobile */
-        bottom: 34px; /* Force safe area bottom on mobile */
-        height: calc(100vh - 78px); /* Subtract safe areas on mobile */
-        height: calc(100dvh - 78px); /* Dynamic viewport height */
+        top: 20px; /* Reduced safe area top */
+        bottom: 20px; /* Reduced safe area bottom */
+        height: calc(100vh - 40px); /* Subtract reduced safe areas */
+        height: calc(100dvh - 40px); /* Dynamic viewport height */
+        /* DEBUG - See the safe area */
+        border-top: 2px solid orange;
+        border-bottom: 2px solid purple;
     }
 }
 
