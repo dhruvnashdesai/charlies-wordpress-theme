@@ -989,8 +989,12 @@ class MapManager {
             // Hide the warehouse marker immediately
             markerElement.style.display = 'none';
 
-            // Skip sliding animation - keep map static
-            // this.slideToProductMode(); // DISABLED
+            // Only disable sliding animation on mobile - desktop can still move
+            const isMobile = window.innerWidth <= 768;
+            if (!isMobile) {
+                this.slideToProductMode(); // Enable on desktop
+            }
+            // Mobile: skip animation to keep map static
 
             // Dispatch event for category circles
             document.dispatchEvent(new CustomEvent('warehouseClicked', {
