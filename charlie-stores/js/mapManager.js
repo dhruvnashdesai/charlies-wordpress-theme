@@ -1878,16 +1878,17 @@ class MapManager {
         let compactCenterX, compactCenterY;
 
         if (isMobile) {
-            // Direct Mapbox approach: position marker in visible content area
-            const safeAreaTop = 0; // Minimal offset - keep marker closer to center
+            // Direct Mapbox approach: position marker much lower to prevent high positioning
+            const safeAreaTop = 0; // No safe area offset
 
-            // Calculate available content height (excluding safe area)
-            const contentHeight = window.innerHeight - safeAreaTop;
-            const compactTop = contentHeight - compactBottom - compactMapSize;
+            // Calculate available content height
+            const contentHeight = window.innerHeight;
+            // Position compact circle much lower - use more of the bottom area
+            const compactTop = contentHeight - compactBottom - compactMapSize - 100; // Add 100px buffer from bottom
 
-            // Position marker in visible content area (below safe area)
+            // Position marker in the lower area of screen
             compactCenterX = compactLeft + (compactMapSize / 2);
-            compactCenterY = safeAreaTop + compactTop + (compactMapSize / 2);
+            compactCenterY = compactTop + (compactMapSize / 2); // Remove safeAreaTop addition
 
             console.log('Direct Mapbox positioning:', {
                 windowHeight: window.innerHeight,
