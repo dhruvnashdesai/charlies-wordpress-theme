@@ -112,11 +112,11 @@ p {
 /* Mobile Safe Area Support */
 @media (max-width: 768px) {
     #app {
-        top: 5px; /* Final adjustment to eliminate white gap */
-        bottom: 0; /* No bottom constraint - let it go to edge */
-        height: calc(100vh - 5px); /* Only subtract top offset */
-        height: calc(100dvh - 5px); /* Dynamic viewport height */
-        /* DEBUG - See the safe area */
+        top: 0; /* Complete elimination of white gap */
+        bottom: 0;
+        height: 100vh;
+        height: 100dvh; /* Dynamic viewport height */
+        /* DEBUG - See the safe area - should see orange at very top now */
         border-top: 2px solid orange;
         border-bottom: 2px solid purple;
     }
