@@ -101,16 +101,22 @@ p {
 /* Full Screen Map */
 #app {
     position: fixed;
-    top: 44px; /* Force safe area top */
+    top: 0;
     left: 0;
-    right: 0;
-    bottom: 34px; /* Force safe area bottom */
     width: 100vw;
-    height: calc(100vh - 78px); /* Subtract top + bottom safe areas */
-    height: calc(100dvh - 78px); /* Dynamic viewport height for mobile browsers */
+    height: 100vh;
     z-index: 1;
     box-sizing: border-box;
-    /* Safe area borders removed - working correctly */
+}
+
+/* Mobile Safe Area Support */
+@media (max-width: 768px) {
+    #app {
+        top: 44px; /* Force safe area top on mobile */
+        bottom: 34px; /* Force safe area bottom on mobile */
+        height: calc(100vh - 78px); /* Subtract safe areas on mobile */
+        height: calc(100dvh - 78px); /* Dynamic viewport height */
+    }
 }
 
 .fullscreen-map {
