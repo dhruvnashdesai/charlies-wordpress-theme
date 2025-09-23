@@ -1026,18 +1026,22 @@ class ProductMenu {
         const isMobile = window.innerWidth <= 768;
 
         if (isMobile) {
-            // Mobile: Full width, slide up from bottom
+            // Mobile: Full screen coverage with safe area support
             this.menuElement.style.width = '100vw';
-            this.menuElement.style.height = '70vh';
+            this.menuElement.style.height = '100vh';
             this.menuElement.style.right = '0';
             this.menuElement.style.top = '100vh'; // Start below screen
             this.menuElement.style.left = '0';
             this.menuElement.style.transform = 'none';
-            this.menuElement.style.borderRadius = '20px 20px 0 0';
+            this.menuElement.style.borderRadius = '0'; // No border radius for full screen
+            // Add safe area padding for mobile devices
+            this.menuElement.style.paddingTop = 'max(env(safe-area-inset-top), 47px)';
+            this.menuElement.style.paddingBottom = 'env(safe-area-inset-bottom, 34px)';
+            this.menuElement.style.boxSizing = 'border-box';
 
-            // Animate slide up
+            // Animate slide up to full screen
             setTimeout(() => {
-                this.menuElement.style.top = '30vh';
+                this.menuElement.style.top = '0'; // Full screen positioning
                 this.menuElement.style.transition = 'top 0.4s ease-out';
             }, 10);
         } else {
