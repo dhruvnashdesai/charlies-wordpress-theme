@@ -638,6 +638,12 @@ class ProductMenu {
         this.currentStoreId = detail.storeId;
         this.availableCategories = detail.categories;
         this.selectedCategory = null; // No category filter initially
+        this.selectedBrand = null; // No brand filter initially
+
+        // Show menu immediately with loading state
+        console.log('ProductMenu: Showing menu with loading state');
+        this.showMenu();
+        this.setLoadingState(true);
 
         try {
             console.log('ProductMenu: Loading all brands and products for store:', detail.storeId);
@@ -648,14 +654,85 @@ class ProductMenu {
                 this.loadAllProductsForStore(detail.storeId)
             ]);
 
-            console.log('ProductMenu: Data loaded, showing menu with category filters');
-            this.selectedBrand = null; // No brand filter initially
-            this.showMenu();
+            console.log('ProductMenu: Data loaded, updating menu content');
+            this.setLoadingState(false);
+            this.updateMenuLayout(); // Refresh the menu with loaded data
 
         } catch (error) {
             console.error('ProductMenu: Failed to load menu data:', error);
-            this.showErrorMenu();
+            this.setLoadingState(false);
+            this.showErrorMessage();
         }
+    }
+
+    /**
+     * Set loading state for the entire menu
+     * @param {boolean} loading - Whether to show loading state
+     */
+    setLoadingState(loading) {
+        if (!this.menuElement) return;
+
+        if (loading) {
+            // Create and show loading overlay
+            if (!this.menuLoadingOverlay) {
+                this.menuLoadingOverlay = document.createElement('div');
+                this.menuLoadingOverlay.className = 'menu-loading-overlay';
+                this.menuLoadingOverlay.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.8);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                    color: #00ff00;
+                    font-family: 'Courier New', monospace;
+                    font-size: 16px;
+                `;
+                this.menuLoadingOverlay.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">⟳</div>
+                        <div>Loading products...</div>
+                    </div>
+                `;
+            }
+            this.menuElement.appendChild(this.menuLoadingOverlay);
+        } else {
+            // Hide and remove loading overlay
+            if (this.menuLoadingOverlay) {
+                this.menuLoadingOverlay.remove();
+                this.menuLoadingOverlay = null;
+            }
+        }
+    }
+
+    /**
+     * Show error message in menu
+     */
+    showErrorMessage() {
+        if (!this.menuElement) return;
+
+        const errorElement = document.createElement('div');
+        errorElement.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff4444;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            z-index: 1000;
+        `;
+        errorElement.innerHTML = `
+            <div style="font-size: 24px; margin-bottom: 10px;">⚠</div>
+            <div>Failed to load products</div>
+            <div style="font-size: 12px; margin-top: 10px; color: #888;">Please try again</div>
+        `;
+
+        this.menuElement.appendChild(errorElement);
     }
 
     /**
