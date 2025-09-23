@@ -15,7 +15,7 @@ class ProductMenu {
         this.filteredProducts = []; // Filtered by selected brand
         this.selectedProduct = null; // Currently selected product for details
         this.menuElement = null;
-        this.currentView = 'products'; // 'products' or 'cart'
+        this.currentView = 'products'; // 'products', 'cart', or 'checkout'
         this.cart = this.loadCartFromStorage(); // Cart items storage
 
         this.init();
@@ -1080,12 +1080,15 @@ class ProductMenu {
         // Show/hide filter container based on current view
         const filterContainer = this.menuElement.querySelector('.filter-container');
         if (filterContainer) {
-            filterContainer.style.display = this.currentView === 'cart' ? 'none' : 'flex';
+            filterContainer.style.display = this.currentView === 'products' ? 'flex' : 'none';
         }
 
         if (this.currentView === 'cart') {
             // Show cart page
             this.renderCartPage();
+        } else if (this.currentView === 'checkout') {
+            // Show checkout page
+            this.renderCheckoutPage();
         } else {
             // Show products page - first clear any cart content
             console.log('updateMenuLayout: Showing products page');
@@ -2541,6 +2544,14 @@ class ProductMenu {
     }
 
     /**
+     * Show checkout page
+     */
+    showCheckoutPage() {
+        this.currentView = 'checkout';
+        this.updateMenuLayout();
+    }
+
+    /**
      * Render cart page
      */
     renderCartPage() {
@@ -2646,6 +2657,21 @@ class ProductMenu {
             console.log('Back button clicked, switching to products view');
             this.showProductsPage();
         });
+
+        // Add checkout button event handler
+        const checkoutBtn = cartItems.querySelector('.checkout-btn');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', () => {
+                console.log('Checkout button clicked');
+                this.showCheckoutPage();
+            });
+            checkoutBtn.addEventListener('mouseenter', () => {
+                checkoutBtn.style.background = 'rgba(0, 255, 0, 0.3)';
+            });
+            checkoutBtn.addEventListener('mouseleave', () => {
+                checkoutBtn.style.background = 'rgba(0, 255, 0, 0.2)';
+            });
+        }
 
         cartContainer.appendChild(cartHeader);
         cartContainer.appendChild(cartItems);
@@ -2767,6 +2793,396 @@ class ProductMenu {
         });
 
         return cartItem;
+    }
+
+    /**
+     * Render checkout page
+     */
+    renderCheckoutPage() {
+        if (!this.productGridContainer) return;
+
+        this.productGridContainer.innerHTML = '';
+
+        const checkoutContainer = document.createElement('div');
+        checkoutContainer.className = 'checkout-container';
+        checkoutContainer.style.cssText = `
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.9);
+        `;
+
+        // Checkout header with back button
+        const checkoutHeader = document.createElement('div');
+        checkoutHeader.style.cssText = `
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        `;
+
+        checkoutHeader.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="back-to-cart-btn" style="
+                    background: rgba(0, 255, 0, 0.2);
+                    border: 1px solid #00ff00;
+                    color: #00ff00;
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-family: 'Courier New', monospace;
+                    font-size: 12px;
+                ">← Back to Cart</button>
+                <h3 style="margin: 0; color: #00ff00; font-size: 18px;">Checkout</h3>
+            </div>
+        `;
+
+        // Order summary
+        const orderSummary = document.createElement('div');
+        orderSummary.style.cssText = `
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        `;
+
+        const cartTotal = this.getCartTotal();
+        const cartItemCount = this.getCartItemCount();
+
+        orderSummary.innerHTML = `
+            <h4 style="margin: 0 0 10px 0; color: #00ff00; font-family: 'Courier New', monospace;">Order Summary</h4>
+            <div style="font-family: 'Courier New', monospace; color: #00ff00;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Items (${cartItemCount}):</span>
+                    <span>$${cartTotal.toFixed(2)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Shipping:</span>
+                    <span>FREE</span>
+                </div>
+                <hr style="border: 1px solid #444; margin: 10px 0;">
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 16px;">
+                    <span>Total:</span>
+                    <span>$${cartTotal.toFixed(2)}</span>
+                </div>
+            </div>
+        `;
+
+        // Payment information
+        const paymentInfo = document.createElement('div');
+        paymentInfo.style.cssText = `
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+        `;
+
+        paymentInfo.innerHTML = `
+            <h4 style="margin: 0 0 15px 0; color: #00ff00;">Payment Method: Direct Bank Transfer</h4>
+            <div style="color: #00aa00; font-size: 14px; line-height: 1.6;">
+                <p style="margin-bottom: 10px;">Please use the following bank details to make your payment:</p>
+                <div id="bank-details" style="background: rgba(0, 255, 0, 0.05); padding: 15px; border-radius: 4px; margin: 10px 0;">
+                    <div style="color: #666; font-size: 12px;">Loading payment instructions...</div>
+                </div>
+                <p style="margin-top: 15px; font-size: 12px; color: #888;">
+                    Your order will be processed once payment is received. Please include your order number in the payment reference.
+                </p>
+            </div>
+        `;
+
+        // Customer information form
+        const customerForm = document.createElement('div');
+        customerForm.style.cssText = `
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+        `;
+
+        customerForm.innerHTML = `
+            <h4 style="margin: 0 0 15px 0; color: #00ff00;">Customer Information</h4>
+            <div style="display: grid; gap: 15px;">
+                <div>
+                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Full Name *</label>
+                    <input type="text" id="customer-name" required style="
+                        width: 100%;
+                        padding: 8px;
+                        background: rgba(0, 0, 0, 0.8);
+                        border: 1px solid #444;
+                        color: #00ff00;
+                        border-radius: 4px;
+                        font-family: 'Courier New', monospace;
+                        box-sizing: border-box;
+                    ">
+                </div>
+                <div>
+                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Email Address *</label>
+                    <input type="email" id="customer-email" required style="
+                        width: 100%;
+                        padding: 8px;
+                        background: rgba(0, 0, 0, 0.8);
+                        border: 1px solid #444;
+                        color: #00ff00;
+                        border-radius: 4px;
+                        font-family: 'Courier New', monospace;
+                        box-sizing: border-box;
+                    ">
+                </div>
+                <div>
+                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Phone Number</label>
+                    <input type="tel" id="customer-phone" style="
+                        width: 100%;
+                        padding: 8px;
+                        background: rgba(0, 0, 0, 0.8);
+                        border: 1px solid #444;
+                        color: #00ff00;
+                        border-radius: 4px;
+                        font-family: 'Courier New', monospace;
+                        box-sizing: border-box;
+                    ">
+                </div>
+                <div>
+                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Delivery Address *</label>
+                    <textarea id="customer-address" required rows="3" style="
+                        width: 100%;
+                        padding: 8px;
+                        background: rgba(0, 0, 0, 0.8);
+                        border: 1px solid #444;
+                        color: #00ff00;
+                        border-radius: 4px;
+                        font-family: 'Courier New', monospace;
+                        resize: vertical;
+                        box-sizing: border-box;
+                    "></textarea>
+                </div>
+            </div>
+        `;
+
+        // Place order button
+        const placeOrderBtn = document.createElement('button');
+        placeOrderBtn.className = 'place-order-btn';
+        placeOrderBtn.textContent = 'PLACE ORDER';
+        placeOrderBtn.style.cssText = `
+            width: 100%;
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        `;
+
+        // Event listeners
+        const backBtn = checkoutHeader.querySelector('.back-to-cart-btn');
+        backBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Back to cart button clicked');
+            this.showCartPage();
+        });
+
+        placeOrderBtn.addEventListener('click', () => {
+            this.handlePlaceOrder();
+        });
+
+        placeOrderBtn.addEventListener('mouseenter', () => {
+            placeOrderBtn.style.background = 'rgba(0, 255, 0, 0.3)';
+        });
+
+        placeOrderBtn.addEventListener('mouseleave', () => {
+            placeOrderBtn.style.background = 'rgba(0, 255, 0, 0.2)';
+        });
+
+        checkoutContainer.appendChild(checkoutHeader);
+        checkoutContainer.appendChild(orderSummary);
+        checkoutContainer.appendChild(paymentInfo);
+        checkoutContainer.appendChild(customerForm);
+        checkoutContainer.appendChild(placeOrderBtn);
+        this.productGridContainer.appendChild(checkoutContainer);
+
+        // Load WooCommerce payment instructions
+        this.loadPaymentInstructions();
+    }
+
+    /**
+     * Load WooCommerce payment instructions
+     */
+    async loadPaymentInstructions() {
+        try {
+            const formData = new FormData();
+            formData.append('action', 'get_payment_instructions');
+            formData.append('nonce', getConfig('nonce'));
+
+            const response = await fetch(getConfig('ajax_url'), {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            const bankDetailsElement = document.getElementById('bank-details');
+            if (bankDetailsElement) {
+                if (data.success && data.data.instructions) {
+                    bankDetailsElement.innerHTML = `
+                        <div style="color: #00ff00; font-size: 13px; line-height: 1.6;">
+                            ${data.data.instructions}
+                        </div>
+                    `;
+                } else {
+                    bankDetailsElement.innerHTML = `
+                        <div style="color: #00ff00; font-size: 13px;">
+                            <strong>Bank Details:</strong><br>
+                            Account Name: Charlie's Store<br>
+                            Account Number: 123-456-789<br>
+                            Sort Code: 12-34-56<br>
+                            Reference: Your Order Number
+                        </div>
+                    `;
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load payment instructions:', error);
+            const bankDetailsElement = document.getElementById('bank-details');
+            if (bankDetailsElement) {
+                bankDetailsElement.innerHTML = `
+                    <div style="color: #00ff00; font-size: 13px;">
+                        <strong>Bank Details:</strong><br>
+                        Account Name: Charlie's Store<br>
+                        Account Number: 123-456-789<br>
+                        Sort Code: 12-34-56<br>
+                        Reference: Your Order Number
+                    </div>
+                `;
+            }
+        }
+    }
+
+    /**
+     * Handle place order
+     */
+    async handlePlaceOrder() {
+        // Validate required fields
+        const name = document.getElementById('customer-name').value.trim();
+        const email = document.getElementById('customer-email').value.trim();
+        const address = document.getElementById('customer-address').value.trim();
+
+        if (!name || !email || !address) {
+            alert('Please fill in all required fields (Name, Email, Address)');
+            return;
+        }
+
+        if (!this.validateEmail(email)) {
+            alert('Please enter a valid email address');
+            return;
+        }
+
+        if (this.cart.length === 0) {
+            alert('Your cart is empty');
+            return;
+        }
+
+        try {
+            const orderData = {
+                customer: {
+                    name: name,
+                    email: email,
+                    phone: document.getElementById('customer-phone').value.trim(),
+                    address: address
+                },
+                items: this.cart,
+                total: this.getCartTotal(),
+                payment_method: 'bacs' // Direct bank transfer
+            };
+
+            const formData = new FormData();
+            formData.append('action', 'create_order');
+            formData.append('order_data', JSON.stringify(orderData));
+            formData.append('nonce', getConfig('nonce'));
+
+            const response = await fetch(getConfig('ajax_url'), {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Clear cart and show success
+                this.clearCart();
+                this.showOrderSuccess(data.data.order_id);
+            } else {
+                alert('Failed to place order: ' + (data.data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Order placement failed:', error);
+            alert('Failed to place order. Please try again.');
+        }
+    }
+
+    /**
+     * Show order success page
+     */
+    showOrderSuccess(orderId) {
+        if (!this.productGridContainer) return;
+
+        this.productGridContainer.innerHTML = '';
+
+        const successContainer = document.createElement('div');
+        successContainer.style.cssText = `
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        `;
+
+        successContainer.innerHTML = `
+            <div style="font-size: 48px; margin-bottom: 20px;">✓</div>
+            <h2 style="color: #00ff00; margin-bottom: 15px;">Order Placed Successfully!</h2>
+            <p style="font-size: 16px; margin-bottom: 10px;">Order Number: <strong>#${orderId}</strong></p>
+            <p style="font-size: 14px; margin-bottom: 20px; color: #00aa00;">
+                Thank you for your order! You will receive an email confirmation shortly.
+            </p>
+            <p style="font-size: 12px; margin-bottom: 30px; color: #888;">
+                Please transfer the payment using the bank details provided and include your order number as reference.
+            </p>
+            <button class="back-to-products-btn" style="
+                background: rgba(0, 255, 0, 0.2);
+                border: 1px solid #00ff00;
+                color: #00ff00;
+                padding: 12px 24px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-family: 'Courier New', monospace;
+                font-size: 14px;
+            ">Continue Shopping</button>
+        `;
+
+        const backBtn = successContainer.querySelector('.back-to-products-btn');
+        backBtn.addEventListener('click', () => {
+            this.showProductsPage();
+        });
+
+        this.productGridContainer.appendChild(successContainer);
+    }
+
+    /**
+     * Validate email address
+     */
+    validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
     }
 }
 
