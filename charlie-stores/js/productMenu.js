@@ -1878,14 +1878,21 @@ class ProductMenu {
         }
 
         // Show initial batch of products (for infinite scroll)
-        const initialBatch = products.slice(0, this.itemsPerPage);
-        initialBatch.forEach(product => {
+        const itemsPerPage = this.itemsPerPage || 20; // Default fallback
+        console.log('renderProductGrid: itemsPerPage:', itemsPerPage);
+        const initialBatch = products.slice(0, itemsPerPage);
+        console.log('renderProductGrid: initialBatch length:', initialBatch.length);
+
+        initialBatch.forEach((product, index) => {
+            console.log(`renderProductGrid: Creating card ${index + 1} for product:`, product.name);
             const card = this.createProductCard(product);
             this.productGrid.appendChild(card);
         });
 
+        console.log('renderProductGrid: Finished appending', initialBatch.length, 'product cards');
+
         // Check if we have more products to load
-        if (products.length <= this.itemsPerPage) {
+        if (products.length <= itemsPerPage) {
             this.hasMoreItems = false;
             if (products.length > 0) {
                 this.showEndMessage();
