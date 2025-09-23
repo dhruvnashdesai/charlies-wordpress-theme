@@ -599,9 +599,9 @@ class ProductMenu {
                 console.log('ProductMenu: No action element found');
             }
 
-            // Check for close button
-            if (e.target.closest('.close-btn')) {
-                console.log('ProductMenu: Close button detected');
+            // Check for close button or cart button
+            if (e.target.closest('.close-btn') || e.target.closest('.cart-btn')) {
+                console.log('ProductMenu: Close or cart button detected, allowing event');
                 return;
             }
 
@@ -1147,7 +1147,10 @@ class ProductMenu {
         // Add cart button handler
         const cartBtn = header.querySelector('.cart-btn');
         if (cartBtn) {
-            cartBtn.addEventListener('click', () => {
+            cartBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Cart button clicked - showing cart page');
                 this.showCartPage();
             });
             cartBtn.addEventListener('mouseenter', () => {
