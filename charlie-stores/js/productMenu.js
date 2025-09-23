@@ -2527,16 +2527,6 @@ class ProductMenu {
                 ">← Back</button>
                 <h3 style="margin: 0; color: #00ff00; font-size: 18px;">Shopping Cart</h3>
             </div>
-            <button class="clear-cart-btn" style="
-                background: rgba(255, 0, 0, 0.2);
-                border: 1px solid #ff4444;
-                color: #ff4444;
-                padding: 6px 12px;
-                border-radius: 4px;
-                cursor: pointer;
-                font-family: 'Courier New', monospace;
-                font-size: 12px;
-            ">Clear Cart</button>
         `;
 
         // Cart items
@@ -2596,20 +2586,9 @@ class ProductMenu {
         // Event listeners
         const backBtn = cartHeader.querySelector('.back-to-products-btn');
         backBtn.addEventListener('click', () => {
-            this.showProductsPage();
-        });
-
-        const clearBtn = cartHeader.querySelector('.clear-cart-btn');
-        clearBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to clear your cart?')) {
-                this.clearCart();
-                this.renderCartPage();
-                // Update header to show new cart count
-                const header = this.menuElement.querySelector('.menu-header');
-                if (header) {
-                    this.updateHeader(header);
-                }
-            }
+            console.log('Back button clicked, switching to products view');
+            this.currentView = 'products';
+            this.updateMenuLayout();
         });
 
         cartContainer.appendChild(cartHeader);
