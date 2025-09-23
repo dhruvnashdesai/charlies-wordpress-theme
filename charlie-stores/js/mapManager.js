@@ -1029,8 +1029,8 @@ class MapManager {
 
         // Mobile-responsive sizing
         const isMobile = window.innerWidth <= 768;
-        const markerSize = isMobile ? 100 : 80; // Bigger on mobile
-        const borderWidth = isMobile ? 5 : 4;   // Thicker border on mobile
+        const markerSize = isMobile ? 120 : 80; // Even bigger on mobile
+        const borderWidth = isMobile ? 6 : 4;   // Even thicker border on mobile
 
         // Use custom icon with large white circle background and pulsing animation
         element.style.cssText = `

@@ -139,7 +139,7 @@ class ProductMenu {
             user-select: none !important;
             transition: all 0.2s ease !important;
         `;
-        categoryDisplay.textContent = 'All Categories';
+        categoryDisplay.textContent = 'Categories';
 
         const categoryArrow = document.createElement('div');
         categoryArrow.className = 'dropdown-arrow';
@@ -223,7 +223,7 @@ class ProductMenu {
             user-select: none !important;
             transition: all 0.2s ease !important;
         `;
-        brandDisplay.textContent = 'All Brands';
+        brandDisplay.textContent = 'Brands';
 
         const brandArrow = document.createElement('div');
         brandArrow.className = 'dropdown-arrow';
@@ -522,8 +522,8 @@ class ProductMenu {
         clearFilters.addEventListener('click', () => {
             console.log('Clear filters button clicked!');
             this.clearAllFilters();
-            categoryDisplay.textContent = 'All Categories';
-            brandDisplay.textContent = 'All Brands';
+            categoryDisplay.textContent = 'Categories';
+            brandDisplay.textContent = 'Brands';
         });
 
         // Store references for easy access
@@ -1285,7 +1285,7 @@ class ProductMenu {
                             padding: 4px 12px; border-radius: 4px; cursor: pointer;
                             font-family: 'Courier New', monospace; font-size: 12px;
                             transition: all 0.2s ease; text-transform: uppercase;
-                        ">All Categories</button>
+                        ">Categories</button>
                         ${this.availableCategories.map(category => `
                             <button data-action="select-category-filter" data-category-id="${category.id}" data-category-name="${category.name}" style="
                                 background: ${this.selectedCategory && this.selectedCategory.id === category.id ? 'rgba(0,255,0,0.2)' : 'transparent'};
@@ -1403,7 +1403,7 @@ class ProductMenu {
                     border-left: ${allSelected ? '3px solid #00ff00' : '3px solid transparent'};
                 " onmouseover="if(!${allSelected}) this.style.background='rgba(0,255,0,0.1)'" onmouseout="if(!${allSelected}) this.style.background='transparent'" data-action="clear-brand-filter">
                     <div style="font-size: 14px; font-weight: bold;">
-                        All Brands
+                        Brands
                     </div>
                     <div style="font-size: 11px; opacity: 0.7;">
                         ${this.allProducts.length} products
@@ -1459,7 +1459,7 @@ class ProductMenu {
             <div style="padding: 15px 15px 10px 15px; border-bottom: 1px solid #333;">
                 <div style="font-size: 14px; font-weight: bold; color: #00ff00;">
                     PRODUCTS
-                    ${this.selectedBrand ? `(${this.selectedBrand.name})` : '(All Brands)'}
+                    ${this.selectedBrand ? `(${this.selectedBrand.name})` : '(Brands)'}
                 </div>
             </div>
         `;
@@ -2142,10 +2142,10 @@ class ProductMenu {
                 transition: background-color 0.2s ease !important;
                 border-bottom: 1px solid rgba(0, 255, 0, 0.2) !important;
             `;
-            allCategoriesOption.textContent = 'All Categories';
+            allCategoriesOption.textContent = 'Categories';
             allCategoriesOption.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.categoryDisplay.textContent = 'All Categories';
+                this.categoryDisplay.textContent = 'Categories';
                 this.closeCategoryDropdown();
                 this.handleCategoryFilter('');
             });
@@ -2210,10 +2210,10 @@ class ProductMenu {
                 transition: background-color 0.2s ease !important;
                 border-bottom: 1px solid rgba(0, 255, 0, 0.2) !important;
             `;
-            allBrandsOption.textContent = 'All Brands';
+            allBrandsOption.textContent = 'Brands';
             allBrandsOption.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.brandDisplay.textContent = 'All Brands';
+                this.brandDisplay.textContent = 'Brands';
                 this.closeBrandDropdown();
                 this.handleBrandFilter('');
             });
