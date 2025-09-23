@@ -1088,12 +1088,14 @@ class ProductMenu {
             this.renderCartPage();
         } else {
             // Show products page
-            if (this.allProducts) {
+            if (this.filteredProducts && this.filteredProducts.length > 0) {
+                this.renderProductGrid(this.filteredProducts);
+            } else if (this.allProducts) {
                 this.renderProductGrid(this.allProducts);
-
-                // Then populate filter dropdowns (this can extract from products if needed)
-                this.populateFilters(this.availableCategories, this.brands);
             }
+
+            // Then populate filter dropdowns (this can extract from products if needed)
+            this.populateFilters(this.availableCategories, this.brands);
         }
     }
 
@@ -2585,10 +2587,11 @@ class ProductMenu {
 
         // Event listeners
         const backBtn = cartHeader.querySelector('.back-to-products-btn');
-        backBtn.addEventListener('click', () => {
+        backBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             console.log('Back button clicked, switching to products view');
-            this.currentView = 'products';
-            this.updateMenuLayout();
+            this.showProductsPage();
         });
 
         cartContainer.appendChild(cartHeader);
