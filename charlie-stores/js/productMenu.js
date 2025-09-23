@@ -15,6 +15,8 @@ class ProductMenu {
         this.filteredProducts = []; // Filtered by selected brand
         this.selectedProduct = null; // Currently selected product for details
         this.menuElement = null;
+        this.currentView = 'products'; // 'products' or 'cart'
+        this.cart = this.loadCartFromStorage(); // Cart items storage
 
         this.init();
     }
@@ -1075,32 +1077,50 @@ class ProductMenu {
             this.updateHeader(header);
         }
 
-        // Render products in grid first
-        if (this.allProducts) {
-            this.renderProductGrid(this.allProducts);
+        // Show/hide filter container based on current view
+        const filterContainer = this.menuElement.querySelector('.filter-container');
+        if (filterContainer) {
+            filterContainer.style.display = this.currentView === 'cart' ? 'none' : 'flex';
+        }
 
-            // Then populate filter dropdowns (this can extract from products if needed)
-            this.populateFilters(this.availableCategories, this.brands);
+        if (this.currentView === 'cart') {
+            // Show cart page
+            this.renderCartPage();
+        } else {
+            // Show products page
+            if (this.allProducts) {
+                this.renderProductGrid(this.allProducts);
+
+                // Then populate filter dropdowns (this can extract from products if needed)
+                this.populateFilters(this.availableCategories, this.brands);
+            }
         }
     }
 
     /**
-     * Update header with store information
+     * Update header with cart button and close button
      */
     updateHeader(header) {
-        const storeName = this.currentWarehouse?.name || `Store ${this.currentStoreId}`;
-        const productCount = this.allProducts?.length || 0;
+        const cartItemCount = this.getCartItemCount();
 
         header.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h3 style="margin: 0; color: #00ff00; font-size: 16px;">
-                        🏭 ${storeName}
-                    </h3>
-                    <div style="color: #00aa00; font-size: 12px; margin-top: 4px;">
-                        ${productCount} products available
-                    </div>
-                </div>
+                <button class="cart-btn" style="
+                    background: rgba(0, 255, 0, 0.2);
+                    border: 1px solid #00ff00;
+                    color: #00ff00;
+                    padding: 8px 16px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-family: 'Courier New', monospace;
+                    font-size: 14px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: all 0.2s ease;
+                ">
+                    🛒 Cart ${cartItemCount > 0 ? `(${cartItemCount})` : ''}
+                </button>
                 <button class="close-menu-btn" style="
                     background: rgba(255, 0, 0, 0.2);
                     border: 1px solid #ff4444;
@@ -1113,6 +1133,20 @@ class ProductMenu {
                 ">✕ Close</button>
             </div>
         `;
+
+        // Add cart button handler
+        const cartBtn = header.querySelector('.cart-btn');
+        if (cartBtn) {
+            cartBtn.addEventListener('click', () => {
+                this.showCartPage();
+            });
+            cartBtn.addEventListener('mouseenter', () => {
+                cartBtn.style.background = 'rgba(0, 255, 0, 0.3)';
+            });
+            cartBtn.addEventListener('mouseleave', () => {
+                cartBtn.style.background = 'rgba(0, 255, 0, 0.2)';
+            });
+        }
 
         // Add close button handler
         const closeBtn = header.querySelector('.close-menu-btn');
@@ -1956,6 +1990,9 @@ class ProductMenu {
     handleAddToCart(product) {
         console.log('Add to cart:', product);
 
+        // Add to cart
+        this.addToCart(product);
+
         // Add visual feedback
         const message = document.createElement('div');
         message.textContent = `${product.name} added to cart!`;
@@ -1974,15 +2011,16 @@ class ProductMenu {
 
         document.body.appendChild(message);
 
+        // Update header to show new cart count
+        const header = this.menuElement.querySelector('.menu-header');
+        if (header) {
+            this.updateHeader(header);
+        }
+
         // Remove message after 3 seconds
         setTimeout(() => {
             message.remove();
         }, 3000);
-
-        // TODO: Implement actual cart functionality
-        if (product.add_to_cart_url) {
-            window.location.href = product.add_to_cart_url;
-        }
     }
 
     /**
@@ -2330,6 +2368,370 @@ class ProductMenu {
             this.endMessage.remove();
             this.endMessage = null;
         }
+    }
+
+    /**
+     * Cart Management Methods
+     */
+
+    /**
+     * Load cart from localStorage
+     */
+    loadCartFromStorage() {
+        try {
+            const cartData = localStorage.getItem('charlie_cart');
+            return cartData ? JSON.parse(cartData) : [];
+        } catch (error) {
+            console.error('Failed to load cart from storage:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Save cart to localStorage
+     */
+    saveCartToStorage() {
+        try {
+            localStorage.setItem('charlie_cart', JSON.stringify(this.cart));
+        } catch (error) {
+            console.error('Failed to save cart to storage:', error);
+        }
+    }
+
+    /**
+     * Add product to cart
+     */
+    addToCart(product, quantity = 1) {
+        const existingItem = this.cart.find(item => item.id === product.id);
+
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            this.cart.push({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                quantity: quantity,
+                raw_price_html: product.raw_price_html
+            });
+        }
+
+        this.saveCartToStorage();
+        console.log('Cart updated:', this.cart);
+    }
+
+    /**
+     * Remove product from cart
+     */
+    removeFromCart(productId) {
+        this.cart = this.cart.filter(item => item.id !== productId);
+        this.saveCartToStorage();
+    }
+
+    /**
+     * Update cart item quantity
+     */
+    updateCartQuantity(productId, quantity) {
+        const item = this.cart.find(item => item.id === productId);
+        if (item) {
+            if (quantity <= 0) {
+                this.removeFromCart(productId);
+            } else {
+                item.quantity = quantity;
+                this.saveCartToStorage();
+            }
+        }
+    }
+
+    /**
+     * Get total cart item count
+     */
+    getCartItemCount() {
+        return this.cart.reduce((total, item) => total + item.quantity, 0);
+    }
+
+    /**
+     * Get total cart value
+     */
+    getCartTotal() {
+        return this.cart.reduce((total, item) => {
+            const price = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
+            return total + (price * item.quantity);
+        }, 0);
+    }
+
+    /**
+     * Clear entire cart
+     */
+    clearCart() {
+        this.cart = [];
+        this.saveCartToStorage();
+    }
+
+    /**
+     * Show cart page
+     */
+    showCartPage() {
+        this.currentView = 'cart';
+        this.updateMenuLayout();
+    }
+
+    /**
+     * Show products page
+     */
+    showProductsPage() {
+        this.currentView = 'products';
+        this.updateMenuLayout();
+    }
+
+    /**
+     * Render cart page
+     */
+    renderCartPage() {
+        if (!this.productGridContainer) return;
+
+        this.productGridContainer.innerHTML = '';
+
+        const cartContainer = document.createElement('div');
+        cartContainer.className = 'cart-container';
+        cartContainer.style.cssText = `
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.9);
+        `;
+
+        // Cart header with back button
+        const cartHeader = document.createElement('div');
+        cartHeader.style.cssText = `
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        `;
+
+        cartHeader.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="back-to-products-btn" style="
+                    background: rgba(0, 255, 0, 0.2);
+                    border: 1px solid #00ff00;
+                    color: #00ff00;
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-family: 'Courier New', monospace;
+                    font-size: 12px;
+                ">← Back</button>
+                <h3 style="margin: 0; color: #00ff00; font-size: 18px;">Shopping Cart</h3>
+            </div>
+            <button class="clear-cart-btn" style="
+                background: rgba(255, 0, 0, 0.2);
+                border: 1px solid #ff4444;
+                color: #ff4444;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-family: 'Courier New', monospace;
+                font-size: 12px;
+            ">Clear Cart</button>
+        `;
+
+        // Cart items
+        const cartItems = document.createElement('div');
+        cartItems.className = 'cart-items';
+
+        if (this.cart.length === 0) {
+            cartItems.innerHTML = `
+                <div style="text-align: center; color: #666; padding: 40px; font-family: 'Courier New', monospace;">
+                    <div style="font-size: 16px; margin-bottom: 10px;">Your cart is empty</div>
+                    <div style="font-size: 14px;">Add some products to get started!</div>
+                </div>
+            `;
+        } else {
+            this.cart.forEach(item => {
+                const cartItem = this.createCartItem(item);
+                cartItems.appendChild(cartItem);
+            });
+
+            // Cart total
+            const cartTotal = document.createElement('div');
+            cartTotal.style.cssText = `
+                margin-top: 20px;
+                padding: 15px;
+                border: 1px solid #00ff00;
+                border-radius: 6px;
+                background: rgba(0, 255, 0, 0.1);
+            `;
+
+            cartTotal.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="color: #00ff00; font-family: 'Courier New', monospace; font-size: 16px; font-weight: bold;">
+                        Total: $${this.getCartTotal().toFixed(2)}
+                    </span>
+                    <span style="color: #00aa00; font-family: 'Courier New', monospace; font-size: 12px;">
+                        ${this.getCartItemCount()} items
+                    </span>
+                </div>
+                <button class="checkout-btn" style="
+                    width: 100%;
+                    background: rgba(0, 255, 0, 0.2);
+                    border: 1px solid #00ff00;
+                    color: #00ff00;
+                    padding: 12px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-family: 'Courier New', monospace;
+                    font-size: 14px;
+                    font-weight: bold;
+                    transition: all 0.2s ease;
+                ">🛒 CHECKOUT</button>
+            `;
+
+            cartItems.appendChild(cartTotal);
+        }
+
+        // Event listeners
+        const backBtn = cartHeader.querySelector('.back-to-products-btn');
+        backBtn.addEventListener('click', () => {
+            this.showProductsPage();
+        });
+
+        const clearBtn = cartHeader.querySelector('.clear-cart-btn');
+        clearBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear your cart?')) {
+                this.clearCart();
+                this.renderCartPage();
+                // Update header to show new cart count
+                const header = this.menuElement.querySelector('.menu-header');
+                if (header) {
+                    this.updateHeader(header);
+                }
+            }
+        });
+
+        cartContainer.appendChild(cartHeader);
+        cartContainer.appendChild(cartItems);
+        this.productGridContainer.appendChild(cartContainer);
+    }
+
+    /**
+     * Create cart item element
+     */
+    createCartItem(item) {
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.style.cssText = `
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            font-family: 'Courier New', monospace;
+        `;
+
+        const price = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
+
+        cartItem.innerHTML = `
+            <div style="width: 60px; height: 60px; background: #222; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                ${item.image ?
+                    `<img src="${item.image}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">` :
+                    `<div style="color: #666; font-size: 10px;">No Image</div>`
+                }
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="color: #00ff00; font-size: 14px; font-weight: bold; margin-bottom: 4px;">
+                        ${item.name}
+                    </div>
+                    <div style="color: #00cc00; font-size: 12px;">
+                        ${item.raw_price_html || `$${price.toFixed(2)}`} each
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                    <button class="qty-decrease" data-product-id="${item.id}" style="
+                        background: rgba(255, 0, 0, 0.2);
+                        border: 1px solid #ff4444;
+                        color: #ff4444;
+                        width: 24px;
+                        height: 24px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 12px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">-</button>
+                    <span style="color: #00ff00; font-size: 14px; min-width: 20px; text-align: center;">
+                        ${item.quantity}
+                    </span>
+                    <button class="qty-increase" data-product-id="${item.id}" style="
+                        background: rgba(0, 255, 0, 0.2);
+                        border: 1px solid #00ff00;
+                        color: #00ff00;
+                        width: 24px;
+                        height: 24px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 12px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">+</button>
+                    <button class="remove-item" data-product-id="${item.id}" style="
+                        background: rgba(255, 0, 0, 0.2);
+                        border: 1px solid #ff4444;
+                        color: #ff4444;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 10px;
+                        margin-left: auto;
+                    ">Remove</button>
+                </div>
+            </div>
+        `;
+
+        // Add event listeners
+        const decreaseBtn = cartItem.querySelector('.qty-decrease');
+        const increaseBtn = cartItem.querySelector('.qty-increase');
+        const removeBtn = cartItem.querySelector('.remove-item');
+
+        decreaseBtn.addEventListener('click', () => {
+            this.updateCartQuantity(item.id, item.quantity - 1);
+            this.renderCartPage();
+            // Update header to show new cart count
+            const header = this.menuElement.querySelector('.menu-header');
+            if (header) {
+                this.updateHeader(header);
+            }
+        });
+
+        increaseBtn.addEventListener('click', () => {
+            this.updateCartQuantity(item.id, item.quantity + 1);
+            this.renderCartPage();
+            // Update header to show new cart count
+            const header = this.menuElement.querySelector('.menu-header');
+            if (header) {
+                this.updateHeader(header);
+            }
+        });
+
+        removeBtn.addEventListener('click', () => {
+            this.removeFromCart(item.id);
+            this.renderCartPage();
+            // Update header to show new cart count
+            const header = this.menuElement.querySelector('.menu-header');
+            if (header) {
+                this.updateHeader(header);
+            }
+        });
+
+        return cartItem;
     }
 }
 
