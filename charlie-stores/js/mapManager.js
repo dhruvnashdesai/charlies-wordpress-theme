@@ -1026,17 +1026,22 @@ class MapManager {
         element.setAttribute('role', 'button');
         element.setAttribute('aria-label', `${warehouse.name} - Click for details`);
         element.setAttribute('tabindex', '0');
-        
+
+        // Mobile-responsive sizing
+        const isMobile = window.innerWidth <= 768;
+        const markerSize = isMobile ? 100 : 80; // Bigger on mobile
+        const borderWidth = isMobile ? 5 : 4;   // Thicker border on mobile
+
         // Use custom icon with large white circle background and pulsing animation
         element.style.cssText = `
-            width: 80px;
-            height: 80px;
+            width: ${markerSize}px;
+            height: ${markerSize}px;
             background-color: white;
             background-image: url('${getConfig('UI.WAREHOUSE_ICON', 'assets/images/ass_1.png')}');
             background-size: 70%;
             background-repeat: no-repeat;
             background-position: center;
-            border: 4px solid #333;
+            border: ${borderWidth}px solid #F08F34;
             border-radius: 50%;
             cursor: pointer;
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
@@ -1048,12 +1053,12 @@ class MapManager {
         // Hover effects - enhanced for pulsing marker
         element.addEventListener('mouseenter', () => {
             element.style.animationDuration = '1s'; // Faster pulse on hover
-            element.style.borderColor = '#000';
+            element.style.borderColor = '#D67D2A'; // Darker orange on hover
         });
-        
+
         element.addEventListener('mouseleave', () => {
             element.style.animationDuration = '2s'; // Back to normal pulse
-            element.style.borderColor = '#333';
+            element.style.borderColor = '#F08F34'; // Back to orange
         });
         
         // Keyboard support

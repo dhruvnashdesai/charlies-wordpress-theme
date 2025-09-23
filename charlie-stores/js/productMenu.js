@@ -370,16 +370,24 @@ class ProductMenu {
                 }
 
                 .filter-container {
-                    flex-direction: column !important;
-                    gap: 10px !important;
-                    align-items: stretch !important;
+                    flex-direction: row !important;
+                    gap: 8px !important;
+                    align-items: center !important;
+                    flex-wrap: nowrap !important;
                 }
 
                 .category-filter,
-                .brand-filter,
+                .brand-filter {
+                    flex: 1 !important;
+                    min-width: 0 !important;
+                    width: auto !important;
+                }
+
                 .clear-filters-btn {
-                    width: 100% !important;
+                    flex-shrink: 0 !important;
+                    width: auto !important;
                     min-width: auto !important;
+                    padding: 6px 12px !important;
                 }
 
                 .gta-product-menu {
