@@ -359,12 +359,12 @@ class ProductMenu {
 
             @media (max-width: 768px) {
                 .product-grid {
-                    grid-template-columns: 1fr !important;
-                    gap: 15px !important;
+                    grid-template-columns: 1fr 1fr !important;
+                    gap: 10px !important;
                 }
 
                 .product-card {
-                    font-size: 14px !important;
+                    font-size: 12px !important;
                 }
 
                 .filter-container {
@@ -1673,25 +1673,30 @@ class ProductMenu {
         card.className = 'product-card';
         card.setAttribute('data-product-id', product.id);
 
+        const isMobile = window.innerWidth <= 768;
+
         card.style.cssText = `
             background: rgba(0, 0, 0, 0.8);
             border: 1px solid #444;
             border-radius: 8px;
-            padding: 15px;
+            padding: ${isMobile ? '10px' : '15px'};
             cursor: pointer;
             transition: all 0.3s ease;
             color: #00ff00;
             font-family: 'Courier New', monospace;
+            font-size: ${isMobile ? '12px' : '14px'};
         `;
 
-        // Product image
+        // Product image - 1:1 aspect ratio on mobile
         const imageContainer = document.createElement('div');
+        const imageSize = isMobile ? '80px' : '120px';
         imageContainer.style.cssText = `
             width: 100%;
-            height: 120px;
+            height: ${imageSize};
+            aspect-ratio: 1/1;
             background: #222;
             border-radius: 6px;
-            margin-bottom: 10px;
+            margin-bottom: ${isMobile ? '6px' : '10px'};
             overflow: hidden;
             display: flex;
             align-items: center;
@@ -1716,22 +1721,23 @@ class ProductMenu {
         const name = document.createElement('h4');
         name.textContent = product.name;
         name.style.cssText = `
-            margin: 0 0 8px 0;
-            font-size: 14px;
+            margin: 0 0 ${isMobile ? '4px' : '8px'} 0;
+            font-size: ${isMobile ? '12px' : '14px'};
             font-weight: bold;
             color: #00ff00;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            line-height: 1.2;
         `;
 
         // Product price
         const price = document.createElement('div');
         price.innerHTML = product.price || 'Price not available';
         price.style.cssText = `
-            font-size: 13px;
+            font-size: ${isMobile ? '11px' : '13px'};
             color: #00cc00;
-            margin-bottom: 8px;
+            margin-bottom: ${isMobile ? '4px' : '8px'};
             font-weight: bold;
         `;
 
@@ -1739,9 +1745,9 @@ class ProductMenu {
         const stock = document.createElement('div');
         stock.textContent = product.in_stock ? `Stock: ${product.stock || 'Available'}` : 'Out of Stock';
         stock.style.cssText = `
-            font-size: 11px;
+            font-size: ${isMobile ? '9px' : '11px'};
             color: ${product.in_stock ? '#00aa00' : '#aa0000'};
-            margin-bottom: 10px;
+            margin-bottom: ${isMobile ? '6px' : '10px'};
         `;
 
         // Add to cart button
@@ -1750,13 +1756,13 @@ class ProductMenu {
         addToCartBtn.disabled = !product.in_stock;
         addToCartBtn.style.cssText = `
             width: 100%;
-            padding: 8px;
+            padding: ${isMobile ? '6px' : '8px'};
             background: ${product.in_stock ? 'rgba(0, 255, 0, 0.2)' : 'rgba(100, 100, 100, 0.2)'};
             border: 1px solid ${product.in_stock ? '#00ff00' : '#666'};
             color: ${product.in_stock ? '#00ff00' : '#666'};
             border-radius: 4px;
             font-family: 'Courier New', monospace;
-            font-size: 12px;
+            font-size: ${isMobile ? '10px' : '12px'};
             cursor: ${product.in_stock ? 'pointer' : 'not-allowed'};
             transition: all 0.3s ease;
         `;
