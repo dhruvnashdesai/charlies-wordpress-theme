@@ -1945,22 +1945,19 @@ class ProductMenu {
      * Handle category filter change
      */
     handleCategoryFilter(categoryId) {
-        console.log('=== CATEGORY FILTER DEBUG ===');
         console.log('Category filter changed to:', categoryId);
-        console.log('Type of categoryId:', typeof categoryId);
-        console.log('CategoryId length:', categoryId?.length);
-
-        // Debug first few products
-        if (this.allProducts && this.allProducts.length > 0) {
-            console.log('Sample product categories structure:');
-            this.allProducts.slice(0, 3).forEach((product, index) => {
-                console.log(`Product ${index + 1} - "${product.name}":`);
-                console.log('  categories:', product.categories, typeof product.categories);
-                console.log('  category:', product.category, typeof product.category);
-            });
-        }
 
         this.selectedCategory = categoryId;
+        this.selectedBrand = null; // Clear brand when category changes
+
+        // Update brand dropdown to show only brands available in selected category
+        this.updateBrandFilterForCategory(categoryId);
+
+        // Update the brand display to show it's been reset
+        if (this.brandDisplay) {
+            this.brandDisplay.textContent = 'Brands';
+        }
+
         this.filterProducts();
     }
 
@@ -1968,23 +1965,249 @@ class ProductMenu {
      * Handle brand filter change
      */
     handleBrandFilter(brandId) {
-        console.log('=== BRAND FILTER DEBUG ===');
         console.log('Brand filter changed to:', brandId);
-        console.log('Type of brandId:', typeof brandId);
-        console.log('BrandId length:', brandId?.length);
-
-        // Debug first few products
-        if (this.allProducts && this.allProducts.length > 0) {
-            console.log('Sample product brands structure:');
-            this.allProducts.slice(0, 3).forEach((product, index) => {
-                console.log(`Product ${index + 1} - "${product.name}":`);
-                console.log('  brand:', product.brand, typeof product.brand);
-                console.log('  brands:', product.brands, typeof product.brands);
-            });
-        }
 
         this.selectedBrand = brandId;
+
+        // Update category dropdown to show only categories available for selected brand
+        this.updateCategoryFilterForBrand(brandId);
+
+        this.selectedCategory = null; // Clear category when brand changes
+
+        // Update the category display to show it's been reset
+        if (this.categoryDisplay) {
+            this.categoryDisplay.textContent = 'Categories';
+        }
         this.filterProducts();
+    }
+
+    /**
+     * Update brand filter dropdown to show only brands available in selected category
+     */
+    updateBrandFilterForCategory(categoryId) {
+        if (!this.brandDropdown || !this.allProducts) return;
+
+        // Get brands available in the selected category
+        let availableBrands = [];
+
+        if (!categoryId || categoryId === '') {
+            // If no category selected, show all brands
+            const brandSet = new Set();
+            this.allProducts.forEach(product => {
+                if (product.brand && product.brand !== 'No Brand') {
+                    brandSet.add(product.brand);
+                }
+                if (product.brands && Array.isArray(product.brands)) {
+                    product.brands.forEach(brand => brandSet.add(brand));
+                }
+            });
+            availableBrands = Array.from(brandSet).map(brand => ({ id: brand, name: brand }));
+        } else {
+            // Filter products by category first, then extract brands
+            const categoryProducts = this.allProducts.filter(product => {
+                return (product.categories && product.categories.includes(categoryId)) ||
+                       (product.category === categoryId) ||
+                       (typeof product.categories === 'string' && product.categories === categoryId);
+            });
+
+            const brandSet = new Set();
+            categoryProducts.forEach(product => {
+                if (product.brand && product.brand !== 'No Brand') {
+                    brandSet.add(product.brand);
+                }
+                if (product.brands && Array.isArray(product.brands)) {
+                    product.brands.forEach(brand => brandSet.add(brand));
+                }
+            });
+            availableBrands = Array.from(brandSet).map(brand => ({ id: brand, name: brand }));
+        }
+
+        // Repopulate brand dropdown
+        this.populateBrandDropdown(availableBrands);
+    }
+
+    /**
+     * Update category filter dropdown to show only categories available for selected brand
+     */
+    updateCategoryFilterForBrand(brandId) {
+        if (!this.categoryDropdown || !this.allProducts) return;
+
+        // Get categories available for the selected brand
+        let availableCategories = [];
+
+        if (!brandId || brandId === '') {
+            // If no brand selected, show all categories
+            const categorySet = new Set();
+            this.allProducts.forEach(product => {
+                if (product.categories && Array.isArray(product.categories)) {
+                    product.categories.forEach(cat => categorySet.add(cat));
+                } else if (product.category) {
+                    categorySet.add(product.category);
+                } else if (typeof product.categories === 'string') {
+                    categorySet.add(product.categories);
+                }
+            });
+            availableCategories = Array.from(categorySet).map(cat => ({ id: cat, name: cat }));
+        } else {
+            // Filter products by brand first, then extract categories
+            const brandProducts = this.allProducts.filter(product => {
+                return (product.brand === brandId) ||
+                       (product.brands && Array.isArray(product.brands) && product.brands.includes(brandId));
+            });
+
+            const categorySet = new Set();
+            brandProducts.forEach(product => {
+                if (product.categories && Array.isArray(product.categories)) {
+                    product.categories.forEach(cat => categorySet.add(cat));
+                } else if (product.category) {
+                    categorySet.add(product.category);
+                } else if (typeof product.categories === 'string') {
+                    categorySet.add(product.categories);
+                }
+            });
+            availableCategories = Array.from(categorySet).map(cat => ({ id: cat, name: cat }));
+        }
+
+        // Repopulate category dropdown
+        this.populateCategoryDropdown(availableCategories);
+    }
+
+    /**
+     * Populate only the brand dropdown
+     */
+    populateBrandDropdown(brands) {
+        if (!this.brandDropdown) return;
+
+        this.brandDropdown.innerHTML = '';
+
+        // Add "All Brands" option
+        const allBrandsOption = document.createElement('div');
+        allBrandsOption.className = 'dropdown-option';
+        allBrandsOption.style.cssText = `
+            padding: 8px 12px !important;
+            color: #00ff00 !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
+            transition: background-color 0.2s ease !important;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2) !important;
+        `;
+        allBrandsOption.textContent = 'Brands';
+        allBrandsOption.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.brandDisplay.textContent = 'Brands';
+            this.closeBrandDropdown();
+            this.handleBrandFilter('');
+        });
+        allBrandsOption.addEventListener('mouseover', () => {
+            allBrandsOption.style.background = 'rgba(0, 255, 0, 0.1)';
+        });
+        allBrandsOption.addEventListener('mouseout', () => {
+            allBrandsOption.style.background = 'transparent';
+        });
+        this.brandDropdown.appendChild(allBrandsOption);
+
+        if (brands && brands.length > 0) {
+            brands.forEach(brand => {
+                const option = document.createElement('div');
+                option.className = 'dropdown-option';
+                option.style.cssText = `
+                    padding: 8px 12px !important;
+                    color: #00ff00 !important;
+                    font-family: 'Courier New', monospace !important;
+                    font-size: 14px !important;
+                    cursor: pointer !important;
+                    transition: background-color 0.2s ease !important;
+                    border-bottom: 1px solid rgba(0, 255, 0, 0.2) !important;
+                `;
+                option.textContent = brand.name || brand;
+                option.dataset.value = brand.name || brand;
+
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.brandDisplay.textContent = brand.name || brand;
+                    this.closeBrandDropdown();
+                    this.handleBrandFilter(brand.name || brand);
+                });
+                option.addEventListener('mouseover', () => {
+                    option.style.background = 'rgba(0, 255, 0, 0.1)';
+                });
+                option.addEventListener('mouseout', () => {
+                    option.style.background = 'transparent';
+                });
+
+                this.brandDropdown.appendChild(option);
+            });
+        }
+    }
+
+    /**
+     * Populate only the category dropdown
+     */
+    populateCategoryDropdown(categories) {
+        if (!this.categoryDropdown) return;
+
+        this.categoryDropdown.innerHTML = '';
+
+        // Add "All Categories" option
+        const allCategoriesOption = document.createElement('div');
+        allCategoriesOption.className = 'dropdown-option';
+        allCategoriesOption.style.cssText = `
+            padding: 8px 12px !important;
+            color: #00ff00 !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
+            transition: background-color 0.2s ease !important;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2) !important;
+        `;
+        allCategoriesOption.textContent = 'Categories';
+        allCategoriesOption.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.categoryDisplay.textContent = 'Categories';
+            this.closeCategoryDropdown();
+            this.handleCategoryFilter('');
+        });
+        allCategoriesOption.addEventListener('mouseover', () => {
+            allCategoriesOption.style.background = 'rgba(0, 255, 0, 0.1)';
+        });
+        allCategoriesOption.addEventListener('mouseout', () => {
+            allCategoriesOption.style.background = 'transparent';
+        });
+        this.categoryDropdown.appendChild(allCategoriesOption);
+
+        if (categories && categories.length > 0) {
+            categories.forEach(category => {
+                const option = document.createElement('div');
+                option.className = 'dropdown-option';
+                option.style.cssText = `
+                    padding: 8px 12px !important;
+                    color: #00ff00 !important;
+                    font-family: 'Courier New', monospace !important;
+                    font-size: 14px !important;
+                    cursor: pointer !important;
+                    transition: background-color 0.2s ease !important;
+                    border-bottom: 1px solid rgba(0, 255, 0, 0.2) !important;
+                `;
+                option.textContent = category.name || category;
+                option.dataset.value = category.name || category;
+
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.categoryDisplay.textContent = category.name || category;
+                    this.closeCategoryDropdown();
+                    this.handleCategoryFilter(category.name || category);
+                });
+                option.addEventListener('mouseover', () => {
+                    option.style.background = 'rgba(0, 255, 0, 0.1)';
+                });
+                option.addEventListener('mouseout', () => {
+                    option.style.background = 'transparent';
+                });
+
+                this.categoryDropdown.appendChild(option);
+            });
+        }
     }
 
     /**
@@ -1993,8 +2216,18 @@ class ProductMenu {
     clearAllFilters() {
         this.selectedCategory = null;
         this.selectedBrand = null;
-        if (this.categoryFilter) this.categoryFilter.value = '';
-        if (this.brandFilter) this.brandFilter.value = '';
+
+        // Reset dropdown displays
+        if (this.categoryDisplay) {
+            this.categoryDisplay.textContent = 'Categories';
+        }
+        if (this.brandDisplay) {
+            this.brandDisplay.textContent = 'Brands';
+        }
+
+        // Repopulate both dropdowns with all available options
+        this.populateFilters(this.availableCategories, this.brands);
+
         this.filterProducts();
     }
 
