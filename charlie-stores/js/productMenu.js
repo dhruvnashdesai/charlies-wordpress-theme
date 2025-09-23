@@ -1088,10 +1088,18 @@ class ProductMenu {
             this.renderCartPage();
         } else {
             // Show products page
+            console.log('updateMenuLayout: Showing products page');
+            console.log('updateMenuLayout: filteredProducts length:', this.filteredProducts?.length || 0);
+            console.log('updateMenuLayout: allProducts length:', this.allProducts?.length || 0);
+
             if (this.filteredProducts && this.filteredProducts.length > 0) {
+                console.log('updateMenuLayout: Rendering filteredProducts');
                 this.renderProductGrid(this.filteredProducts);
-            } else if (this.allProducts) {
+            } else if (this.allProducts && this.allProducts.length > 0) {
+                console.log('updateMenuLayout: Rendering allProducts');
                 this.renderProductGrid(this.allProducts);
+            } else {
+                console.log('updateMenuLayout: No products to render');
             }
 
             // Then populate filter dropdowns (this can extract from products if needed)
@@ -1836,7 +1844,13 @@ class ProductMenu {
      * Render products in the grid (with infinite scroll support)
      */
     renderProductGrid(products) {
-        if (!this.productGrid) return;
+        console.log('renderProductGrid called with products:', products?.length || 0);
+        console.log('renderProductGrid: productGrid element exists:', !!this.productGrid);
+
+        if (!this.productGrid) {
+            console.error('renderProductGrid: productGrid element not found');
+            return;
+        }
 
         // Store all products for infinite scroll
         this.filteredProducts = products;
@@ -1846,6 +1860,7 @@ class ProductMenu {
 
         // Clear existing products
         this.productGrid.innerHTML = '';
+        console.log('renderProductGrid: cleared existing products');
 
         if (!products || products.length === 0) {
             const noProducts = document.createElement('div');
@@ -2484,6 +2499,15 @@ class ProductMenu {
      */
     showProductsPage() {
         this.currentView = 'products';
+
+        // Ensure we have products to display
+        if (!this.filteredProducts || this.filteredProducts.length === 0) {
+            this.filteredProducts = [...this.allProducts] || [];
+        }
+
+        console.log('showProductsPage: filteredProducts length:', this.filteredProducts.length);
+        console.log('showProductsPage: allProducts length:', this.allProducts?.length || 0);
+
         this.updateMenuLayout();
     }
 
