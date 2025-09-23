@@ -1032,6 +1032,13 @@ class MapManager {
         const markerSize = isMobile ? 120 : 80; // Even bigger on mobile
         const borderWidth = isMobile ? 6 : 4;   // Even thicker border on mobile
 
+        console.log('Warehouse marker sizing:', {
+            isMobile: isMobile,
+            screenWidth: window.innerWidth,
+            markerSize: markerSize,
+            borderWidth: borderWidth
+        });
+
         // Use custom icon with large white circle background and pulsing animation
         element.style.cssText = `
             width: ${markerSize}px;

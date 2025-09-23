@@ -180,7 +180,7 @@ function charlie_enqueue_store_assets() {
         'charlie-map',
         get_template_directory_uri() . '/charlie-stores/js/mapManager.js?nocache=' . time(),
         array('mapbox-gl', 'charlie-config'),
-        '1.6.1',
+        '1.7.0',
         true
     );
 

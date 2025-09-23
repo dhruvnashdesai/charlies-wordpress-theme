@@ -378,16 +378,26 @@ class ProductMenu {
 
                 .category-filter,
                 .brand-filter {
-                    flex: 1 !important;
-                    min-width: 0 !important;
+                    flex: 0 1 auto !important;
+                    min-width: 80px !important;
+                    max-width: 120px !important;
                     width: auto !important;
+                    padding: 8px 6px !important;
+                    font-size: 12px !important;
+                }
+
+                .category-filter .filter-display,
+                .brand-filter .filter-display {
+                    padding: 4px 8px !important;
+                    font-size: 12px !important;
                 }
 
                 .clear-filters-btn {
                     flex-shrink: 0 !important;
                     width: auto !important;
-                    min-width: auto !important;
-                    padding: 6px 12px !important;
+                    min-width: 70px !important;
+                    padding: 8px 10px !important;
+                    font-size: 11px !important;
                 }
 
                 .gta-product-menu {
