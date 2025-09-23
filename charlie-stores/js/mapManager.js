@@ -897,14 +897,14 @@ class MapManager {
 
         // Mobile-responsive radius calculation
         const isMobile = window.innerWidth <= 768;
-        const mobileRadiusMultiplier = isMobile ? 0.25 : 1.0; // Even tighter circle on mobile
+        const mobileRadiusMultiplier = isMobile ? 0.15 : 1.0; // Reduced circle size on mobile
 
         // Create dynamic gradient based on calculated radius
         const baseInnerRadius = tenKmInPixels * 0.7 * mobileRadiusMultiplier;
         const baseOuterRadius = tenKmInPixels * 1.2 * mobileRadiusMultiplier;
 
-        const innerRadius = Math.max(baseInnerRadius, isMobile ? 120 : 150); // Smaller minimum on mobile
-        const outerRadius = Math.max(baseOuterRadius, isMobile ? 200 : 300); // Smaller minimum on mobile
+        const innerRadius = Math.max(baseInnerRadius, isMobile ? 80 : 150); // Reduced minimum on mobile
+        const outerRadius = Math.max(baseOuterRadius, isMobile ? 140 : 300); // Reduced minimum on mobile
 
         // Use same pixel positioning as working charlies_site implementation
         const centerX = markerCenterX;
