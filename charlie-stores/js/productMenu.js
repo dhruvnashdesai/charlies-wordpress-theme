@@ -1087,10 +1087,29 @@ class ProductMenu {
             // Show cart page
             this.renderCartPage();
         } else {
-            // Show products page
+            // Show products page - first clear any cart content
             console.log('updateMenuLayout: Showing products page');
             console.log('updateMenuLayout: filteredProducts length:', this.filteredProducts?.length || 0);
             console.log('updateMenuLayout: allProducts length:', this.allProducts?.length || 0);
+
+            // Clear the product grid container completely to remove any cart content
+            if (this.productGridContainer) {
+                this.productGridContainer.innerHTML = '';
+                console.log('updateMenuLayout: Cleared productGridContainer');
+
+                // Recreate the product grid element
+                const productGrid = document.createElement('div');
+                productGrid.className = 'product-grid';
+                productGrid.style.cssText = `
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    max-width: 100%;
+                `;
+                this.productGridContainer.appendChild(productGrid);
+                this.productGrid = productGrid;
+                console.log('updateMenuLayout: Recreated product grid');
+            }
 
             if (this.filteredProducts && this.filteredProducts.length > 0) {
                 console.log('updateMenuLayout: Rendering filteredProducts');
