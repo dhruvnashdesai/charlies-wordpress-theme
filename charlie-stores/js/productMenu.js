@@ -264,7 +264,7 @@ class ProductMenu {
         // Clear filters button
         const clearFilters = document.createElement('button');
         clearFilters.className = 'clear-filters-btn';
-        clearFilters.textContent = 'Clear Filters';
+        clearFilters.textContent = 'Clear';
         clearFilters.style.cssText = `
             background: rgba(255, 0, 0, 0.2);
             border: 1px solid #ff4444;
@@ -378,25 +378,23 @@ class ProductMenu {
 
                 .category-filter,
                 .brand-filter {
-                    flex: 0 1 auto !important;
-                    min-width: 80px !important;
-                    max-width: 120px !important;
+                    flex: 1 !important;
+                    max-width: 100px !important;
+                    min-width: 70px !important;
                     width: auto !important;
-                    padding: 8px 6px !important;
                     font-size: 12px !important;
                 }
 
                 .category-filter .filter-display,
                 .brand-filter .filter-display {
-                    padding: 4px 8px !important;
-                    font-size: 12px !important;
+                    padding: 6px 4px !important;
+                    font-size: 11px !important;
                 }
 
                 .clear-filters-btn {
                     flex-shrink: 0 !important;
-                    width: auto !important;
-                    min-width: 70px !important;
-                    padding: 8px 10px !important;
+                    width: 50px !important;
+                    padding: 6px 4px !important;
                     font-size: 11px !important;
                 }
 
