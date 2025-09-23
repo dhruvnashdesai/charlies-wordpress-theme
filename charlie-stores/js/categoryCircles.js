@@ -102,6 +102,7 @@ class CategoryCircles {
         document.body.classList.add('warehouse-mode');
 
         this.currentStoreId = warehouse.id;
+        const isMobile = window.innerWidth <= 768;
 
         try {
             // Hide any existing categories
@@ -116,8 +117,13 @@ class CategoryCircles {
             // Just add the product view class without the category positioning
             document.body.classList.add('product-view-mode');
 
-            // Hide vignette but skip category repositioning
-            this.hideVignette();
+            // Hide vignette only on desktop, keep it visible on mobile
+            if (!isMobile) {
+                this.hideVignette();
+                console.log('Desktop: Hiding vignette overlay');
+            } else {
+                console.log('Mobile: Keeping vignette overlay visible');
+            }
 
             // Dispatch event to open product menu with all categories
             document.dispatchEvent(new CustomEvent('warehouseSelectedForMenu', {
@@ -476,12 +482,18 @@ class CategoryCircles {
         }
 
         console.log('CategoryCircles: Exiting product view');
+        const isMobile = window.innerWidth <= 768;
 
         // Remove product view class
         document.body.classList.remove('product-view-mode');
 
-        // Show the vignette overlay again
-        this.showVignette();
+        // Show the vignette overlay - it should already be visible on mobile
+        if (!isMobile) {
+            this.showVignette();
+            console.log('Desktop: Restoring vignette overlay');
+        } else {
+            console.log('Mobile: Vignette overlay was never hidden');
+        }
 
         // Restore category circles to their original positions around the vignette
         this.restoreOriginalPositions();
