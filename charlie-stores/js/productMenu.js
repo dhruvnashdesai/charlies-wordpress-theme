@@ -75,8 +75,8 @@ class ProductMenu {
         this.menuElement.style.cssText = `
             position: fixed;
             top: 50%;
-            right: -1000px;
-            width: 950px;
+            right: -1500px;
+            width: 1400px;
             height: 80vh;
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(20, 20, 20, 0.95));
             border: 2px solid #00ff00;
@@ -291,7 +291,7 @@ class ProductMenu {
         productGrid.className = 'product-grid';
         productGrid.style.cssText = `
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
             gap: 20px;
             max-width: 100%;
         `;
@@ -1141,7 +1141,7 @@ class ProductMenu {
             }, 10);
         } else {
             // Desktop: Fixed width on right side
-            const menuWidth = 600; // Reduced width for single panel
+            const menuWidth = 1400; // Expanded width for 4-column grid
             this.menuElement.style.width = menuWidth + 'px';
             this.menuElement.style.height = '80vh';
             this.menuElement.style.right = '20px';
@@ -1198,7 +1198,7 @@ class ProductMenu {
                 productGrid.className = 'product-grid';
                 productGrid.style.cssText = `
                     display: grid;
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: 1fr 1fr 1fr 1fr;
                     gap: 20px;
                     max-width: 100%;
                 `;
