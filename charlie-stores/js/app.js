@@ -248,12 +248,12 @@ class CharlieStoreApp {
         let screenX, screenY;
 
         if (isMobile) {
-            // Mobile: Top center of vignette
+            // Mobile: Top center ON the vignette edge
             screenX = centerX;
-            screenY = centerY - innerRadius - 40; // 40px outside the vignette edge
+            screenY = centerY - innerRadius; // Exactly on the vignette edge
         } else {
-            // Desktop: Right center of vignette
-            screenX = centerX + innerRadius + 40; // 40px outside the vignette edge
+            // Desktop: Right center ON the vignette edge
+            screenX = centerX + innerRadius; // Exactly on the vignette edge
             screenY = centerY;
         }
 
