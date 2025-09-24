@@ -240,14 +240,20 @@ class CharlieStoreApp {
         const baseOuterRadius = tenKmInPixels * 1.2 * mobileRadiusMultiplier;
         const exclusionRadius = Math.max(baseOuterRadius, isMobile ? 200 : 300);
 
-        // Position warehouse at fixed locations on vignette edge
+        // Position warehouse at fixed locations on vignette edge using category circles approach
         // Get vignette information from map manager
         const vignetteInfo = this.mapManager.getCurrentVignetteInfo();
         const { centerX, centerY, innerRadius } = vignetteInfo;
 
+        // Use the same approach as category circles
+        const vignetteRadius = innerRadius; // Exactly on the edge, not outside
+        const centerPoint = { x: centerX, y: centerY };
+
         console.log('Warehouse positioning debug:', {
             isMobile,
             vignetteInfo,
+            centerPoint,
+            vignetteRadius,
             screenWidth,
             screenHeight
         });
@@ -255,18 +261,25 @@ class CharlieStoreApp {
         let screenX, screenY;
 
         if (isMobile) {
-            // Mobile: Top center ON the vignette edge
-            screenX = centerX; // Use vignette center X (marker position)
-            screenY = centerY - innerRadius; // Move up from center by radius distance
+            // Mobile: Top center ON the vignette edge (angle = -90 degrees)
+            const angle = -90; // Due up
+            const radians = (angle * Math.PI) / 180;
+            screenX = centerPoint.x + (vignetteRadius * Math.cos(radians));
+            screenY = centerPoint.y + (vignetteRadius * Math.sin(radians));
         } else {
-            // Desktop: Right center ON the vignette edge
-            screenX = centerX + innerRadius; // Move right from center by radius distance
-            screenY = centerY; // Use vignette center Y (marker position)
+            // Desktop: Right center ON the vignette edge (angle = 0 degrees)
+            const angle = 0; // Due right
+            const radians = (angle * Math.PI) / 180;
+            screenX = centerPoint.x + (vignetteRadius * Math.cos(radians));
+            screenY = centerPoint.y + (vignetteRadius * Math.sin(radians));
         }
 
         console.log('Warehouse final position:', { screenX, screenY });
-        console.log('Vignette center:', { centerX, centerY });
-        console.log('Inner radius:', innerRadius);
+        console.log('Calculation details:', {
+            angle: isMobile ? -90 : 0,
+            vignetteRadius,
+            centerPoint
+        });
 
         // Clamp to screen bounds if necessary
         const clampedX = Math.max(50, Math.min(screenWidth - 50, screenX));
