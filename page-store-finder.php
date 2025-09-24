@@ -47,7 +47,7 @@ if ($full_screen === 'yes') {
 
                 <!-- Step 2: Postal Code Entry -->
                 <div id="postalCodeStep" class="hidden">
-                    <p><?php _e('Please enter your postal code to find nearby stores:', 'charlies-stores'); ?></p>
+                    <p><?php _e('Enter your location for access to the club:', 'charlies-stores'); ?></p>
                     <div class="modal-input-group">
                         <input
                             type="text"
@@ -57,7 +57,7 @@ if ($full_screen === 'yes') {
                             pattern="[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d"
                             title="<?php _e('Please enter a valid Canadian postal code (e.g., M5V 3A8)', 'charlies-stores'); ?>"
                         >
-                        <button id="modalSearchBtn" class="btn btn-primary"><?php _e('Find Stores', 'charlies-stores'); ?></button>
+                        <button id="modalSearchBtn" class="btn btn-primary"><?php _e('Get Access', 'charlies-stores'); ?></button>
                     </div>
                     <div id="modalError" class="error-message hidden"></div>
                 </div>

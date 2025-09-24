@@ -440,7 +440,7 @@ class AgeVerification {
     setModalLoadingState(loading) {
         if (this.modalSearchBtn) {
             this.modalSearchBtn.disabled = loading;
-            this.modalSearchBtn.textContent = loading ? 'Searching...' : 'Find Stores';
+            this.modalSearchBtn.textContent = loading ? 'Searching...' : 'Getting Access';
         }
         
         if (this.modalPostalCode) {
