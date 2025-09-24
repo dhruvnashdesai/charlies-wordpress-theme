@@ -214,14 +214,15 @@ class CharlieStoreApp {
     }
 
     /**
-     * Generate a fake warehouse location outside the 10km circle (in the black area)
+     * Generate warehouse location at fixed position on vignette edge
+     * Desktop: Right center of vignette | Mobile: Top center of vignette
      * @param {number} centerLat - Center latitude
      * @param {number} centerLng - Center longitude
-     * @returns {object} Fake warehouse data with screen position
+     * @returns {object} Warehouse data with fixed screen position
      */
     generateFakeWarehouseLocation(centerLat, centerLng) {
-        // Generate warehouse outside the 10km circle
-        // We'll place it in the black area at a random screen position
+        // Position warehouse at fixed location on vignette edge
+        // Desktop: right center | Mobile: top center
 
         // Get screen dimensions
         const screenWidth = window.innerWidth;
@@ -239,48 +240,21 @@ class CharlieStoreApp {
         const baseOuterRadius = tenKmInPixels * 1.2 * mobileRadiusMultiplier;
         const exclusionRadius = Math.max(baseOuterRadius, isMobile ? 200 : 300);
 
-        // Find a random position in a tight ring just outside the circle
-        const centerX = screenWidth / 2;
-        const centerY = screenHeight / 2;
+        // Position warehouse at fixed locations on vignette edge
+        // Get vignette information from map manager
+        const vignetteInfo = this.mapManager.getCurrentVignetteInfo();
+        const { centerX, centerY, innerRadius } = vignetteInfo;
 
         let screenX, screenY;
 
         if (isMobile) {
-            // Mobile-specific positioning: place in visible corners/edges
-            const mobilePositions = [
-                { x: screenWidth - 80, y: screenHeight - 150 }, // Bottom-right (primary)
-                { x: 80, y: screenHeight - 150 }, // Bottom-left
-                { x: screenWidth - 80, y: 150 }, // Top-right
-                { x: 80, y: 150 } // Top-left
-            ];
-
-            // Filter positions that are outside the vignette circle
-            const validPositions = mobilePositions.filter(pos => {
-                const distanceFromCenter = Math.sqrt(
-                    Math.pow(pos.x - centerX, 2) + Math.pow(pos.y - centerY, 2)
-                );
-                return distanceFromCenter > exclusionRadius;
-            });
-
-            // Use valid position or fallback to bottom-right
-            const selectedPosition = validPositions.length > 0
-                ? validPositions[Math.floor(Math.random() * validPositions.length)]
-                : { x: screenWidth - 80, y: screenHeight - 150 };
-
-            screenX = selectedPosition.x;
-            screenY = selectedPosition.y;
+            // Mobile: Top center of vignette
+            screenX = centerX;
+            screenY = centerY - innerRadius - 40; // 40px outside the vignette edge
         } else {
-            // Desktop logic (existing)
-            const minSpawnDistance = exclusionRadius + 20; // Just outside the fade
-            const maxSpawnDistance = exclusionRadius + 120; // Tight ring, not too far out
-
-            // Generate random angle and distance within the tight ring
-            const angle = Math.random() * 2 * Math.PI;
-            const distance = minSpawnDistance + Math.random() * (maxSpawnDistance - minSpawnDistance);
-
-            // Calculate position in the tight ring
-            screenX = centerX + Math.cos(angle) * distance;
-            screenY = centerY + Math.sin(angle) * distance;
+            // Desktop: Right center of vignette
+            screenX = centerX + innerRadius + 40; // 40px outside the vignette edge
+            screenY = centerY;
         }
 
         // Clamp to screen bounds if necessary
