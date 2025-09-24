@@ -260,25 +260,44 @@ class CharlieStoreApp {
 
         let screenX, screenY;
 
+        // Marker sizes (from mapManager.js)
+        const markerSize = isMobile ? 120 : 80;
+        const markerRadius = markerSize / 2;
+
         if (isMobile) {
             // Mobile: Top center ON the vignette edge (angle = -90 degrees)
+            // Position marker so its bottom edge touches the vignette edge
             const angle = -90; // Due up
             const radians = (angle * Math.PI) / 180;
-            screenX = centerPoint.x + (vignetteRadius * Math.cos(radians));
-            screenY = centerPoint.y + (vignetteRadius * Math.sin(radians));
+            const edgeX = centerPoint.x + (vignetteRadius * Math.cos(radians));
+            const edgeY = centerPoint.y + (vignetteRadius * Math.sin(radians));
+
+            // Move marker outward by its radius so it sits ON the edge, not center ON edge
+            screenX = edgeX;
+            screenY = edgeY - markerRadius; // Move up by marker radius
         } else {
             // Desktop: Right center ON the vignette edge (angle = 0 degrees)
+            // Position marker so its left edge touches the vignette edge
             const angle = 0; // Due right
             const radians = (angle * Math.PI) / 180;
-            screenX = centerPoint.x + (vignetteRadius * Math.cos(radians));
-            screenY = centerPoint.y + (vignetteRadius * Math.sin(radians));
+            const edgeX = centerPoint.x + (vignetteRadius * Math.cos(radians));
+            const edgeY = centerPoint.y + (vignetteRadius * Math.sin(radians));
+
+            // Move marker outward by its radius so it sits ON the edge, not center ON edge
+            screenX = edgeX + markerRadius; // Move right by marker radius
+            screenY = edgeY;
         }
 
         console.log('Warehouse final position:', { screenX, screenY });
         console.log('Calculation details:', {
             angle: isMobile ? -90 : 0,
             vignetteRadius,
-            centerPoint
+            centerPoint,
+            markerSize,
+            markerRadius,
+            edgePosition: isMobile ?
+                { edgeX: centerPoint.x, edgeY: centerPoint.y - vignetteRadius } :
+                { edgeX: centerPoint.x + vignetteRadius, edgeY: centerPoint.y }
         });
 
         // Clamp to screen bounds if necessary
