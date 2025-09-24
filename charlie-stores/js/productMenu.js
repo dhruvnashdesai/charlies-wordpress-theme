@@ -75,8 +75,8 @@ class ProductMenu {
         this.menuElement.style.cssText = `
             position: fixed;
             top: 50%;
-            right: -1500px;
-            width: 1400px;
+            right: -1200px;
+            width: 1150px;
             height: 80vh;
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(20, 20, 20, 0.95));
             border: 2px solid #00ff00;
@@ -1141,7 +1141,7 @@ class ProductMenu {
             }, 10);
         } else {
             // Desktop: Fixed width on right side
-            const menuWidth = 1400; // Expanded width for 4-column grid
+            const menuWidth = 1150; // Balanced width for 4-column grid with marker visibility
             this.menuElement.style.width = menuWidth + 'px';
             this.menuElement.style.height = '80vh';
             this.menuElement.style.right = '20px';
