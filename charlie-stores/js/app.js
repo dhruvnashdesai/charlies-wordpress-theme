@@ -245,6 +245,13 @@ class CharlieStoreApp {
         const vignetteInfo = this.mapManager.getCurrentVignetteInfo();
         const { centerX, centerY, innerRadius } = vignetteInfo;
 
+        console.log('Warehouse positioning debug:', {
+            isMobile,
+            vignetteInfo,
+            screenWidth,
+            screenHeight
+        });
+
         let screenX, screenY;
 
         if (isMobile) {
@@ -256,6 +263,8 @@ class CharlieStoreApp {
             screenX = centerX + innerRadius; // Exactly on the vignette edge
             screenY = centerY;
         }
+
+        console.log('Warehouse final position:', { screenX, screenY });
 
         // Clamp to screen bounds if necessary
         const clampedX = Math.max(50, Math.min(screenWidth - 50, screenX));
