@@ -256,15 +256,17 @@ class CharlieStoreApp {
 
         if (isMobile) {
             // Mobile: Top center ON the vignette edge
-            screenX = centerX;
-            screenY = centerY - innerRadius; // Exactly on the vignette edge
+            screenX = centerX; // Use vignette center X (marker position)
+            screenY = centerY - innerRadius; // Move up from center by radius distance
         } else {
             // Desktop: Right center ON the vignette edge
-            screenX = centerX + innerRadius; // Exactly on the vignette edge
-            screenY = centerY;
+            screenX = centerX + innerRadius; // Move right from center by radius distance
+            screenY = centerY; // Use vignette center Y (marker position)
         }
 
         console.log('Warehouse final position:', { screenX, screenY });
+        console.log('Vignette center:', { centerX, centerY });
+        console.log('Inner radius:', innerRadius);
 
         // Clamp to screen bounds if necessary
         const clampedX = Math.max(50, Math.min(screenWidth - 50, screenX));
