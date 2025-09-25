@@ -3560,10 +3560,13 @@ class ProductMenu {
         }
 
         // Show warehouse marker if it exists
-        const warehouseMarker = window.charlieApp?.mapManager?.markers?.get(1)?.element; // Warehouse ID is typically 1
-        if (warehouseMarker) {
-            warehouseMarker.style.display = 'block';
-            console.log('ProductMenu: Restored warehouse marker');
+        if (window.charlieApp?.mapManager?.markers) {
+            window.charlieApp.mapManager.markers.forEach((markerData, markerId) => {
+                if (markerData.warehouse && markerData.warehouse.type === 'warehouse' && markerData.element) {
+                    markerData.element.style.display = 'block';
+                    console.log('ProductMenu: Restored warehouse marker with ID:', markerId);
+                }
+            });
         }
 
         // Show cart marker if it exists
