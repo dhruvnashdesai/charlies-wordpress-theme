@@ -273,8 +273,8 @@ class CharlieStoreApp {
             const edgeY = centerPoint.y + (vignetteRadius * Math.sin(radians));
 
             // Fine-tuning: move a little more up and to the left
-            screenX = edgeX - 15; // Move left by 15px
-            screenY = edgeY - markerRadius - 10; // Move up by marker radius + 10px
+            screenX = edgeX - 25; // Move left by 25px
+            screenY = edgeY - markerRadius - 20; // Move up by marker radius + 20px
         } else {
             // Desktop: Right center ON the vignette edge (angle = 0 degrees)
             // Position marker so its left edge touches the vignette edge
@@ -284,8 +284,8 @@ class CharlieStoreApp {
             const edgeY = centerPoint.y + (vignetteRadius * Math.sin(radians));
 
             // Fine-tuning: move a little more to the right and slightly up
-            screenX = edgeX + markerRadius + 10; // Move right by marker radius + 10px
-            screenY = edgeY - 5; // Move up by 5px
+            screenX = edgeX + markerRadius + 20; // Move right by marker radius + 20px
+            screenY = edgeY - 15; // Move up by 15px
         }
 
         console.log('Warehouse final position:', { screenX, screenY });
