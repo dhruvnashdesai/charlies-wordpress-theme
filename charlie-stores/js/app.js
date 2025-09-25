@@ -276,8 +276,8 @@ class CharlieStoreApp {
             const edgeY = centerPoint.y + (vignetteRadius * Math.sin(radians));
 
             // Fine-tuning: mobile positioning adjustments
-            screenX = edgeX - 30; // Move left by 30px (35 - 5 right adjustment)
-            screenY = edgeY - markerRadius - 95; // Move up by marker radius + 95px (85 + 10 more up)
+            screenX = edgeX - 30; // Move left by 30px (no horizontal change)
+            screenY = edgeY - markerRadius - 100; // Move up by marker radius + 100px (95 + 5 more up)
         } else {
             // Desktop: Right center ON the vignette edge (angle = 0 degrees)
             // Position marker so its left edge touches the vignette edge
@@ -357,8 +357,8 @@ class CharlieStoreApp {
             const edgeY = centerPoint.y + (vignetteRadius * Math.sin(radians));
 
             // Position cart marker on the vignette edge with mobile adjustment
-            screenX = edgeX - markerRadius; // Adjust for marker size (no horizontal change)
-            screenY = edgeY - markerRadius - 60; // Move up by marker radius + 60px (50 + 10 more up)
+            screenX = edgeX - markerRadius + 10; // Move right by 10px from previous position
+            screenY = edgeY - markerRadius - 65; // Move up by marker radius + 65px (60 + 5 more up)
         } else {
             // Desktop: Higher up than warehouse and more to the left (-30 degrees)
             const angle = -30; // Upper right diagonal
