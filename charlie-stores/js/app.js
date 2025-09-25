@@ -263,8 +263,8 @@ class CharlieStoreApp {
 
         let screenX, screenY;
 
-        // Marker sizes (updated to match mapManager.js balanced sizing)
-        const markerSize = isMobile ? 100 : 80; // Updated from 120 to 100 on mobile
+        // Marker sizes (updated to match mapManager.js 60px sizing)
+        const markerSize = isMobile ? 60 : 80; // Reduced to 60px on mobile
         const markerRadius = markerSize / 2;
 
         if (isMobile) {
@@ -343,8 +343,8 @@ class CharlieStoreApp {
         const centerPoint = { x: centerX, y: centerY };
         const isMobile = window.innerWidth <= 768;
 
-        // Marker sizes (updated to match mapManager.js balanced sizing)
-        const markerSize = isMobile ? 100 : 80; // Updated from 120 to 100 on mobile
+        // Marker sizes (updated to match mapManager.js 60px sizing)
+        const markerSize = isMobile ? 60 : 80; // Reduced to 60px on mobile
         const markerRadius = markerSize / 2;
 
         let screenX, screenY;

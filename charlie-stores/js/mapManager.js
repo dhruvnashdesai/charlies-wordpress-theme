@@ -1094,10 +1094,10 @@ class MapManager {
         element.setAttribute('aria-label', `${cart.name} - Click to access cart`);
         element.setAttribute('tabindex', '0');
 
-        // Mobile-responsive sizing (balanced size for mobile)
+        // Mobile-responsive sizing (reduced to 60px for mobile)
         const isMobile = window.innerWidth <= 768;
-        const markerSize = isMobile ? 100 : 80; // Reduced from 120 to 100 on mobile
-        const borderWidth = isMobile ? 5 : 4;
+        const markerSize = isMobile ? 60 : 80; // Reduced to 60px on mobile
+        const borderWidth = isMobile ? 3 : 4;
 
         // Use cart icon with styling similar to warehouse
         element.style.cssText = `
@@ -1217,10 +1217,10 @@ class MapManager {
         element.setAttribute('aria-label', `${warehouse.name} - Click for details`);
         element.setAttribute('tabindex', '0');
 
-        // Mobile-responsive sizing (balanced size for mobile)
+        // Mobile-responsive sizing (reduced to 60px for mobile)
         const isMobile = window.innerWidth <= 768;
-        const markerSize = isMobile ? 100 : 80; // Balanced at 100px on mobile
-        const borderWidth = isMobile ? 5 : 4;   // Balanced border width
+        const markerSize = isMobile ? 60 : 80; // Reduced to 60px on mobile
+        const borderWidth = isMobile ? 3 : 4;  // Reduced border width
 
         console.log('Warehouse marker sizing:', {
             isMobile: isMobile,

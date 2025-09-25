@@ -493,17 +493,17 @@
 
     /* Mobile Warehouse Marker */
     .warehouse-marker {
-        width: 100px !important;
-        height: 100px !important;
-        border: 5px solid #ff6b35 !important;
+        width: 60px !important;
+        height: 60px !important;
+        border: 3px solid #ff6b35 !important;
         box-shadow: 0 4px 20px rgba(255, 107, 53, 0.6) !important;
     }
 
     /* Mobile Cart Marker */
     .cart-marker {
-        width: 100px !important;
-        height: 100px !important;
-        border: 5px solid #28a745 !important;
+        width: 60px !important;
+        height: 60px !important;
+        border: 3px solid #28a745 !important;
     }
 
     /* Mobile Popup Optimizations */
@@ -583,13 +583,13 @@
     }
 
     .warehouse-marker {
-        width: 100px !important;
-        height: 100px !important;
+        width: 60px !important;
+        height: 60px !important;
     }
 
     .cart-marker {
-        width: 100px !important;
-        height: 100px !important;
+        width: 60px !important;
+        height: 60px !important;
     }
 
     .mapboxgl-popup {
@@ -633,13 +633,13 @@
     }
 
     .warehouse-marker {
-        width: 100px !important;
-        height: 100px !important;
+        width: 60px !important;
+        height: 60px !important;
     }
 
     .cart-marker {
-        width: 100px !important;
-        height: 100px !important;
+        width: 60px !important;
+        height: 60px !important;
     }
 }
 
