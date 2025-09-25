@@ -274,7 +274,7 @@ class CharlieStoreApp {
 
             // Fine-tuning: mobile is centered, just move up more
             screenX = edgeX - 25; // Keep left position
-            screenY = edgeY - markerRadius - 80; // Move up by marker radius + 80px
+            screenY = edgeY - markerRadius - 75; // Move up by marker radius + 75px
         } else {
             // Desktop: Right center ON the vignette edge (angle = 0 degrees)
             // Position marker so its left edge touches the vignette edge
