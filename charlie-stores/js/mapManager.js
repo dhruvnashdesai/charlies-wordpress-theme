@@ -512,8 +512,27 @@ class MapManager {
                 warehouseMarkers.push(markerId);
             }
         });
-        
+
         warehouseMarkers.forEach(markerId => {
+            this.removeMarker(markerId);
+        });
+
+        // Also clear cart markers when clearing warehouse markers
+        this.clearCartMarkers();
+    }
+
+    /**
+     * Clear only cart markers from the map
+     */
+    clearCartMarkers() {
+        const cartMarkers = [];
+        this.markers.forEach((markerData, markerId) => {
+            if (markerData.cart && markerData.cart.type === 'cart') {
+                cartMarkers.push(markerId);
+            }
+        });
+
+        cartMarkers.forEach(markerId => {
             this.removeMarker(markerId);
         });
     }
@@ -1013,6 +1032,161 @@ class MapManager {
 
         console.log(`Warehouse marker placed at screen position: ${warehouse.screenPosition.x}, ${warehouse.screenPosition.y}`);
         return markerElement;
+    }
+
+    /**
+     * Add cart marker to the map (positioned in black area outside 10km circle)
+     * @param {object} cart - Cart data with screenPosition
+     */
+    addCartMarker(cart) {
+        if (!this.isInitialized) return;
+
+        const markerId = cart.id;
+
+        // Remove existing marker if it exists
+        this.removeMarker(markerId);
+
+        // Create custom cart marker element
+        const markerElement = this.createCartMarkerElement(cart);
+
+        // Position marker at fixed screen coordinates (not geographic)
+        if (cart.screenPosition) {
+            markerElement.style.position = 'fixed';
+            markerElement.style.left = `${cart.screenPosition.x}px`;
+            markerElement.style.top = `${cart.screenPosition.y}px`;
+            markerElement.style.zIndex = '600'; // Above vignette but below crosshair
+            markerElement.style.transform = 'translate(-50%, -50%)';
+
+            // Add directly to the map container instead of using Mapbox marker
+            this.mapContainer.appendChild(markerElement);
+        }
+
+        // Add click event for cart interaction
+        markerElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            // Handle cart click - redirect to cart page or open cart menu
+            this.handleCartClick(cart);
+        });
+
+        // Store marker reference
+        this.markers.set(markerId, {
+            marker: null, // No Mapbox marker, just DOM element
+            element: markerElement,
+            cart: cart,
+            isSelected: false,
+            isScreenMarker: true // Flag to indicate this is a screen-positioned marker
+        });
+
+        console.log(`Cart marker placed at screen position: ${cart.screenPosition.x}, ${cart.screenPosition.y}`);
+        return markerElement;
+    }
+
+    /**
+     * Create custom cart marker element
+     * @param {object} cart - Cart data
+     * @returns {HTMLElement} Marker element
+     */
+    createCartMarkerElement(cart) {
+        const element = document.createElement('div');
+        element.className = 'cart-marker';
+        element.setAttribute('role', 'button');
+        element.setAttribute('aria-label', `${cart.name} - Click to access cart`);
+        element.setAttribute('tabindex', '0');
+
+        // Mobile-responsive sizing (same as warehouse)
+        const isMobile = window.innerWidth <= 768;
+        const markerSize = isMobile ? 120 : 80;
+        const borderWidth = isMobile ? 6 : 4;
+
+        // Use cart icon with styling similar to warehouse
+        element.style.cssText = `
+            width: ${markerSize}px;
+            height: ${markerSize}px;
+            background-color: #28a745;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>');
+            background-size: 60%;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            border: ${borderWidth}px solid #28a745;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+            position: relative;
+            z-index: 600;
+        `;
+
+        // Add hover effects
+        element.addEventListener('mouseenter', () => {
+            element.style.transform = 'translate(-50%, -50%) scale(1.1)';
+            element.style.boxShadow = '0 6px 20px rgba(40, 167, 69, 0.6)';
+        });
+
+        element.addEventListener('mouseleave', () => {
+            element.style.transform = 'translate(-50%, -50%) scale(1)';
+            element.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.4)';
+        });
+
+        // Add keyboard support
+        element.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                element.click();
+            }
+        });
+
+        return element;
+    }
+
+    /**
+     * Handle cart marker click
+     * @param {object} cart - Cart data
+     */
+    handleCartClick(cart) {
+        console.log('Cart clicked:', cart.name);
+
+        // Check if WooCommerce cart URL is available
+        const cartUrl = getConfig('WOOCOMMERCE.CART_URL');
+
+        if (cartUrl && getConfig('WOOCOMMERCE.IS_ACTIVE')) {
+            // Redirect to WooCommerce cart page
+            window.location.href = cartUrl;
+        } else {
+            // Fallback: dispatch event for custom cart handling
+            document.dispatchEvent(new CustomEvent('cartClicked', {
+                detail: cart
+            }));
+        }
+
+        // Track cart access for analytics
+        this.trackEvent('cart_accessed', {
+            source: 'map_marker',
+            cart_id: cart.id
+        });
+    }
+
+    /**
+     * Track analytics events
+     * @param {string} eventName - Event name
+     * @param {object} eventData - Additional event data
+     */
+    trackEvent(eventName, eventData = {}) {
+        // Google Analytics
+        if (typeof gtag === 'function') {
+            gtag('event', eventName, {
+                event_category: 'map_interaction',
+                ...eventData
+            });
+        }
+
+        // WordPress hooks
+        if (typeof window !== 'undefined' && window.wp && window.wp.hooks) {
+            window.wp.hooks.doAction('charlie_analytics', eventName, eventData);
+        }
+
+        console.log('Map Event:', eventName, eventData);
     }
 
     /**

@@ -203,10 +203,13 @@ class CharlieStoreApp {
         
         // Store the warehouse data to prevent regeneration
         this.currentWarehouse = fakeWarehouse;
-        
+
         // Add the warehouse marker
         this.mapManager.addWarehouseMarker(fakeWarehouse);
-        
+
+        // Add the cart marker
+        this.addCartMarker(userCoordinates);
+
         // Mark as added
         this.warehouseAdded = true;
         
@@ -322,6 +325,65 @@ class CharlieStoreApp {
         };
         
         return fakeWarehouse;
+    }
+
+    /**
+     * Add a cart marker positioned on the vignette edge
+     * @param {Array} userCoordinates - [longitude, latitude] of user's postal code
+     */
+    addCartMarker(userCoordinates) {
+        if (!this.mapManager.isMapInitialized()) return;
+
+        // Get vignette information from map manager
+        const vignetteInfo = this.mapManager.getCurrentVignetteInfo();
+        const { centerX, centerY, innerRadius } = vignetteInfo;
+
+        // Use the same approach as warehouse positioning
+        const vignetteRadius = innerRadius;
+        const centerPoint = { x: centerX, y: centerY };
+        const isMobile = window.innerWidth <= 768;
+
+        // Marker sizes (same as warehouse)
+        const markerSize = isMobile ? 120 : 80;
+        const markerRadius = markerSize / 2;
+
+        let screenX, screenY;
+
+        if (isMobile) {
+            // Mobile: Left side and slightly lower than warehouse (-135 degrees)
+            const angle = -135; // Top-left diagonal
+            const radians = (angle * Math.PI) / 180;
+            const edgeX = centerPoint.x + (vignetteRadius * Math.cos(radians));
+            const edgeY = centerPoint.y + (vignetteRadius * Math.sin(radians));
+
+            // Position cart marker on the vignette edge
+            screenX = edgeX - markerRadius; // Adjust for marker size
+            screenY = edgeY - markerRadius; // Adjust for marker size
+        } else {
+            // Desktop: Higher up than warehouse and more to the left (-30 degrees)
+            const angle = -30; // Upper right diagonal
+            const radians = (angle * Math.PI) / 180;
+            const edgeX = centerPoint.x + (vignetteRadius * Math.cos(radians));
+            const edgeY = centerPoint.y + (vignetteRadius * Math.sin(radians));
+
+            // Position cart marker on the vignette edge
+            screenX = edgeX + markerRadius; // Adjust for marker size
+            screenY = edgeY - markerRadius; // Adjust for marker size
+        }
+
+        // Create cart marker data
+        const cartMarker = {
+            id: 'cart_marker',
+            name: 'Shopping Cart',
+            type: 'cart',
+            screenPosition: { x: screenX, y: screenY },
+            description: 'Access your shopping cart'
+        };
+
+        // Add the cart marker using map manager
+        this.mapManager.addCartMarker(cartMarker);
+
+        console.log('Cart marker positioned at:', { screenX, screenY });
     }
 
     /**
