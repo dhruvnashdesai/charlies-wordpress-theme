@@ -274,7 +274,7 @@ class CharlieStoreApp {
 
             // Fine-tuning: mobile is centered, just move up more
             screenX = edgeX - 25; // Keep left position
-            screenY = edgeY - markerRadius - 30; // Move up by marker radius + 30px
+            screenY = edgeY - markerRadius - 40; // Move up by marker radius + 40px
         } else {
             // Desktop: Right center ON the vignette edge (angle = 0 degrees)
             // Position marker so its left edge touches the vignette edge
@@ -284,8 +284,8 @@ class CharlieStoreApp {
             const edgeY = centerPoint.y + (vignetteRadius * Math.sin(radians));
 
             // Fine-tuning: move more to the right and slightly more up
-            screenX = edgeX + markerRadius + 40; // Move right by marker radius + 40px
-            screenY = edgeY - 20; // Move up by 20px
+            screenX = edgeX + markerRadius + 60; // Move right by marker radius + 60px
+            screenY = edgeY - 30; // Move up by 30px
         }
 
         console.log('Warehouse final position:', { screenX, screenY });
