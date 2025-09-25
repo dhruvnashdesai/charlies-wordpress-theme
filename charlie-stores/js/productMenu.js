@@ -50,6 +50,12 @@ class ProductMenu {
             this.handleWarehouseSelectedForMenu(e.detail);
         });
 
+        // Listen for cart marker clicks
+        document.addEventListener('cartClicked', (e) => {
+            console.log('ProductMenu: cartClicked event received!', e.detail);
+            this.handleCartClicked(e.detail);
+        });
+
         // Close menu on escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isVisible) {
@@ -663,6 +669,31 @@ class ProductMenu {
             this.setLoadingState(false);
             this.showErrorMessage();
         }
+    }
+
+    /**
+     * Handle cart marker click - open the cart view in the product menu
+     * @param {object} detail - Cart click event detail
+     */
+    async handleCartClicked(detail) {
+        console.log('ProductMenu: Cart clicked, opening cart view:', detail);
+
+        // Set up basic state for cart view
+        this.currentView = 'cart';
+        this.currentStoreId = 1; // Use default store ID for cart functionality
+
+        // Show menu immediately
+        console.log('ProductMenu: Showing menu with cart view');
+        this.showMenu();
+
+        // Update menu to show cart content
+        this.updateMenuLayout();
+
+        // Track cart access
+        this.trackEvent('cart_opened', {
+            source: 'map_marker',
+            items_count: this.cart.length
+        });
     }
 
     /**
@@ -3509,6 +3540,28 @@ class ProductMenu {
     validateEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
+    }
+
+    /**
+     * Track analytics events
+     * @param {string} eventName - Event name
+     * @param {object} eventData - Additional event data
+     */
+    trackEvent(eventName, eventData = {}) {
+        // Google Analytics
+        if (typeof gtag === 'function') {
+            gtag('event', eventName, {
+                event_category: 'product_menu',
+                ...eventData
+            });
+        }
+
+        // WordPress hooks
+        if (typeof window !== 'undefined' && window.wp && window.wp.hooks) {
+            window.wp.hooks.doAction('charlie_analytics', eventName, eventData);
+        }
+
+        console.log('ProductMenu Event:', eventName, eventData);
     }
 }
 

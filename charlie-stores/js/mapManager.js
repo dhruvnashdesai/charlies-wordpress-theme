@@ -1147,18 +1147,27 @@ class MapManager {
     handleCartClick(cart) {
         console.log('Cart clicked:', cart.name);
 
-        // Check if WooCommerce cart URL is available
-        const cartUrl = getConfig('WOOCOMMERCE.CART_URL');
-
-        if (cartUrl && getConfig('WOOCOMMERCE.IS_ACTIVE')) {
-            // Redirect to WooCommerce cart page
-            window.location.href = cartUrl;
-        } else {
-            // Fallback: dispatch event for custom cart handling
-            document.dispatchEvent(new CustomEvent('cartClicked', {
-                detail: cart
-            }));
+        // Hide the cart marker immediately (like warehouse marker)
+        const cartMarkerElement = this.markers.get(cart.id)?.element;
+        if (cartMarkerElement) {
+            cartMarkerElement.style.display = 'none';
         }
+
+        // Check if we're on mobile to handle differently
+        const isMobile = window.innerWidth <= 768;
+        if (!isMobile) {
+            // Desktop: enable sliding animation to product mode
+            this.slideToProductMode();
+        }
+        // Mobile: skip animation to keep map static
+
+        // Dispatch event to open cart menu in the product menu modal
+        document.dispatchEvent(new CustomEvent('cartClicked', {
+            detail: {
+                cart: cart,
+                openCartMenu: true // Flag to indicate we want to open cart menu specifically
+            }
+        }));
 
         // Track cart access for analytics
         this.trackEvent('cart_accessed', {
