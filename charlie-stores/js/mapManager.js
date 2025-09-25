@@ -1158,6 +1158,13 @@ class MapManager {
         if (!isMobile) {
             // Desktop: enable sliding animation to product mode
             this.slideToProductMode();
+
+            // Hide vignette overlay on desktop (match warehouse behavior exactly)
+            const vignette = document.getElementById('radiusVignette');
+            if (vignette) {
+                vignette.style.display = 'none';
+            }
+            console.log('Desktop: Hiding vignette overlay for cart menu');
         }
         // Mobile: skip animation to keep map static
 

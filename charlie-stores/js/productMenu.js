@@ -1334,9 +1334,9 @@ class ProductMenu {
             this.menuElement.style.transition = 'top 0.4s ease-in';
             this.menuElement.style.top = '100vh';
         } else {
-            // Desktop: Slide right
+            // Desktop: Slide right (fully off-screen)
             this.menuElement.style.transition = 'right 0.4s ease-in';
-            this.menuElement.style.right = '-700px';
+            this.menuElement.style.right = '-1050px'; // Match initial hidden position
         }
 
         this.isVisible = false;
