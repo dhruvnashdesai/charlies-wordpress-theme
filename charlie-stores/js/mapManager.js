@@ -1916,6 +1916,49 @@ class MapManager {
     }
 
     /**
+     * Slide map back to original centered position (reverse of slideToProductMode)
+     */
+    slideBackFromProductMode() {
+        if (!this.isInitialized || !this.map || !this.userLocationMarker) {
+            console.warn('Map or marker not available for slide back animation');
+            return;
+        }
+
+        console.log('MapManager: Sliding map back to centered position');
+
+        // Get the user location marker coordinates (the original center)
+        const markerCoords = this.userLocationMarker.getLngLat();
+
+        // Remove product mode class
+        const mapContainer = document.getElementById('map');
+        if (mapContainer) mapContainer.classList.remove('product-mode');
+
+        // Temporarily disable map event tracking during animation
+        this.removeVignetteTracking();
+
+        // Animate back to centered position
+        this.map.easeTo({
+            center: markerCoords,
+            duration: 600, // Same duration as slideToProductMode
+            essential: true
+        });
+
+        // Update vignette continuously during animation for smooth tracking
+        const animationInterval = setInterval(() => {
+            this.updateRadiusVignette();
+        }, 16); // ~60fps updates
+
+        // Clear interval and re-enable map event tracking after animation completes
+        setTimeout(() => {
+            clearInterval(animationInterval);
+            this.updateRadiusVignette();
+            // Re-enable map event tracking
+            this.setupVignetteTracking();
+            console.log('MapManager: Map slide back animation complete');
+        }, 650); // After animation completes
+    }
+
+    /**
      * Update marker positions for product mode
      */
     updateMarkersForProductMode() {

@@ -1345,6 +1345,10 @@ class ProductMenu {
         setTimeout(() => {
             // Exit product view when menu closes
             document.body.classList.remove('product-view-mode');
+
+            // Restore warehouse and cart markers when menu closes
+            this.restoreMapMarkers();
+
             document.dispatchEvent(new CustomEvent('menuClosed'));
             console.log('ProductMenu: Menu hidden and menuClosed event dispatched');
 
@@ -3540,6 +3544,47 @@ class ProductMenu {
     validateEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
+    }
+
+    /**
+     * Restore warehouse and cart markers when menu closes
+     */
+    restoreMapMarkers() {
+        console.log('ProductMenu: Restoring map markers after menu close');
+
+        // Slide map back to centered position on desktop
+        const isMobile = window.innerWidth <= 768;
+        if (!isMobile && window.charlieApp?.mapManager) {
+            window.charlieApp.mapManager.slideBackFromProductMode();
+            console.log('ProductMenu: Initiated map slide back to center');
+        }
+
+        // Show warehouse marker if it exists
+        const warehouseMarker = window.charlieApp?.mapManager?.markers?.get(1)?.element; // Warehouse ID is typically 1
+        if (warehouseMarker) {
+            warehouseMarker.style.display = 'block';
+            console.log('ProductMenu: Restored warehouse marker');
+        }
+
+        // Show cart marker if it exists
+        const cartMarker = window.charlieApp?.mapManager?.markers?.get('cart_marker')?.element;
+        if (cartMarker) {
+            cartMarker.style.display = 'block';
+            console.log('ProductMenu: Restored cart marker');
+        }
+
+        // Also ensure vignette is visible on desktop (restore from category circles behavior)
+        if (!isMobile) {
+            const vignette = document.getElementById('radiusVignette');
+            if (vignette) {
+                vignette.style.display = '';
+                console.log('ProductMenu: Restored vignette overlay on desktop');
+            }
+        }
+
+        // Restore warehouse mode class if needed (for safe area background)
+        document.body.classList.remove('warehouse-mode');
+        console.log('ProductMenu: Cleaned up warehouse-mode class');
     }
 
     /**
