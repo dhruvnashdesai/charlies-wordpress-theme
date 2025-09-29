@@ -81,8 +81,8 @@ function charlies_enqueue_assets() {
     // Theme stylesheet
     wp_enqueue_style('charlies-style', get_stylesheet_uri(), array(), '1.0.0');
 
-    // Theme JavaScript (if needed)
-    wp_enqueue_script('charlies-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), '1.0.0', true);
+    // Theme JavaScript (if needed) - commented out since file doesn't exist
+    // wp_enqueue_script('charlies-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), '1.0.0', true);
 }
 add_action('wp_enqueue_scripts', 'charlies_enqueue_assets');
 

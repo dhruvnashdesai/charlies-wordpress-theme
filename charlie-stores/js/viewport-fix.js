@@ -11,8 +11,10 @@
         const vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
 
-        // Also set full height for body
-        document.body.style.height = `${window.innerHeight}px`;
+        // Also set full height for body (with safety check)
+        if (document.body) {
+            document.body.style.height = `${window.innerHeight}px`;
+        }
 
         console.log('Viewport height set:', window.innerHeight);
     }
@@ -28,8 +30,12 @@
         window.viewportResizeTimer = setTimeout(setViewportHeight, 100);
     }
 
-    // Initial setup
-    setViewportHeight();
+    // Initial setup - wait for DOM to be ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setViewportHeight);
+    } else {
+        setViewportHeight();
+    }
 
     // Event listeners
     window.addEventListener('resize', handleResize);
