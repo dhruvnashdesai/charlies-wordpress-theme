@@ -34,6 +34,8 @@ class Charlie_WooCommerce_Integration {
         add_action('wp_ajax_nopriv_charlie_remove_from_cart', array($this, 'ajax_remove_from_cart'));
         add_action('wp_ajax_charlie_woo_checkout', array($this, 'ajax_woo_checkout'));
         add_action('wp_ajax_nopriv_charlie_woo_checkout', array($this, 'ajax_woo_checkout'));
+        add_action('wp_ajax_get_payment_instructions', array($this, 'ajax_get_payment_instructions'));
+        add_action('wp_ajax_nopriv_get_payment_instructions', array($this, 'ajax_get_payment_instructions'));
 
         // Add store location field to products (only in admin)
         if (is_admin()) {
@@ -1082,6 +1084,97 @@ class Charlie_WooCommerce_Integration {
         } catch (Exception $e) {
             error_log('Charlie Checkout Error: ' . $e->getMessage());
             wp_send_json_error('Failed to create order: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get payment instructions from WooCommerce BACS gateway settings
+     */
+    public function ajax_get_payment_instructions() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'charlie_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+
+        try {
+            // Get the BACS payment gateway
+            $payment_gateways = WC()->payment_gateways->payment_gateways();
+
+            if (!isset($payment_gateways['bacs'])) {
+                wp_send_json_error('BACS payment gateway not found');
+                return;
+            }
+
+            $bacs_gateway = $payment_gateways['bacs'];
+
+            // Check if BACS is enabled
+            if ($bacs_gateway->enabled !== 'yes') {
+                wp_send_json_error('BACS payment gateway is not enabled');
+                return;
+            }
+
+            // Get the settings
+            $description = $bacs_gateway->get_option('description', '');
+            $instructions = $bacs_gateway->get_option('instructions', '');
+            $accounts = $bacs_gateway->get_option('account_details', array());
+
+            // Build the instructions HTML
+            $instructions_html = '';
+
+            if (!empty($description)) {
+                $instructions_html .= '<p>' . wp_kses_post($description) . '</p>';
+            }
+
+            if (!empty($accounts) && is_array($accounts)) {
+                $instructions_html .= '<div style="margin: 15px 0;">';
+                foreach ($accounts as $account) {
+                    if (!empty($account['account_name'])) {
+                        $instructions_html .= '<div style="margin-bottom: 15px; padding: 10px; background: rgba(0, 255, 0, 0.05); border-radius: 4px;">';
+                        $instructions_html .= '<strong>Account Name:</strong> ' . esc_html($account['account_name']) . '<br>';
+
+                        if (!empty($account['account_number'])) {
+                            $instructions_html .= '<strong>Account Number:</strong> ' . esc_html($account['account_number']) . '<br>';
+                        }
+
+                        if (!empty($account['sort_code'])) {
+                            $instructions_html .= '<strong>Sort Code:</strong> ' . esc_html($account['sort_code']) . '<br>';
+                        }
+
+                        if (!empty($account['iban'])) {
+                            $instructions_html .= '<strong>IBAN:</strong> ' . esc_html($account['iban']) . '<br>';
+                        }
+
+                        if (!empty($account['bic'])) {
+                            $instructions_html .= '<strong>BIC:</strong> ' . esc_html($account['bic']) . '<br>';
+                        }
+
+                        if (!empty($account['bank_name'])) {
+                            $instructions_html .= '<strong>Bank:</strong> ' . esc_html($account['bank_name']) . '<br>';
+                        }
+
+                        $instructions_html .= '</div>';
+                    }
+                }
+                $instructions_html .= '</div>';
+            }
+
+            if (!empty($instructions)) {
+                $instructions_html .= '<p style="margin-top: 15px;">' . wp_kses_post($instructions) . '</p>';
+            }
+
+            // If no custom instructions, provide fallback
+            if (empty($instructions_html)) {
+                $instructions_html = '<p>Please contact us for bank transfer details.</p>';
+            }
+
+            wp_send_json_success(array(
+                'instructions' => $instructions_html
+            ));
+
+        } catch (Exception $e) {
+            error_log('Charlie Payment Instructions Error: ' . $e->getMessage());
+            wp_send_json_error('Failed to load payment instructions');
         }
     }
 }
