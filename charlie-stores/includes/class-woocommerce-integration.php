@@ -23,6 +23,16 @@ class Charlie_WooCommerce_Integration {
         add_action('wp_ajax_get_store_products_by_brand', array($this, 'get_store_products_by_brand'));
         add_action('wp_ajax_nopriv_get_store_products_by_brand', array($this, 'get_store_products_by_brand'));
 
+        // Add WooCommerce cart integration AJAX handlers
+        add_action('wp_ajax_charlie_add_to_cart', array($this, 'ajax_add_to_cart'));
+        add_action('wp_ajax_nopriv_charlie_add_to_cart', array($this, 'ajax_add_to_cart'));
+        add_action('wp_ajax_charlie_get_cart', array($this, 'ajax_get_cart'));
+        add_action('wp_ajax_nopriv_charlie_get_cart', array($this, 'ajax_get_cart'));
+        add_action('wp_ajax_charlie_update_cart', array($this, 'ajax_update_cart'));
+        add_action('wp_ajax_nopriv_charlie_update_cart', array($this, 'ajax_update_cart'));
+        add_action('wp_ajax_charlie_remove_from_cart', array($this, 'ajax_remove_from_cart'));
+        add_action('wp_ajax_nopriv_charlie_remove_from_cart', array($this, 'ajax_remove_from_cart'));
+
         // Add store location field to products (only in admin)
         if (is_admin()) {
             add_action('woocommerce_product_options_general_product_data', array($this, 'add_store_location_field'));
@@ -871,6 +881,119 @@ class Charlie_WooCommerce_Integration {
         if (isset($_POST['charlie_category_color'])) {
             $color = sanitize_hex_color($_POST['charlie_category_color']);
             update_term_meta($term_id, '_charlie_category_color', $color);
+        }
+    }
+
+    /**
+     * AJAX: Add product to WooCommerce cart
+     */
+    public function ajax_add_to_cart() {
+        check_ajax_referer('charlie_nonce', 'nonce');
+
+        $product_id = absint($_POST['product_id']);
+        $quantity = absint($_POST['quantity']) ?: 1;
+
+        if (!$product_id) {
+            wp_send_json_error('Invalid product ID');
+        }
+
+        // Add to WooCommerce cart
+        $cart_item_key = WC()->cart->add_to_cart($product_id, $quantity);
+
+        if ($cart_item_key) {
+            wp_send_json_success(array(
+                'message' => 'Product added to cart',
+                'cart_item_key' => $cart_item_key,
+                'cart_count' => WC()->cart->get_cart_contents_count(),
+                'cart_total' => WC()->cart->get_cart_total()
+            ));
+        } else {
+            wp_send_json_error('Failed to add product to cart');
+        }
+    }
+
+    /**
+     * AJAX: Get WooCommerce cart contents
+     */
+    public function ajax_get_cart() {
+        check_ajax_referer('charlie_nonce', 'nonce');
+
+        $cart_items = array();
+        $cart_total = 0;
+
+        foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+            $product = $cart_item['data'];
+            $product_id = $cart_item['product_id'];
+
+            $cart_items[] = array(
+                'cart_item_key' => $cart_item_key,
+                'product_id' => $product_id,
+                'name' => $product->get_name(),
+                'price' => $product->get_price(),
+                'quantity' => $cart_item['quantity'],
+                'line_total' => $cart_item['line_total'],
+                'image' => get_the_post_thumbnail_url($product_id, 'thumbnail'),
+                'url' => get_permalink($product_id)
+            );
+        }
+
+        wp_send_json_success(array(
+            'items' => $cart_items,
+            'count' => WC()->cart->get_cart_contents_count(),
+            'subtotal' => WC()->cart->get_cart_subtotal(),
+            'total' => WC()->cart->get_total(),
+            'checkout_url' => wc_get_checkout_url()
+        ));
+    }
+
+    /**
+     * AJAX: Update cart item quantity
+     */
+    public function ajax_update_cart() {
+        check_ajax_referer('charlie_nonce', 'nonce');
+
+        $cart_item_key = sanitize_text_field($_POST['cart_item_key']);
+        $quantity = absint($_POST['quantity']);
+
+        if (!$cart_item_key) {
+            wp_send_json_error('Invalid cart item key');
+        }
+
+        $updated = WC()->cart->set_quantity($cart_item_key, $quantity);
+
+        if ($updated) {
+            wp_send_json_success(array(
+                'message' => 'Cart updated',
+                'cart_count' => WC()->cart->get_cart_contents_count(),
+                'cart_total' => WC()->cart->get_cart_total()
+            ));
+        } else {
+            wp_send_json_error('Failed to update cart');
+        }
+    }
+
+    /**
+     * AJAX: Remove item from cart
+     */
+    public function ajax_remove_from_cart() {
+        check_ajax_referer('charlie_nonce', 'nonce');
+
+        $cart_item_key = sanitize_text_field($_POST['cart_item_key']);
+
+        if (!$cart_item_key) {
+            wp_send_json_error('Invalid cart item key');
+        }
+
+        $removed = WC()->cart->remove_cart_item($cart_item_key);
+
+        if ($removed) {
+            wp_send_json_success(array(
+                'message' => 'Item removed from cart',
+                'cart_count' => WC()->cart->get_cart_contents_count(),
+                'cart_total' => WC()->cart->get_cart_total()
+            ));
+        } else {
+            wp_send_json_error('Failed to remove item from cart');
         }
     }
 }

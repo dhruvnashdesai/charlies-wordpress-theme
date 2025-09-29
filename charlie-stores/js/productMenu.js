@@ -16,7 +16,8 @@ class ProductMenu {
         this.selectedProduct = null; // Currently selected product for details
         this.menuElement = null;
         this.currentView = 'products'; // 'products', 'cart', or 'checkout'
-        this.cart = this.loadCartFromStorage(); // Cart items storage
+        this.cart = []; // Local cart storage for backward compatibility
+        this.wooCart = null; // WooCommerce cart manager
 
         this.init();
     }
@@ -29,8 +30,61 @@ class ProductMenu {
         this.createMenuElement();
         console.log('ProductMenu: Menu element created:', !!this.menuElement);
         this.setupEventListeners();
+        this.initWooCart();
         console.log('ProductMenu: Event listeners setup complete');
         console.log('ProductMenu: Initialization complete');
+    }
+
+    /**
+     * Initialize WooCommerce cart manager
+     */
+    initWooCart() {
+        if (typeof WooCartManager !== 'undefined') {
+            this.wooCart = new WooCartManager();
+            console.log('ProductMenu: WooCommerce cart manager initialized');
+
+            // Listen for cart events
+            document.addEventListener('cart_updated', (e) => {
+                this.handleCartUpdated(e.detail);
+            });
+
+            document.addEventListener('cart_loaded', (e) => {
+                this.handleCartLoaded(e.detail);
+            });
+        } else {
+            console.warn('ProductMenu: WooCartManager not available, falling back to localStorage');
+            this.cart = this.loadCartFromStorage();
+        }
+    }
+
+    /**
+     * Handle cart updated event from WooCommerce
+     */
+    handleCartUpdated(cartData) {
+        console.log('ProductMenu: Cart updated:', cartData);
+        this.cart = cartData.cart?.items || [];
+        this.updateHeaderCartCount();
+    }
+
+    /**
+     * Handle cart loaded event from WooCommerce
+     */
+    handleCartLoaded(cartData) {
+        console.log('ProductMenu: Cart loaded:', cartData);
+        this.cart = cartData.items || [];
+        this.updateHeaderCartCount();
+    }
+
+    /**
+     * Update header cart count display
+     */
+    updateHeaderCartCount() {
+        // This will be called when cart is updated to refresh the display
+        if (this.currentView === 'cart') {
+            // If we're on the cart page, refresh it
+            this.renderCartPage();
+        }
+        // The header update happens automatically in updateMenuHeader when menu is visible
     }
 
     /**
@@ -2785,7 +2839,7 @@ class ProductMenu {
      */
 
     /**
-     * Load cart from localStorage
+     * Load cart from localStorage (fallback only)
      */
     loadCartFromStorage() {
         try {
@@ -2798,7 +2852,7 @@ class ProductMenu {
     }
 
     /**
-     * Save cart to localStorage
+     * Save cart to localStorage (fallback only)
      */
     saveCartToStorage() {
         try {
@@ -2811,7 +2865,25 @@ class ProductMenu {
     /**
      * Add product to cart
      */
-    addToCart(product, quantity = 1) {
+    async addToCart(product, quantity = 1) {
+        if (this.wooCart) {
+            try {
+                await this.wooCart.addToCart(product.id, quantity);
+                console.log('Product added to WooCommerce cart:', product.name);
+            } catch (error) {
+                console.error('Failed to add to WooCommerce cart:', error);
+                // Fallback to localStorage
+                this.addToLocalCart(product, quantity);
+            }
+        } else {
+            this.addToLocalCart(product, quantity);
+        }
+    }
+
+    /**
+     * Add product to local cart (fallback)
+     */
+    addToLocalCart(product, quantity = 1) {
         const existingItem = this.cart.find(item => item.id === product.id);
 
         if (existingItem) {
@@ -2834,7 +2906,31 @@ class ProductMenu {
     /**
      * Remove product from cart
      */
-    removeFromCart(productId) {
+    async removeFromCart(productId) {
+        if (this.wooCart) {
+            try {
+                // Find the cart item key for this product
+                const cartItem = this.cart.find(item => item.product_id == productId || item.id == productId);
+                if (cartItem && cartItem.cart_item_key) {
+                    await this.wooCart.removeFromCart(cartItem.cart_item_key);
+                    console.log('Product removed from WooCommerce cart:', productId);
+                } else {
+                    console.warn('Cart item key not found for product:', productId);
+                }
+            } catch (error) {
+                console.error('Failed to remove from WooCommerce cart:', error);
+                // Fallback to localStorage
+                this.removeFromLocalCart(productId);
+            }
+        } else {
+            this.removeFromLocalCart(productId);
+        }
+    }
+
+    /**
+     * Remove product from local cart (fallback)
+     */
+    removeFromLocalCart(productId) {
         this.cart = this.cart.filter(item => item.id !== productId);
         this.saveCartToStorage();
     }
@@ -2842,11 +2938,39 @@ class ProductMenu {
     /**
      * Update cart item quantity
      */
-    updateCartQuantity(productId, quantity) {
+    async updateCartQuantity(productId, quantity) {
+        if (this.wooCart) {
+            try {
+                if (quantity <= 0) {
+                    await this.removeFromCart(productId);
+                } else {
+                    // Find the cart item key for this product
+                    const cartItem = this.cart.find(item => item.product_id == productId || item.id == productId);
+                    if (cartItem && cartItem.cart_item_key) {
+                        await this.wooCart.updateCartQuantity(cartItem.cart_item_key, quantity);
+                        console.log('Cart quantity updated for product:', productId, 'to', quantity);
+                    } else {
+                        console.warn('Cart item key not found for product:', productId);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to update cart quantity:', error);
+                // Fallback to localStorage
+                this.updateLocalCartQuantity(productId, quantity);
+            }
+        } else {
+            this.updateLocalCartQuantity(productId, quantity);
+        }
+    }
+
+    /**
+     * Update local cart item quantity (fallback)
+     */
+    updateLocalCartQuantity(productId, quantity) {
         const item = this.cart.find(item => item.id === productId);
         if (item) {
             if (quantity <= 0) {
-                this.removeFromCart(productId);
+                this.removeFromLocalCart(productId);
             } else {
                 item.quantity = quantity;
                 this.saveCartToStorage();
@@ -2858,6 +2982,9 @@ class ProductMenu {
      * Get total cart item count
      */
     getCartItemCount() {
+        if (this.wooCart) {
+            return this.wooCart.getCartItemCount();
+        }
         return this.cart.reduce((total, item) => total + item.quantity, 0);
     }
 
@@ -2865,6 +2992,9 @@ class ProductMenu {
      * Get total cart value
      */
     getCartTotal() {
+        if (this.wooCart) {
+            return this.wooCart.getCartTotal();
+        }
         return this.cart.reduce((total, item) => {
             const price = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
             return total + (price * item.quantity);
@@ -2874,7 +3004,25 @@ class ProductMenu {
     /**
      * Clear entire cart
      */
-    clearCart() {
+    async clearCart() {
+        if (this.wooCart) {
+            try {
+                await this.wooCart.clearCart();
+                console.log('WooCommerce cart cleared');
+            } catch (error) {
+                console.error('Failed to clear WooCommerce cart:', error);
+                // Fallback to localStorage
+                this.clearLocalCart();
+            }
+        } else {
+            this.clearLocalCart();
+        }
+    }
+
+    /**
+     * Clear local cart (fallback)
+     */
+    clearLocalCart() {
         this.cart = [];
         this.saveCartToStorage();
     }
@@ -2908,8 +3056,15 @@ class ProductMenu {
      * Show checkout page
      */
     showCheckoutPage() {
-        this.currentView = 'checkout';
-        this.updateMenuLayout();
+        if (this.wooCart) {
+            // Redirect to WooCommerce checkout
+            console.log('Redirecting to WooCommerce checkout');
+            this.wooCart.goToCheckout();
+        } else {
+            // Fallback to custom checkout
+            this.currentView = 'checkout';
+            this.updateMenuLayout();
+        }
     }
 
     /**
@@ -3024,7 +3179,13 @@ class ProductMenu {
         if (checkoutBtn) {
             checkoutBtn.addEventListener('click', () => {
                 console.log('Checkout button clicked');
-                this.showCheckoutPage();
+                if (this.wooCart && !this.wooCart.isEmpty()) {
+                    this.showCheckoutPage();
+                } else if (this.cart.length === 0) {
+                    alert('Your cart is empty');
+                } else {
+                    this.showCheckoutPage();
+                }
             });
             checkoutBtn.addEventListener('mouseenter', () => {
                 checkoutBtn.style.background = 'rgba(0, 255, 0, 0.3)';
