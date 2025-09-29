@@ -4224,12 +4224,12 @@ class ProductMenu {
             case 'on-hold':
                 statusColor = '#ffa500';
                 statusIcon = '⏳';
-                nextSteps = 'We\\'re waiting for your bank transfer payment. Please check your email for transfer details.';
+                nextSteps = 'We\'re waiting for your bank transfer payment. Please check your email for transfer details.';
                 break;
             case 'processing':
                 statusColor = '#4dabf7';
                 statusIcon = '🔄';
-                nextSteps = 'Payment received! We\\'re preparing your order for shipment.';
+                nextSteps = 'Payment received! We\'re preparing your order for shipment.';
                 break;
             case 'completed':
                 statusColor = '#00ff00';
