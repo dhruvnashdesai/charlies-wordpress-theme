@@ -152,16 +152,42 @@ class ProductMenu {
             this.handleCartClicked(e.detail);
         });
 
-        // Close menu on escape key
+        // Close menu on escape key (but not in checkout mode)
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isVisible) {
+                // Don't close menu during checkout - user must explicitly close
+                if (this.currentView === 'checkout') {
+                    console.log('ProductMenu: In checkout mode, ignoring escape key');
+                    return;
+                }
                 this.hideMenu();
             }
         });
 
-        // Close menu when clicking outside
+        // Close menu when clicking outside (but not in checkout mode)
         document.addEventListener('click', (e) => {
             if (this.isVisible && this.menuElement && !this.menuElement.contains(e.target)) {
+                // Don't close menu during checkout - user must explicitly close
+                if (this.currentView === 'checkout') {
+                    console.log('ProductMenu: In checkout mode, ignoring outside click');
+                    return;
+                }
+
+                // Check if click is on a browser extension modal (like NordPass)
+                const clickedElement = e.target;
+
+                // Skip if clicked on extension elements (common classes/attributes)
+                if (clickedElement.closest('[data-extension]') ||
+                    clickedElement.closest('.extension-modal') ||
+                    clickedElement.closest('[class*="nordpass"]') ||
+                    clickedElement.closest('[class*="lastpass"]') ||
+                    clickedElement.closest('[class*="bitwarden"]') ||
+                    clickedElement.closest('[id*="password"]') ||
+                    clickedElement.matches('iframe')) {
+                    console.log('ProductMenu: Click on extension element, ignoring...');
+                    return;
+                }
+
                 console.log('ProductMenu: Clicked outside menu, closing...');
                 this.hideMenu();
             }
