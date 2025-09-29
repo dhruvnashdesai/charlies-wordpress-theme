@@ -3042,9 +3042,24 @@ class ProductMenu {
         console.log('ProductMenu: local cart items:', this.cart.length);
 
         if (this.wooCart && this.cartTotal !== undefined) {
-            // Use cached total from WooCommerce
-            const total = parseFloat(this.cartTotal.toString().replace(/[^0-9.-]+/g, '')) || 0;
-            console.log('ProductMenu: Using cached WooCommerce total:', total);
+            // Use cached total from WooCommerce - extract number from HTML
+            let total = 0;
+            const totalStr = this.cartTotal.toString();
+            console.log('ProductMenu: Raw cartTotal string:', totalStr);
+
+            // Extract number from HTML string like "<span...>$29.99</span>"
+            const matches = totalStr.match(/[\d,]+\.\d{2}/);
+            if (matches) {
+                total = parseFloat(matches[0].replace(/,/g, ''));
+            } else {
+                // Fallback: try to extract any decimal number
+                const fallbackMatches = totalStr.match(/\d+\.\d+/);
+                if (fallbackMatches) {
+                    total = parseFloat(fallbackMatches[0]);
+                }
+            }
+
+            console.log('ProductMenu: Extracted WooCommerce total:', total);
             return total;
         } else if (this.wooCart) {
             const wooTotal = this.wooCart.getCartTotal();
@@ -3116,9 +3131,16 @@ class ProductMenu {
      * Show checkout page
      */
     showCheckoutPage() {
-        // Always show custom checkout within the menu
-        this.currentView = 'checkout';
-        this.updateMenuLayout();
+        if (this.wooCart && !this.wooCart.isEmpty()) {
+            // Redirect to WooCommerce checkout page
+            console.log('ProductMenu: Redirecting to WooCommerce checkout');
+            this.wooCart.goToCheckout();
+        } else {
+            // Fallback: show custom checkout within the menu
+            console.log('ProductMenu: Showing custom checkout (fallback)');
+            this.currentView = 'checkout';
+            this.updateMenuLayout();
+        }
     }
 
     /**
