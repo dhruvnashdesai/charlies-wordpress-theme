@@ -39,20 +39,56 @@ class ProductMenu {
      * Initialize WooCommerce cart manager
      */
     initWooCart() {
-        if (typeof WooCartManager !== 'undefined') {
+        // Try to use existing global instance first
+        if (typeof window !== 'undefined' && window.charlieCart) {
+            this.wooCart = window.charlieCart;
+            console.log('ProductMenu: Using existing WooCommerce cart manager');
+        } else if (typeof WooCartManager !== 'undefined') {
             this.wooCart = new WooCartManager();
-            console.log('ProductMenu: WooCommerce cart manager initialized');
-
-            // Listen for cart events
-            document.addEventListener('cart_updated', (e) => {
-                this.handleCartUpdated(e.detail);
-            });
-
-            document.addEventListener('cart_loaded', (e) => {
-                this.handleCartLoaded(e.detail);
-            });
+            console.log('ProductMenu: Created new WooCommerce cart manager');
         } else {
             console.warn('ProductMenu: WooCartManager not available, falling back to localStorage');
+            this.cart = this.loadCartFromStorage();
+            return;
+        }
+
+        // Listen for cart events
+        document.addEventListener('cart_updated', (e) => {
+            this.handleCartUpdated(e.detail);
+        });
+
+        document.addEventListener('cart_loaded', (e) => {
+            this.handleCartLoaded(e.detail);
+        });
+
+        // Load initial cart data
+        if (this.wooCart) {
+            this.loadInitialCartData();
+        }
+    }
+
+    /**
+     * Load initial cart data from WooCommerce
+     */
+    async loadInitialCartData() {
+        try {
+            console.log('ProductMenu: Loading initial cart data...');
+            const cartData = await this.wooCart.loadCart();
+            console.log('ProductMenu: Initial cart data loaded:', cartData);
+
+            if (cartData) {
+                this.cart = cartData.items || [];
+                this.cartTotal = cartData.total || '0.00';
+                this.cartCount = cartData.count || 0;
+                console.log('ProductMenu: Cart initialized with', this.cartCount, 'items, total:', this.cartTotal);
+
+                // If menu is visible, update the display
+                if (this.isVisible) {
+                    this.updateMenuLayout();
+                }
+            }
+        } catch (error) {
+            console.error('ProductMenu: Failed to load initial cart data:', error);
             this.cart = this.loadCartFromStorage();
         }
     }
@@ -3000,17 +3036,29 @@ class ProductMenu {
      * Get total cart value
      */
     getCartTotal() {
+        console.log('ProductMenu: getCartTotal() called');
+        console.log('ProductMenu: wooCart available:', !!this.wooCart);
+        console.log('ProductMenu: cartTotal cached:', this.cartTotal);
+        console.log('ProductMenu: local cart items:', this.cart.length);
+
         if (this.wooCart && this.cartTotal !== undefined) {
             // Use cached total from WooCommerce
             const total = parseFloat(this.cartTotal.toString().replace(/[^0-9.-]+/g, '')) || 0;
+            console.log('ProductMenu: Using cached WooCommerce total:', total);
             return total;
         } else if (this.wooCart) {
-            return this.wooCart.getCartTotal();
+            const wooTotal = this.wooCart.getCartTotal();
+            console.log('ProductMenu: Using WooCommerce total:', wooTotal);
+            return wooTotal;
         }
-        return this.cart.reduce((total, item) => {
+
+        // Fallback to local cart calculation
+        const localTotal = this.cart.reduce((total, item) => {
             const price = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
             return total + (price * item.quantity);
         }, 0);
+        console.log('ProductMenu: Using local cart total:', localTotal);
+        return localTotal;
     }
 
     /**
