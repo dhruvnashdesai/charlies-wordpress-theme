@@ -32,6 +32,8 @@ class Charlie_WooCommerce_Integration {
         add_action('wp_ajax_nopriv_charlie_update_cart', array($this, 'ajax_update_cart'));
         add_action('wp_ajax_charlie_remove_from_cart', array($this, 'ajax_remove_from_cart'));
         add_action('wp_ajax_nopriv_charlie_remove_from_cart', array($this, 'ajax_remove_from_cart'));
+        add_action('wp_ajax_charlie_woo_checkout', array($this, 'ajax_woo_checkout'));
+        add_action('wp_ajax_nopriv_charlie_woo_checkout', array($this, 'ajax_woo_checkout'));
 
         // Add store location field to products (only in admin)
         if (is_admin()) {
@@ -994,6 +996,92 @@ class Charlie_WooCommerce_Integration {
             ));
         } else {
             wp_send_json_error('Failed to remove item from cart');
+        }
+    }
+
+    /**
+     * Process WooCommerce checkout via AJAX
+     */
+    public function ajax_woo_checkout() {
+        check_ajax_referer('charlie_nonce', 'nonce');
+
+        if (!class_exists('WooCommerce')) {
+            wp_send_json_error('WooCommerce is not active');
+        }
+
+        $customer_data = json_decode(stripslashes($_POST['customer_data']), true);
+
+        if (!$customer_data || !isset($customer_data['billing'])) {
+            wp_send_json_error('Invalid customer data');
+        }
+
+        if (WC()->cart->is_empty()) {
+            wp_send_json_error('Cart is empty');
+        }
+
+        try {
+            // Create a new order
+            $order = wc_create_order();
+
+            // Add cart contents to order
+            foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+                $product = $cart_item['data'];
+                $quantity = $cart_item['quantity'];
+
+                $order->add_product($product, $quantity);
+            }
+
+            // Set billing address
+            $billing = $customer_data['billing'];
+            $order->set_address(array(
+                'first_name' => $billing['first_name'],
+                'last_name' => $billing['last_name'],
+                'email' => $billing['email'],
+                'phone' => $billing['phone'],
+                'address_1' => $billing['address_1'],
+                'city' => $billing['city'] ?: 'Unknown',
+                'state' => $billing['state'] ?: '',
+                'postcode' => $billing['postcode'] ?: '',
+                'country' => $billing['country'] ?: 'CA'
+            ), 'billing');
+
+            // Set shipping same as billing
+            $order->set_address(array(
+                'first_name' => $billing['first_name'],
+                'last_name' => $billing['last_name'],
+                'address_1' => $billing['address_1'],
+                'city' => $billing['city'] ?: 'Unknown',
+                'state' => $billing['state'] ?: '',
+                'postcode' => $billing['postcode'] ?: '',
+                'country' => $billing['country'] ?: 'CA'
+            ), 'shipping');
+
+            // Set payment method
+            $payment_method = isset($customer_data['payment_method']) ? $customer_data['payment_method'] : 'bacs';
+            $order->set_payment_method($payment_method);
+
+            // Calculate totals
+            $order->calculate_totals();
+
+            // Set order status
+            $order->update_status('pending', 'Order created via Charlie\'s theme checkout');
+
+            // Save the order
+            $order->save();
+
+            // Clear the cart
+            WC()->cart->empty_cart();
+
+            wp_send_json_success(array(
+                'order_id' => $order->get_id(),
+                'order_number' => $order->get_order_number(),
+                'order_total' => $order->get_formatted_order_total(),
+                'message' => 'Order created successfully'
+            ));
+
+        } catch (Exception $e) {
+            error_log('Charlie Checkout Error: ' . $e->getMessage());
+            wp_send_json_error('Failed to create order: ' . $e->getMessage());
         }
     }
 }

@@ -62,7 +62,11 @@ class ProductMenu {
      */
     handleCartUpdated(cartData) {
         console.log('ProductMenu: Cart updated:', cartData);
-        this.cart = cartData.cart?.items || [];
+        if (cartData.cart) {
+            this.cart = cartData.cart.items || [];
+            this.cartTotal = cartData.cart.total || '0.00';
+            this.cartCount = cartData.cart.count || 0;
+        }
         this.updateHeaderCartCount();
     }
 
@@ -72,6 +76,8 @@ class ProductMenu {
     handleCartLoaded(cartData) {
         console.log('ProductMenu: Cart loaded:', cartData);
         this.cart = cartData.items || [];
+        this.cartTotal = cartData.total || '0.00';
+        this.cartCount = cartData.count || 0;
         this.updateHeaderCartCount();
     }
 
@@ -2982,7 +2988,9 @@ class ProductMenu {
      * Get total cart item count
      */
     getCartItemCount() {
-        if (this.wooCart) {
+        if (this.wooCart && this.cartCount !== undefined) {
+            return this.cartCount;
+        } else if (this.wooCart) {
             return this.wooCart.getCartItemCount();
         }
         return this.cart.reduce((total, item) => total + item.quantity, 0);
@@ -2992,7 +3000,11 @@ class ProductMenu {
      * Get total cart value
      */
     getCartTotal() {
-        if (this.wooCart) {
+        if (this.wooCart && this.cartTotal !== undefined) {
+            // Use cached total from WooCommerce
+            const total = parseFloat(this.cartTotal.toString().replace(/[^0-9.-]+/g, '')) || 0;
+            return total;
+        } else if (this.wooCart) {
             return this.wooCart.getCartTotal();
         }
         return this.cart.reduce((total, item) => {
@@ -3056,15 +3068,9 @@ class ProductMenu {
      * Show checkout page
      */
     showCheckoutPage() {
-        if (this.wooCart) {
-            // Redirect to WooCommerce checkout
-            console.log('Redirecting to WooCommerce checkout');
-            this.wooCart.goToCheckout();
-        } else {
-            // Fallback to custom checkout
-            this.currentView = 'checkout';
-            this.updateMenuLayout();
-        }
+        // Always show custom checkout within the menu
+        this.currentView = 'checkout';
+        this.updateMenuLayout();
     }
 
     /**
@@ -3609,42 +3615,85 @@ class ProductMenu {
             return;
         }
 
-        if (this.cart.length === 0) {
+        if (this.wooCart && this.wooCart.isEmpty()) {
+            alert('Your cart is empty');
+            return;
+        } else if (!this.wooCart && this.cart.length === 0) {
             alert('Your cart is empty');
             return;
         }
 
         try {
-            const orderData = {
-                customer: {
-                    name: name,
-                    email: email,
-                    phone: document.getElementById('customer-phone').value.trim(),
-                    address: address
-                },
-                items: this.cart,
-                total: this.getCartTotal(),
-                payment_method: 'bacs' // Direct bank transfer
-            };
+            if (this.wooCart) {
+                // Use WooCommerce checkout
+                const orderData = {
+                    billing: {
+                        first_name: name.split(' ')[0] || '',
+                        last_name: name.split(' ').slice(1).join(' ') || '',
+                        email: email,
+                        phone: document.getElementById('customer-phone').value.trim(),
+                        address_1: address,
+                        city: '',
+                        state: '',
+                        postcode: '',
+                        country: 'CA'
+                    },
+                    payment_method: 'bacs' // Direct bank transfer
+                };
 
-            const formData = new FormData();
-            formData.append('action', 'create_order');
-            formData.append('order_data', JSON.stringify(orderData));
-            formData.append('nonce', getConfig('nonce'));
+                const response = await fetch(window.charlie_config.ajax_url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        action: 'charlie_woo_checkout',
+                        customer_data: JSON.stringify(orderData),
+                        nonce: window.charlie_config.nonce
+                    })
+                });
 
-            const response = await fetch(getConfig('ajax_url'), {
-                method: 'POST',
-                body: formData
-            });
+                const data = await response.json();
 
-            const data = await response.json();
-
-            if (data.success) {
-                // Clear cart and show success
-                this.clearCart();
-                this.showOrderSuccess(data.data.order_id);
+                if (data.success) {
+                    // Clear cart and show success
+                    await this.wooCart.clearCart();
+                    this.showOrderSuccess(data.data.order_id, data.data.order_number);
+                } else {
+                    alert('Failed to place order: ' + (data.data || 'Unknown error'));
+                }
             } else {
-                alert('Failed to place order: ' + (data.data.message || 'Unknown error'));
+                // Fallback to custom order system
+                const orderData = {
+                    customer: {
+                        name: name,
+                        email: email,
+                        phone: document.getElementById('customer-phone').value.trim(),
+                        address: address
+                    },
+                    items: this.cart,
+                    total: this.getCartTotal(),
+                    payment_method: 'bacs'
+                };
+
+                const formData = new FormData();
+                formData.append('action', 'create_order');
+                formData.append('order_data', JSON.stringify(orderData));
+                formData.append('nonce', window.charlie_config.nonce);
+
+                const response = await fetch(window.charlie_config.ajax_url, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    this.clearCart();
+                    this.showOrderSuccess(data.data.order_id);
+                } else {
+                    alert('Failed to place order: ' + (data.data.message || 'Unknown error'));
+                }
             }
         } catch (error) {
             console.error('Order placement failed:', error);
@@ -3655,7 +3704,7 @@ class ProductMenu {
     /**
      * Show order success page
      */
-    showOrderSuccess(orderId) {
+    showOrderSuccess(orderId, orderNumber = null) {
         if (!this.productGridContainer) return;
 
         this.productGridContainer.innerHTML = '';
@@ -3672,7 +3721,7 @@ class ProductMenu {
         successContainer.innerHTML = `
             <div style="font-size: 48px; margin-bottom: 20px;">✓</div>
             <h2 style="color: #00ff00; margin-bottom: 15px;">Order Placed Successfully!</h2>
-            <p style="font-size: 16px; margin-bottom: 10px;">Order Number: <strong>#${orderId}</strong></p>
+            <p style="font-size: 16px; margin-bottom: 10px;">Order Number: <strong>#${orderNumber || orderId}</strong></p>
             <p style="font-size: 14px; margin-bottom: 20px; color: #00aa00;">
                 Thank you for your order! You will receive an email confirmation shortly.
             </p>
