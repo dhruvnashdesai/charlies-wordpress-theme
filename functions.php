@@ -350,3 +350,38 @@ function charlie_save_page_meta($post_id) {
     update_post_meta($post_id, '_charlie_full_screen', $full_screen);
 }
 add_action('save_post', 'charlie_save_page_meta');
+
+/**
+ * DEBUG: WooCommerce Cart/Checkout Pricing
+ * TODO: Remove this after debugging pricing issue
+ */
+// Debug product pricing in cart
+add_action('woocommerce_before_cart', function() {
+    if (!WC()->cart->is_empty()) {
+        echo '<div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border: 1px solid #ccc;">';
+        echo '<h4>DEBUG: Cart Contents</h4>';
+
+        foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+            $product = $cart_item['data'];
+            echo '<p><strong>Product:</strong> ' . $product->get_name() . '</p>';
+            echo '<p><strong>Product ID:</strong> ' . $product->get_id() . '</p>';
+            echo '<p><strong>Price from Product:</strong> $' . $product->get_price() . '</p>';
+            echo '<p><strong>Regular Price:</strong> $' . $product->get_regular_price() . '</p>';
+            echo '<p><strong>Sale Price:</strong> $' . $product->get_sale_price() . '</p>';
+            echo '<p><strong>Cart Item Price:</strong> $' . $cart_item['data']->get_price() . '</p>';
+            echo '<hr>';
+        }
+        echo '</div>';
+    }
+});
+
+// Debug checkout pricing
+add_action('woocommerce_before_checkout_form', function() {
+    if (!WC()->cart->is_empty()) {
+        echo '<div style="background: #ffe0e0; padding: 10px; margin: 10px 0; border: 1px solid #ff0000;">';
+        echo '<h4>DEBUG: Checkout Pricing</h4>';
+        echo '<p><strong>Cart Subtotal:</strong> $' . WC()->cart->get_subtotal() . '</p>';
+        echo '<p><strong>Cart Total:</strong> $' . WC()->cart->get_total() . '</p>';
+        echo '</div>';
+    }
+});
