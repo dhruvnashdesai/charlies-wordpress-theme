@@ -11,22 +11,46 @@ class CharlieStoreApp {
         this.storeManager = null;
         this.geocodingService = null;
         this.ageVerification = null;
-        
+
         this.isInitialized = false;
         this.currentLocation = null;
         this.currentStores = [];
         this.warehouseAdded = false;
-        
+
         // DOM elements (minimal for full screen map)
         this.mapContainer = null;
         this.loadingSpinner = null;
-        
+
+        // Add event listener immediately to avoid race conditions
+        this.setupEventListeners();
+
         // Initialize when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
         } else {
             this.init();
         }
+    }
+
+    /**
+     * Setup critical event listeners early to avoid race conditions
+     */
+    setupEventListeners() {
+        console.log('Setting up early event listeners...');
+
+        // Listen for modal search completion immediately
+        document.addEventListener('modalSearchComplete', async (e) => {
+            console.log('App received modalSearchComplete event (early listener):', e.detail);
+
+            // If app isn't initialized yet, queue the event
+            if (!this.isInitialized) {
+                console.log('App not initialized yet, queuing search data...');
+                this.queuedSearchData = e.detail;
+                return;
+            }
+
+            await this.handleModalSearchComplete(e.detail);
+        });
     }
 
     /**
@@ -48,17 +72,19 @@ class CharlieStoreApp {
             
             // Initialize map
             await this.initMap();
-            
-            // Listen for initial search data from modal
-            document.addEventListener('modalSearchComplete', async (e) => {
-                await this.handleModalSearchComplete(e.detail);
-            });
-            
+
             // Load any saved search (will be overridden by modal if user searches)
             this.loadSavedSearch();
-            
+
             this.isInitialized = true;
             console.log('App initialized successfully');
+
+            // Process any queued search data from modal
+            if (this.queuedSearchData) {
+                console.log('Processing queued search data...');
+                await this.handleModalSearchComplete(this.queuedSearchData);
+                this.queuedSearchData = null;
+            }
             
             // Track app initialization
             this.trackEvent('app_initialized');
@@ -470,22 +496,27 @@ class CharlieStoreApp {
      */
     async handleModalSearchComplete(searchData) {
         try {
-            if (!searchData) return;
+            if (!searchData) {
+                console.log('handleModalSearchComplete: No search data provided');
+                return;
+            }
 
             console.log('Handling modal search completion:', searchData.postalCode);
-            
+            console.log('App initialized?', this.isInitialized);
+            console.log('Map ready?', this.mapManager?.isMapInitialized());
+
             // Set current location and reset warehouse flag
             this.currentLocation = searchData.geocodeResult;
             this.warehouseAdded = false;
-            
+
             // Update map with dramatic animation (no stores needed)
             this.updateMap(searchData.geocodeResult, [], true);
-            
+
             // Save for future sessions
             this.saveSearch(searchData.postalCode, searchData.geocodeResult, []);
-            
+
             console.log('Modal search complete - map centered on location');
-            
+
         } catch (error) {
             console.error('Failed to handle modal search completion:', error);
         }

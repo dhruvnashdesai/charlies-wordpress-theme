@@ -307,6 +307,7 @@ class AgeVerification {
                 nearbyStores: [] // No stores needed
             };
 
+            console.log('Age verification dispatching modalSearchComplete event:', searchData);
             document.dispatchEvent(new CustomEvent('modalSearchComplete', {
                 detail: searchData
             }));
