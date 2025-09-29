@@ -4051,21 +4051,60 @@ class ProductMenu {
             <h2 style="color: #00ff00; margin-bottom: 15px;">Order Placed Successfully!</h2>
             <p style="font-size: 16px; margin-bottom: 10px;">Order Number: <strong>#${orderNumber || orderId}</strong></p>
             <p style="font-size: 14px; margin-bottom: 20px; color: #00aa00;">
-                Thank you for your order! You will receive an email confirmation shortly.
+                Thank you for your order! You will receive an email confirmation with bank transfer details shortly.
             </p>
-            <p style="font-size: 12px; margin-bottom: 30px; color: #888;">
-                Please transfer the payment using the bank details provided and include your order number as reference.
-            </p>
-            <button class="back-to-products-btn" style="
-                background: rgba(0, 255, 0, 0.2);
+
+            <div style="
+                background: rgba(0, 255, 0, 0.1);
                 border: 1px solid #00ff00;
-                color: #00ff00;
-                padding: 12px 24px;
-                border-radius: 4px;
-                cursor: pointer;
-                font-family: 'Courier New', monospace;
-                font-size: 14px;
-            ">Continue Shopping</button>
+                border-radius: 6px;
+                padding: 20px;
+                margin: 20px 0;
+                text-align: left;
+            ">
+                <h3 style="color: #00ff00; margin: 0 0 15px 0; font-size: 16px;">Payment Instructions</h3>
+                <div style="color: #00aa00; font-size: 13px; line-height: 1.6;">
+                    <p style="margin: 0 0 10px 0;">• Check your email for detailed bank transfer instructions</p>
+                    <p style="margin: 0 0 10px 0;">• Include order number <strong>#${orderNumber || orderId}</strong> as payment reference</p>
+                    <p style="margin: 0 0 10px 0;">• Your order status will update to "Processing" once payment is received</p>
+                    <p style="margin: 0;">• Contact us if you have any questions about the transfer</p>
+                </div>
+            </div>
+
+            <div style="
+                background: rgba(255, 165, 0, 0.1);
+                border: 1px solid #ffa500;
+                border-radius: 6px;
+                padding: 15px;
+                margin: 20px 0;
+                color: #ffa500;
+                font-size: 12px;
+            ">
+                <strong>Order Status:</strong> On Hold - Awaiting Bank Transfer Payment
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button class="check-order-status-btn" style="
+                    background: rgba(0, 255, 0, 0.2);
+                    border: 1px solid #00ff00;
+                    color: #00ff00;
+                    padding: 12px 24px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-family: 'Courier New', monospace;
+                    font-size: 14px;
+                ">Check Order Status</button>
+                <button class="back-to-products-btn" style="
+                    background: rgba(0, 255, 0, 0.2);
+                    border: 1px solid #00ff00;
+                    color: #00ff00;
+                    padding: 12px 24px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-family: 'Courier New', monospace;
+                    font-size: 14px;
+                ">Continue Shopping</button>
+            </div>
         `;
 
         const backBtn = successContainer.querySelector('.back-to-products-btn');
@@ -4073,7 +4112,230 @@ class ProductMenu {
             this.showProductsPage();
         });
 
+        const checkStatusBtn = successContainer.querySelector('.check-order-status-btn');
+        checkStatusBtn.addEventListener('click', () => {
+            this.checkOrderStatus(orderId, orderNumber);
+        });
+
         this.productGridContainer.appendChild(successContainer);
+    }
+
+    /**
+     * Check order status and display tracking information
+     */
+    async checkOrderStatus(orderId, orderNumber = null) {
+        if (!this.productGridContainer) return;
+
+        this.productGridContainer.innerHTML = '';
+
+        const trackingContainer = document.createElement('div');
+        trackingContainer.style.cssText = `
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            height: 100%;
+            overflow-y: auto;
+        `;
+
+        // Show loading state
+        trackingContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px;">
+                <h2 style="color: #00ff00; margin-bottom: 15px;">Checking Order Status...</h2>
+                <div style="color: #00aa00; font-size: 14px;">Loading order #${orderNumber || orderId}</div>
+            </div>
+        `;
+
+        this.productGridContainer.appendChild(trackingContainer);
+
+        try {
+            // Query order status from WooCommerce
+            const response = await fetch(window.charlie_config.ajax_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'charlie_get_order_status',
+                    order_id: orderId,
+                    nonce: window.charlie_config.nonce
+                })
+            });
+
+            const data = await response.json();
+            console.log('Order status response:', data);
+
+            if (data.success) {
+                this.displayOrderTracking(data.data, orderNumber);
+            } else {
+                throw new Error(data.data || 'Failed to load order status');
+            }
+
+        } catch (error) {
+            console.error('Failed to check order status:', error);
+            trackingContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px;">
+                    <h2 style="color: #ff6b6b; margin-bottom: 15px;">Error Loading Order</h2>
+                    <p style="color: #00aa00; margin-bottom: 30px;">Unable to load order status. Please try again or contact support.</p>
+                    <button class="back-to-success-btn" style="
+                        background: rgba(0, 255, 0, 0.2);
+                        border: 1px solid #00ff00;
+                        color: #00ff00;
+                        padding: 12px 24px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-family: 'Courier New', monospace;
+                        font-size: 14px;
+                    ">Back to Order Summary</button>
+                </div>
+            `;
+
+            const backBtn = trackingContainer.querySelector('.back-to-success-btn');
+            backBtn.addEventListener('click', () => {
+                this.showOrderSuccess(orderId, orderNumber);
+            });
+        }
+    }
+
+    /**
+     * Display order tracking information
+     */
+    displayOrderTracking(orderData, orderNumber = null) {
+        if (!this.productGridContainer) return;
+
+        const trackingContainer = this.productGridContainer.querySelector('div');
+        const status = orderData.status;
+        const statusDisplay = orderData.status_name || status;
+        const orderTotal = orderData.total || '0.00';
+        const dateCreated = orderData.date_created || 'Unknown';
+        const paymentMethod = orderData.payment_method_title || 'Bank Transfer';
+
+        // Determine status color and icon
+        let statusColor = '#ffa500'; // default orange
+        let statusIcon = '⏳';
+        let nextSteps = '';
+
+        switch (status) {
+            case 'pending':
+                statusColor = '#ffa500';
+                statusIcon = '⏳';
+                nextSteps = 'Your order is pending. Please complete payment to proceed.';
+                break;
+            case 'on-hold':
+                statusColor = '#ffa500';
+                statusIcon = '⏳';
+                nextSteps = 'We\\'re waiting for your bank transfer payment. Please check your email for transfer details.';
+                break;
+            case 'processing':
+                statusColor = '#4dabf7';
+                statusIcon = '🔄';
+                nextSteps = 'Payment received! We\\'re preparing your order for shipment.';
+                break;
+            case 'completed':
+                statusColor = '#00ff00';
+                statusIcon = '✅';
+                nextSteps = 'Your order has been completed and delivered. Thank you!';
+                break;
+            case 'cancelled':
+                statusColor = '#ff6b6b';
+                statusIcon = '❌';
+                nextSteps = 'This order has been cancelled.';
+                break;
+            case 'refunded':
+                statusColor = '#ff6b6b';
+                statusIcon = '↩️';
+                nextSteps = 'This order has been refunded.';
+                break;
+            case 'failed':
+                statusColor = '#ff6b6b';
+                statusIcon = '❌';
+                nextSteps = 'Payment failed. Please try placing a new order.';
+                break;
+        }
+
+        trackingContainer.innerHTML = `
+            <div style="max-width: 600px; margin: 0 auto;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="color: #00ff00; margin-bottom: 10px;">Order Tracking</h2>
+                    <p style="color: #00aa00; font-size: 16px;">Order #${orderNumber || orderData.id}</p>
+                </div>
+
+                <div style="
+                    background: rgba(0, 0, 0, 0.8);
+                    border: 1px solid #444;
+                    border-radius: 6px;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                ">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <label style="color: #00aa00; font-size: 12px; display: block; margin-bottom: 5px;">Order Date</label>
+                            <div style="color: #00ff00; font-size: 14px;">${dateCreated}</div>
+                        </div>
+                        <div>
+                            <label style="color: #00aa00; font-size: 12px; display: block; margin-bottom: 5px;">Payment Method</label>
+                            <div style="color: #00ff00; font-size: 14px;">${paymentMethod}</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label style="color: #00aa00; font-size: 12px; display: block; margin-bottom: 5px;">Order Total</label>
+                            <div style="color: #00ff00; font-size: 16px; font-weight: bold;">$${orderTotal}</div>
+                        </div>
+                        <div>
+                            <label style="color: #00aa00; font-size: 12px; display: block; margin-bottom: 5px;">Current Status</label>
+                            <div style="color: ${statusColor}; font-size: 16px; font-weight: bold;">${statusIcon} ${statusDisplay}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="
+                    background: rgba(0, 255, 0, 0.1);
+                    border: 1px solid #00ff00;
+                    border-radius: 6px;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                ">
+                    <h3 style="color: #00ff00; margin: 0 0 10px 0; font-size: 16px;">Next Steps</h3>
+                    <p style="color: #00aa00; margin: 0; font-size: 14px; line-height: 1.6;">${nextSteps}</p>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="refresh-status-btn" style="
+                        background: rgba(0, 255, 0, 0.2);
+                        border: 1px solid #00ff00;
+                        color: #00ff00;
+                        padding: 12px 24px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-family: 'Courier New', monospace;
+                        font-size: 14px;
+                        margin-right: 15px;
+                    ">Refresh Status</button>
+                    <button class="back-to-products-btn" style="
+                        background: rgba(0, 255, 0, 0.2);
+                        border: 1px solid #00ff00;
+                        color: #00ff00;
+                        padding: 12px 24px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-family: 'Courier New', monospace;
+                        font-size: 14px;
+                    ">Continue Shopping</button>
+                </div>
+            </div>
+        `;
+
+        // Add event listeners
+        const refreshBtn = trackingContainer.querySelector('.refresh-status-btn');
+        refreshBtn.addEventListener('click', () => {
+            this.checkOrderStatus(orderData.id, orderNumber);
+        });
+
+        const backBtn = trackingContainer.querySelector('.back-to-products-btn');
+        backBtn.addEventListener('click', () => {
+            this.showProductsPage();
+        });
     }
 
     /**

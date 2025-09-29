@@ -36,6 +36,8 @@ class Charlie_WooCommerce_Integration {
         add_action('wp_ajax_nopriv_charlie_woo_checkout', array($this, 'ajax_woo_checkout'));
         add_action('wp_ajax_get_payment_instructions', array($this, 'ajax_get_payment_instructions'));
         add_action('wp_ajax_nopriv_get_payment_instructions', array($this, 'ajax_get_payment_instructions'));
+        add_action('wp_ajax_charlie_get_order_status', array($this, 'ajax_get_order_status'));
+        add_action('wp_ajax_nopriv_charlie_get_order_status', array($this, 'ajax_get_order_status'));
 
         // Add store location field to products (only in admin)
         if (is_admin()) {
@@ -1065,8 +1067,8 @@ class Charlie_WooCommerce_Integration {
             // Calculate totals
             $order->calculate_totals();
 
-            // Set order status
-            $order->update_status('pending', 'Order created via Charlie\'s theme checkout');
+            // Set order status - use 'on-hold' for bank transfers to trigger email with payment instructions
+            $order->update_status('on-hold', 'Order created via Charlie\'s theme checkout - awaiting bank transfer payment');
 
             // Save the order
             $order->save();
@@ -1175,6 +1177,84 @@ class Charlie_WooCommerce_Integration {
         } catch (Exception $e) {
             error_log('Charlie Payment Instructions Error: ' . $e->getMessage());
             wp_send_json_error('Failed to load payment instructions');
+        }
+    }
+
+    /**
+     * Get order status and details for tracking
+     */
+    public function ajax_get_order_status() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'charlie_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+
+        $order_id = intval($_POST['order_id']);
+
+        if (!$order_id) {
+            wp_send_json_error('Invalid order ID');
+            return;
+        }
+
+        try {
+            // Get the order
+            $order = wc_get_order($order_id);
+
+            if (!$order) {
+                wp_send_json_error('Order not found');
+                return;
+            }
+
+            // Get order status information
+            $status = $order->get_status();
+            $status_name = wc_get_order_status_name($status);
+
+            // Format the date
+            $date_created = $order->get_date_created();
+            $formatted_date = $date_created ? $date_created->date_i18n(get_option('date_format')) : 'Unknown';
+
+            // Get payment method
+            $payment_method = $order->get_payment_method();
+            $payment_method_title = $order->get_payment_method_title();
+
+            // Get order total
+            $total = $order->get_formatted_order_total();
+            $total_numeric = $order->get_total();
+
+            // Get order items (optional, for detailed tracking)
+            $items = array();
+            foreach ($order->get_items() as $item_id => $item) {
+                $product = $item->get_product();
+                $items[] = array(
+                    'name' => $item->get_name(),
+                    'quantity' => $item->get_quantity(),
+                    'total' => wc_price($item->get_total()),
+                    'product_id' => $item->get_product_id()
+                );
+            }
+
+            // Prepare response data
+            $order_data = array(
+                'id' => $order->get_id(),
+                'order_number' => $order->get_order_number(),
+                'status' => $status,
+                'status_name' => $status_name,
+                'date_created' => $formatted_date,
+                'payment_method' => $payment_method,
+                'payment_method_title' => $payment_method_title ?: 'Bank Transfer',
+                'total' => $total_numeric,
+                'total_formatted' => $total,
+                'items' => $items,
+                'billing_email' => $order->get_billing_email(),
+                'billing_phone' => $order->get_billing_phone()
+            );
+
+            wp_send_json_success($order_data);
+
+        } catch (Exception $e) {
+            error_log('Charlie Order Status Error: ' . $e->getMessage());
+            wp_send_json_error('Failed to load order status');
         }
     }
 }
