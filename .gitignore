@@ -48,3 +48,6 @@ wp-config-local.php
 
 # MacOS
 *.DS_Store
+
+# Local development environment
+dev-setup/
