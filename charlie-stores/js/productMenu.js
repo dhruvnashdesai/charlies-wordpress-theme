@@ -3131,16 +3131,10 @@ class ProductMenu {
      * Show checkout page
      */
     showCheckoutPage() {
-        if (this.wooCart && !this.wooCart.isEmpty()) {
-            // Redirect to WooCommerce checkout page
-            console.log('ProductMenu: Redirecting to WooCommerce checkout');
-            this.wooCart.goToCheckout();
-        } else {
-            // Fallback: show custom checkout within the menu
-            console.log('ProductMenu: Showing custom checkout (fallback)');
-            this.currentView = 'checkout';
-            this.updateMenuLayout();
-        }
+        // Always show embedded WooCommerce checkout within the menu
+        console.log('ProductMenu: Showing embedded WooCommerce checkout');
+        this.currentView = 'checkout';
+        this.updateMenuLayout();
     }
 
     /**
@@ -3402,12 +3396,13 @@ class ProductMenu {
         this.productGridContainer.innerHTML = '';
 
         const checkoutContainer = document.createElement('div');
-        checkoutContainer.className = 'checkout-container';
+        checkoutContainer.className = 'woocommerce-checkout-container';
         checkoutContainer.style.cssText = `
             padding: 20px;
             height: 100%;
             overflow-y: auto;
             background: rgba(0, 0, 0, 0.9);
+            font-family: 'Courier New', monospace;
         `;
 
         // Checkout header with back button
@@ -3437,149 +3432,26 @@ class ProductMenu {
             </div>
         `;
 
-        // Order summary
-        const orderSummary = document.createElement('div');
-        orderSummary.style.cssText = `
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid #00ff00;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 20px;
+        // Main checkout layout (two columns)
+        const checkoutMain = document.createElement('div');
+        checkoutMain.style.cssText = `
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            align-items: start;
         `;
 
-        const cartTotal = this.getCartTotal();
-        const cartItemCount = this.getCartItemCount();
+        // Left column: Billing & Payment
+        const leftColumn = document.createElement('div');
+        leftColumn.appendChild(this.createBillingSection());
+        leftColumn.appendChild(this.createPaymentSection());
 
-        orderSummary.innerHTML = `
-            <h4 style="margin: 0 0 10px 0; color: #00ff00; font-family: 'Courier New', monospace;">Order Summary</h4>
-            <div style="font-family: 'Courier New', monospace; color: #00ff00;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span>Items (${cartItemCount}):</span>
-                    <span>$${cartTotal.toFixed(2)}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span>Shipping:</span>
-                    <span>FREE</span>
-                </div>
-                <hr style="border: 1px solid #444; margin: 10px 0;">
-                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 16px;">
-                    <span>Total:</span>
-                    <span>$${cartTotal.toFixed(2)}</span>
-                </div>
-            </div>
-        `;
+        // Right column: Order summary
+        const rightColumn = document.createElement('div');
+        rightColumn.appendChild(this.createOrderSummarySection());
 
-        // Payment information
-        const paymentInfo = document.createElement('div');
-        paymentInfo.style.cssText = `
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #444;
-            border-radius: 6px;
-            padding: 20px;
-            margin-bottom: 20px;
-            font-family: 'Courier New', monospace;
-        `;
-
-        paymentInfo.innerHTML = `
-            <h4 style="margin: 0 0 15px 0; color: #00ff00;">Payment Method: Direct Bank Transfer</h4>
-            <div style="color: #00aa00; font-size: 14px; line-height: 1.6;">
-                <p style="margin-bottom: 10px;">Please use the following bank details to make your payment:</p>
-                <div id="bank-details" style="background: rgba(0, 255, 0, 0.05); padding: 15px; border-radius: 4px; margin: 10px 0;">
-                    <div style="color: #666; font-size: 12px;">Loading payment instructions...</div>
-                </div>
-                <p style="margin-top: 15px; font-size: 12px; color: #888;">
-                    Your order will be processed once payment is received. Please include your order number in the payment reference.
-                </p>
-            </div>
-        `;
-
-        // Customer information form
-        const customerForm = document.createElement('div');
-        customerForm.style.cssText = `
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #444;
-            border-radius: 6px;
-            padding: 20px;
-            margin-bottom: 20px;
-            font-family: 'Courier New', monospace;
-        `;
-
-        customerForm.innerHTML = `
-            <h4 style="margin: 0 0 15px 0; color: #00ff00;">Customer Information</h4>
-            <div style="display: grid; gap: 15px;">
-                <div>
-                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Full Name *</label>
-                    <input type="text" id="customer-name" required style="
-                        width: 100%;
-                        padding: 8px;
-                        background: rgba(0, 0, 0, 0.8);
-                        border: 1px solid #444;
-                        color: #00ff00;
-                        border-radius: 4px;
-                        font-family: 'Courier New', monospace;
-                        box-sizing: border-box;
-                    ">
-                </div>
-                <div>
-                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Email Address *</label>
-                    <input type="email" id="customer-email" required style="
-                        width: 100%;
-                        padding: 8px;
-                        background: rgba(0, 0, 0, 0.8);
-                        border: 1px solid #444;
-                        color: #00ff00;
-                        border-radius: 4px;
-                        font-family: 'Courier New', monospace;
-                        box-sizing: border-box;
-                    ">
-                </div>
-                <div>
-                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Phone Number</label>
-                    <input type="tel" id="customer-phone" style="
-                        width: 100%;
-                        padding: 8px;
-                        background: rgba(0, 0, 0, 0.8);
-                        border: 1px solid #444;
-                        color: #00ff00;
-                        border-radius: 4px;
-                        font-family: 'Courier New', monospace;
-                        box-sizing: border-box;
-                    ">
-                </div>
-                <div>
-                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Delivery Address *</label>
-                    <textarea id="customer-address" required rows="3" style="
-                        width: 100%;
-                        padding: 8px;
-                        background: rgba(0, 0, 0, 0.8);
-                        border: 1px solid #444;
-                        color: #00ff00;
-                        border-radius: 4px;
-                        font-family: 'Courier New', monospace;
-                        resize: vertical;
-                        box-sizing: border-box;
-                    "></textarea>
-                </div>
-            </div>
-        `;
-
-        // Place order button
-        const placeOrderBtn = document.createElement('button');
-        placeOrderBtn.className = 'place-order-btn';
-        placeOrderBtn.textContent = 'PLACE ORDER';
-        placeOrderBtn.style.cssText = `
-            width: 100%;
-            background: rgba(0, 255, 0, 0.2);
-            border: 1px solid #00ff00;
-            color: #00ff00;
-            padding: 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.2s ease;
-        `;
+        checkoutMain.appendChild(leftColumn);
+        checkoutMain.appendChild(rightColumn);
 
         // Event listeners
         const backBtn = checkoutHeader.querySelector('.back-to-cart-btn');
@@ -3590,33 +3462,382 @@ class ProductMenu {
             this.showCartPage();
         });
 
-        placeOrderBtn.addEventListener('click', () => {
-            this.handlePlaceOrder();
-        });
+        checkoutContainer.appendChild(checkoutHeader);
+        checkoutContainer.appendChild(checkoutMain);
+        this.productGridContainer.appendChild(checkoutContainer);
+    }
 
+    /**
+     * Create billing information section
+     */
+    createBillingSection() {
+        const billingSection = document.createElement('div');
+        billingSection.className = 'woocommerce-billing-fields';
+        billingSection.style.cssText = `
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        `;
+
+        const canadianProvinces = [
+            { code: 'AB', name: 'Alberta' },
+            { code: 'BC', name: 'British Columbia' },
+            { code: 'MB', name: 'Manitoba' },
+            { code: 'NB', name: 'New Brunswick' },
+            { code: 'NL', name: 'Newfoundland and Labrador' },
+            { code: 'NS', name: 'Nova Scotia' },
+            { code: 'ON', name: 'Ontario' },
+            { code: 'PE', name: 'Prince Edward Island' },
+            { code: 'QC', name: 'Quebec' },
+            { code: 'SK', name: 'Saskatchewan' },
+            { code: 'NT', name: 'Northwest Territories' },
+            { code: 'NU', name: 'Nunavut' },
+            { code: 'YT', name: 'Yukon' }
+        ];
+
+        const provinceOptions = canadianProvinces.map(province =>
+            `<option value="${province.code}">${province.name}</option>`
+        ).join('');
+
+        billingSection.innerHTML = `
+            <h3 style="margin: 0 0 20px 0; color: #00ff00; font-size: 16px;">Billing Details</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">First Name *</label>
+                    <input type="text" id="billing_first_name" name="billing_first_name" required style="
+                        width: 100%;
+                        padding: 10px;
+                        background: rgba(0, 0, 0, 0.8);
+                        border: 1px solid #444;
+                        color: #00ff00;
+                        border-radius: 4px;
+                        font-family: 'Courier New', monospace;
+                        box-sizing: border-box;
+                    ">
+                </div>
+                <div>
+                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Last Name *</label>
+                    <input type="text" id="billing_last_name" name="billing_last_name" required style="
+                        width: 100%;
+                        padding: 10px;
+                        background: rgba(0, 0, 0, 0.8);
+                        border: 1px solid #444;
+                        color: #00ff00;
+                        border-radius: 4px;
+                        font-family: 'Courier New', monospace;
+                        box-sizing: border-box;
+                    ">
+                </div>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Company (optional)</label>
+                <input type="text" id="billing_company" name="billing_company" style="
+                    width: 100%;
+                    padding: 10px;
+                    background: rgba(0, 0, 0, 0.8);
+                    border: 1px solid #444;
+                    color: #00ff00;
+                    border-radius: 4px;
+                    font-family: 'Courier New', monospace;
+                    box-sizing: border-box;
+                ">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Country *</label>
+                <select id="billing_country" name="billing_country" required style="
+                    width: 100%;
+                    padding: 10px;
+                    background: rgba(0, 0, 0, 0.8);
+                    border: 1px solid #444;
+                    color: #00ff00;
+                    border-radius: 4px;
+                    font-family: 'Courier New', monospace;
+                    box-sizing: border-box;
+                ">
+                    <option value="CA" selected>Canada</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Street Address *</label>
+                <input type="text" id="billing_address_1" name="billing_address_1" placeholder="House number and street name" required style="
+                    width: 100%;
+                    padding: 10px;
+                    background: rgba(0, 0, 0, 0.8);
+                    border: 1px solid #444;
+                    color: #00ff00;
+                    border-radius: 4px;
+                    font-family: 'Courier New', monospace;
+                    box-sizing: border-box;
+                    margin-bottom: 10px;
+                ">
+                <input type="text" id="billing_address_2" name="billing_address_2" placeholder="Apartment, suite, unit etc. (optional)" style="
+                    width: 100%;
+                    padding: 10px;
+                    background: rgba(0, 0, 0, 0.8);
+                    border: 1px solid #444;
+                    color: #00ff00;
+                    border-radius: 4px;
+                    font-family: 'Courier New', monospace;
+                    box-sizing: border-box;
+                ">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">City *</label>
+                    <input type="text" id="billing_city" name="billing_city" required style="
+                        width: 100%;
+                        padding: 10px;
+                        background: rgba(0, 0, 0, 0.8);
+                        border: 1px solid #444;
+                        color: #00ff00;
+                        border-radius: 4px;
+                        font-family: 'Courier New', monospace;
+                        box-sizing: border-box;
+                    ">
+                </div>
+                <div>
+                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Province *</label>
+                    <select id="billing_state" name="billing_state" required style="
+                        width: 100%;
+                        padding: 10px;
+                        background: rgba(0, 0, 0, 0.8);
+                        border: 1px solid #444;
+                        color: #00ff00;
+                        border-radius: 4px;
+                        font-family: 'Courier New', monospace;
+                        box-sizing: border-box;
+                    ">
+                        <option value="">Select Province</option>
+                        ${provinceOptions}
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Postal Code *</label>
+                    <input type="text" id="billing_postcode" name="billing_postcode" placeholder="K1A 0A6" required style="
+                        width: 100%;
+                        padding: 10px;
+                        background: rgba(0, 0, 0, 0.8);
+                        border: 1px solid #444;
+                        color: #00ff00;
+                        border-radius: 4px;
+                        font-family: 'Courier New', monospace;
+                        box-sizing: border-box;
+                        text-transform: uppercase;
+                    ">
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Email Address *</label>
+                    <input type="email" id="billing_email" name="billing_email" required style="
+                        width: 100%;
+                        padding: 10px;
+                        background: rgba(0, 0, 0, 0.8);
+                        border: 1px solid #444;
+                        color: #00ff00;
+                        border-radius: 4px;
+                        font-family: 'Courier New', monospace;
+                        box-sizing: border-box;
+                    ">
+                </div>
+                <div>
+                    <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Phone *</label>
+                    <input type="tel" id="billing_phone" name="billing_phone" required style="
+                        width: 100%;
+                        padding: 10px;
+                        background: rgba(0, 0, 0, 0.8);
+                        border: 1px solid #444;
+                        color: #00ff00;
+                        border-radius: 4px;
+                        font-family: 'Courier New', monospace;
+                        box-sizing: border-box;
+                    ">
+                </div>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; color: #00aa00; margin-bottom: 5px; font-size: 12px;">Order Notes (optional)</label>
+                <textarea id="order_comments" name="order_comments" rows="3" placeholder="Notes about your order, e.g. special notes for delivery." style="
+                    width: 100%;
+                    padding: 10px;
+                    background: rgba(0, 0, 0, 0.8);
+                    border: 1px solid #444;
+                    color: #00ff00;
+                    border-radius: 4px;
+                    font-family: 'Courier New', monospace;
+                    resize: vertical;
+                    box-sizing: border-box;
+                "></textarea>
+            </div>
+        `;
+
+        return billingSection;
+    }
+
+    /**
+     * Create payment section
+     */
+    createPaymentSection() {
+        const paymentSection = document.createElement('div');
+        paymentSection.className = 'woocommerce-payment-methods';
+        paymentSection.style.cssText = `
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        `;
+
+        paymentSection.innerHTML = `
+            <h3 style="margin: 0 0 20px 0; color: #00ff00; font-size: 16px;">Payment Method</h3>
+            <div class="wc_payment_methods payment_methods methods">
+                <div class="wc_payment_method payment_method_bacs" style="margin-bottom: 15px;">
+                    <input id="payment_method_bacs" type="radio" class="input-radio" name="payment_method" value="bacs" checked="checked" style="margin-right: 10px;">
+                    <label for="payment_method_bacs" style="color: #00ff00; font-size: 14px;">Direct Bank Transfer</label>
+                    <div class="payment_box payment_method_bacs_box" style="
+                        background: rgba(0, 255, 0, 0.05);
+                        border: 1px solid #444;
+                        border-radius: 4px;
+                        padding: 15px;
+                        margin: 10px 0;
+                        color: #00aa00;
+                        font-size: 13px;
+                        line-height: 1.6;
+                    ">
+                        <p style="margin: 0 0 10px 0;">Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.</p>
+                        <div id="bank-details-payment" style="
+                            background: rgba(0, 255, 0, 0.1);
+                            padding: 10px;
+                            border-radius: 4px;
+                            margin: 10px 0;
+                            color: #00ff00;
+                        ">
+                            <div style="color: #666; font-size: 12px;">Loading payment instructions...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row place-order" style="margin-top: 20px;">
+                <div class="woocommerce-terms-and-conditions-wrapper">
+                    <div class="woocommerce-privacy-policy-text"></div>
+                </div>
+                <button type="submit" class="button alt" id="place_order" value="Place order" style="
+                    width: 100%;
+                    background: rgba(0, 255, 0, 0.2);
+                    border: 1px solid #00ff00;
+                    color: #00ff00;
+                    padding: 15px 30px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-family: 'Courier New', monospace;
+                    font-size: 16px;
+                    font-weight: bold;
+                    transition: all 0.2s ease;
+                ">Place Order</button>
+            </div>
+        `;
+
+        // Add hover effect to place order button
+        const placeOrderBtn = paymentSection.querySelector('#place_order');
         placeOrderBtn.addEventListener('mouseenter', () => {
             placeOrderBtn.style.background = 'rgba(0, 255, 0, 0.3)';
         });
-
         placeOrderBtn.addEventListener('mouseleave', () => {
             placeOrderBtn.style.background = 'rgba(0, 255, 0, 0.2)';
         });
 
-        checkoutContainer.appendChild(checkoutHeader);
-        checkoutContainer.appendChild(orderSummary);
-        checkoutContainer.appendChild(paymentInfo);
-        checkoutContainer.appendChild(customerForm);
-        checkoutContainer.appendChild(placeOrderBtn);
-        this.productGridContainer.appendChild(checkoutContainer);
+        // Add click handler
+        placeOrderBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.handleWooCommerceCheckout();
+        });
 
-        // Load WooCommerce payment instructions
-        this.loadPaymentInstructions();
+        // Load payment instructions
+        this.loadPaymentInstructions('bank-details-payment');
+
+        return paymentSection;
+    }
+
+    /**
+     * Create order summary section
+     */
+    createOrderSummarySection() {
+        const orderSection = document.createElement('div');
+        orderSection.className = 'woocommerce-checkout-review-order';
+        orderSection.style.cssText = `
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 20px;
+            position: sticky;
+            top: 20px;
+        `;
+
+        const cartItems = this.wooCart ? this.wooCart.getCartItems() : [];
+        const cartTotal = this.getCartTotal();
+        const cartItemCount = this.getCartItemCount();
+
+        let itemsHtml = '';
+        if (cartItems.length > 0) {
+            itemsHtml = cartItems.map(item => `
+                <tr style="border-bottom: 1px solid #333;">
+                    <td style="padding: 10px 0; color: #00ff00; font-size: 13px;">
+                        ${item.name} × ${item.quantity}
+                    </td>
+                    <td style="padding: 10px 0; text-align: right; color: #00ff00; font-size: 13px;">
+                        ${item.total}
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            itemsHtml = `
+                <tr>
+                    <td colspan="2" style="padding: 20px 0; text-align: center; color: #666; font-size: 13px;">
+                        Your cart is empty
+                    </td>
+                </tr>
+            `;
+        }
+
+        orderSection.innerHTML = `
+            <h3 style="margin: 0 0 20px 0; color: #00ff00; font-size: 16px;">Your Order</h3>
+            <table class="shop_table woocommerce-checkout-review-order-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid #444;">
+                        <th style="padding: 10px 0; color: #00aa00; font-size: 12px; text-align: left;">Product</th>
+                        <th style="padding: 10px 0; color: #00aa00; font-size: 12px; text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${itemsHtml}
+                </tbody>
+                <tfoot>
+                    <tr class="cart-subtotal" style="border-bottom: 1px solid #333;">
+                        <th style="padding: 10px 0; color: #00aa00; font-size: 14px;">Subtotal</th>
+                        <td style="padding: 10px 0; text-align: right; color: #00ff00; font-size: 14px;">$${cartTotal.toFixed(2)}</td>
+                    </tr>
+                    <tr class="shipping" style="border-bottom: 1px solid #333;">
+                        <th style="padding: 10px 0; color: #00aa00; font-size: 14px;">Shipping</th>
+                        <td style="padding: 10px 0; text-align: right; color: #00ff00; font-size: 14px;">
+                            <span style="color: #00aa00;">Free shipping</span>
+                        </td>
+                    </tr>
+                    <tr class="order-total" style="border-top: 2px solid #00ff00;">
+                        <th style="padding: 15px 0 10px 0; color: #00ff00; font-size: 16px; font-weight: bold;">Total</th>
+                        <td style="padding: 15px 0 10px 0; text-align: right; color: #00ff00; font-size: 16px; font-weight: bold;">$${cartTotal.toFixed(2)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        `;
+
+        return orderSection;
     }
 
     /**
      * Load WooCommerce payment instructions
      */
-    async loadPaymentInstructions() {
+    async loadPaymentInstructions(targetElementId = 'bank-details') {
         try {
             const formData = new FormData();
             formData.append('action', 'get_payment_instructions');
@@ -3629,7 +3850,7 @@ class ProductMenu {
 
             const data = await response.json();
 
-            const bankDetailsElement = document.getElementById('bank-details');
+            const bankDetailsElement = document.getElementById(targetElementId);
             if (bankDetailsElement) {
                 if (data.success && data.data.instructions) {
                     bankDetailsElement.innerHTML = `
@@ -3651,7 +3872,7 @@ class ProductMenu {
             }
         } catch (error) {
             console.error('Failed to load payment instructions:', error);
-            const bankDetailsElement = document.getElementById('bank-details');
+            const bankDetailsElement = document.getElementById(targetElementId);
             if (bankDetailsElement) {
                 bankDetailsElement.innerHTML = `
                     <div style="color: #00ff00; font-size: 13px;">
@@ -3667,108 +3888,145 @@ class ProductMenu {
     }
 
     /**
-     * Handle place order
+     * Handle WooCommerce checkout with full billing form
      */
-    async handlePlaceOrder() {
-        // Validate required fields
-        const name = document.getElementById('customer-name').value.trim();
-        const email = document.getElementById('customer-email').value.trim();
-        const address = document.getElementById('customer-address').value.trim();
-
-        if (!name || !email || !address) {
-            alert('Please fill in all required fields (Name, Email, Address)');
-            return;
-        }
-
-        if (!this.validateEmail(email)) {
-            alert('Please enter a valid email address');
-            return;
-        }
-
-        if (this.wooCart && this.wooCart.isEmpty()) {
-            alert('Your cart is empty');
-            return;
-        } else if (!this.wooCart && this.cart.length === 0) {
-            alert('Your cart is empty');
-            return;
-        }
-
+    async handleWooCommerceCheckout() {
         try {
-            if (this.wooCart) {
-                // Use WooCommerce checkout
-                const orderData = {
-                    billing: {
-                        first_name: name.split(' ')[0] || '',
-                        last_name: name.split(' ').slice(1).join(' ') || '',
-                        email: email,
-                        phone: document.getElementById('customer-phone').value.trim(),
-                        address_1: address,
-                        city: '',
-                        state: '',
-                        postcode: '',
-                        country: 'CA'
-                    },
-                    payment_method: 'bacs' // Direct bank transfer
-                };
+            // Get all form values
+            const firstName = document.getElementById('billing_first_name')?.value.trim();
+            const lastName = document.getElementById('billing_last_name')?.value.trim();
+            const company = document.getElementById('billing_company')?.value.trim();
+            const country = document.getElementById('billing_country')?.value.trim();
+            const address1 = document.getElementById('billing_address_1')?.value.trim();
+            const address2 = document.getElementById('billing_address_2')?.value.trim();
+            const city = document.getElementById('billing_city')?.value.trim();
+            const state = document.getElementById('billing_state')?.value.trim();
+            const postcode = document.getElementById('billing_postcode')?.value.trim();
+            const email = document.getElementById('billing_email')?.value.trim();
+            const phone = document.getElementById('billing_phone')?.value.trim();
+            const orderComments = document.getElementById('order_comments')?.value.trim();
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked')?.value || 'bacs';
 
-                const response = await fetch(window.charlie_config.ajax_url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        action: 'charlie_woo_checkout',
-                        customer_data: JSON.stringify(orderData),
-                        nonce: window.charlie_config.nonce
-                    })
-                });
+            // Validate required fields
+            const requiredFields = {
+                'First Name': firstName,
+                'Last Name': lastName,
+                'Street Address': address1,
+                'City': city,
+                'Province': state,
+                'Postal Code': postcode,
+                'Email': email,
+                'Phone': phone
+            };
 
-                const data = await response.json();
-
-                if (data.success) {
-                    // Clear cart and show success
-                    await this.wooCart.clearCart();
-                    this.showOrderSuccess(data.data.order_id, data.data.order_number);
-                } else {
-                    alert('Failed to place order: ' + (data.data || 'Unknown error'));
-                }
-            } else {
-                // Fallback to custom order system
-                const orderData = {
-                    customer: {
-                        name: name,
-                        email: email,
-                        phone: document.getElementById('customer-phone').value.trim(),
-                        address: address
-                    },
-                    items: this.cart,
-                    total: this.getCartTotal(),
-                    payment_method: 'bacs'
-                };
-
-                const formData = new FormData();
-                formData.append('action', 'create_order');
-                formData.append('order_data', JSON.stringify(orderData));
-                formData.append('nonce', window.charlie_config.nonce);
-
-                const response = await fetch(window.charlie_config.ajax_url, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    this.clearCart();
-                    this.showOrderSuccess(data.data.order_id);
-                } else {
-                    alert('Failed to place order: ' + (data.data.message || 'Unknown error'));
+            const missingFields = [];
+            for (const [fieldName, value] of Object.entries(requiredFields)) {
+                if (!value) {
+                    missingFields.push(fieldName);
                 }
             }
+
+            if (missingFields.length > 0) {
+                alert(`Please fill in the following required fields: ${missingFields.join(', ')}`);
+                return;
+            }
+
+            // Validate email format
+            if (!this.validateEmail(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+
+            // Validate Canadian postal code
+            if (!this.validateCanadianPostalCode(postcode)) {
+                alert('Please enter a valid Canadian postal code (e.g., K1A 0A6)');
+                return;
+            }
+
+            // Check cart is not empty
+            if (this.wooCart && this.wooCart.isEmpty()) {
+                alert('Your cart is empty');
+                return;
+            } else if (!this.wooCart && this.cart.length === 0) {
+                alert('Your cart is empty');
+                return;
+            }
+
+            // Disable the submit button to prevent double submission
+            const submitBtn = document.getElementById('place_order');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+            submitBtn.style.opacity = '0.6';
+
+            // Prepare order data
+            const orderData = {
+                billing: {
+                    first_name: firstName,
+                    last_name: lastName,
+                    company: company,
+                    country: country,
+                    address_1: address1,
+                    address_2: address2,
+                    city: city,
+                    state: state,
+                    postcode: postcode.toUpperCase(),
+                    email: email,
+                    phone: phone
+                },
+                payment_method: paymentMethod,
+                order_comments: orderComments
+            };
+
+            console.log('Placing WooCommerce order with data:', orderData);
+
+            // Submit to WooCommerce
+            const response = await fetch(window.charlie_config.ajax_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'charlie_woo_checkout',
+                    customer_data: JSON.stringify(orderData),
+                    nonce: window.charlie_config.nonce
+                })
+            });
+
+            const data = await response.json();
+            console.log('WooCommerce checkout response:', data);
+
+            if (data.success) {
+                // Clear cart and show success
+                if (this.wooCart) {
+                    await this.wooCart.clearCart();
+                }
+                this.showOrderSuccess(data.data.order_id, data.data.order_number);
+            } else {
+                throw new Error(data.data || 'Unknown error occurred during checkout');
+            }
+
         } catch (error) {
-            console.error('Order placement failed:', error);
-            alert('Failed to place order. Please try again.');
+            console.error('WooCommerce checkout failed:', error);
+            alert('Failed to place order: ' + error.message);
+        } finally {
+            // Re-enable the submit button
+            const submitBtn = document.getElementById('place_order');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText || 'Place Order';
+                submitBtn.style.opacity = '1';
+            }
         }
+    }
+
+    /**
+     * Validate Canadian postal code format
+     */
+    validateCanadianPostalCode(postalCode) {
+        // Canadian postal code format: A1A 1A1 (with or without space)
+        const canadianPostalCodeRegex = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z]\s?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
+        return canadianPostalCodeRegex.test(postalCode.replace(/\s/g, ''));
     }
 
     /**
