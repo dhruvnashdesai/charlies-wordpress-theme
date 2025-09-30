@@ -4664,10 +4664,10 @@ class ProductMenu {
         `;
 
         const actions = [
-            { title: 'Order History', desc: 'View past orders and track current ones', url: '/my-account/orders/' },
-            { title: 'Account Details', desc: 'Update your personal information', url: '/my-account/edit-account/' },
-            { title: 'Addresses', desc: 'Manage billing and shipping addresses', url: '/my-account/edit-address/' },
-            { title: 'Payment Methods', desc: 'Manage saved payment methods', url: '/my-account/payment-methods/' }
+            { title: 'Order History', desc: 'View past orders and track current ones', action: 'orders' },
+            { title: 'Account Details', desc: 'Update your personal information', action: 'account_details' },
+            { title: 'Addresses', desc: 'Manage billing and shipping addresses', action: 'addresses' },
+            { title: 'Payment Methods', desc: 'Manage saved payment methods', action: 'payment_methods' }
         ];
 
         actions.forEach(action => {
@@ -4694,7 +4694,7 @@ class ProductMenu {
             `;
 
             actionCard.addEventListener('click', () => {
-                window.location.href = action.url;
+                this.handleAccountAction(action.action);
             });
 
             actionCard.addEventListener('mouseenter', () => {
@@ -4713,6 +4713,608 @@ class ProductMenu {
         dashboardSection.appendChild(welcomeSection);
         dashboardSection.appendChild(actionsGrid);
         container.appendChild(dashboardSection);
+    }
+
+    /**
+     * Handle account action selection
+     * @param {string} action - The action to perform
+     */
+    handleAccountAction(action) {
+        console.log('ProductMenu: Handling account action:', action);
+
+        // Clear the current container and show the specific form
+        if (!this.productGridContainer) return;
+
+        this.productGridContainer.innerHTML = '';
+
+        switch (action) {
+            case 'orders':
+                this.renderOrderHistory();
+                break;
+            case 'account_details':
+                this.renderAccountDetails();
+                break;
+            case 'addresses':
+                this.renderAddresses();
+                break;
+            case 'payment_methods':
+                this.renderPaymentMethods();
+                break;
+            default:
+                console.error('Unknown account action:', action);
+                this.renderAccountDashboard(); // Fall back to dashboard
+        }
+    }
+
+    /**
+     * Render order history page
+     */
+    async renderOrderHistory() {
+        const container = this.createAccountPageContainer('Order History');
+
+        try {
+            // Fetch orders from WooCommerce REST API
+            const orders = await this.fetchCustomerOrders();
+
+            const ordersSection = document.createElement('div');
+            ordersSection.style.cssText = `
+                padding: 20px 0;
+            `;
+
+            if (orders && orders.length > 0) {
+                ordersSection.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <p style="color: #ffffff; margin: 0;">
+                            You have ${orders.length} order${orders.length !== 1 ? 's' : ''} on record.
+                        </p>
+                    </div>
+                `;
+
+                // Create orders table
+                const ordersTable = document.createElement('div');
+                ordersTable.style.cssText = `
+                    background: rgba(0, 0, 0, 0.7);
+                    border: 1px solid #00ff00;
+                    border-radius: 4px;
+                    overflow: hidden;
+                `;
+
+                // Table header
+                const header = document.createElement('div');
+                header.style.cssText = `
+                    display: grid;
+                    grid-template-columns: 1fr 1fr 1fr 1fr auto;
+                    gap: 15px;
+                    padding: 15px;
+                    background: rgba(0, 255, 0, 0.1);
+                    color: #00ff00;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    font-size: 12px;
+                `;
+                header.innerHTML = `
+                    <div>Order</div>
+                    <div>Date</div>
+                    <div>Status</div>
+                    <div>Total</div>
+                    <div>Actions</div>
+                `;
+
+                ordersTable.appendChild(header);
+
+                // Add orders
+                orders.forEach(order => {
+                    const orderRow = document.createElement('div');
+                    orderRow.style.cssText = `
+                        display: grid;
+                        grid-template-columns: 1fr 1fr 1fr 1fr auto;
+                        gap: 15px;
+                        padding: 15px;
+                        border-top: 1px solid rgba(0, 255, 0, 0.2);
+                        color: #ffffff;
+                        align-items: center;
+                    `;
+
+                    const statusColor = this.getOrderStatusColor(order.status);
+                    const formattedDate = new Date(order.date_created).toLocaleDateString();
+
+                    orderRow.innerHTML = `
+                        <div style="color: #00ff00; font-weight: bold;">#${order.number}</div>
+                        <div>${formattedDate}</div>
+                        <div style="color: ${statusColor}; text-transform: uppercase;">${order.status}</div>
+                        <div>$${order.total}</div>
+                        <div>
+                            <button style="
+                                background: transparent;
+                                border: 1px solid #00ff00;
+                                color: #00ff00;
+                                padding: 5px 10px;
+                                cursor: pointer;
+                                font-family: 'Courier New', monospace;
+                                font-size: 11px;
+                                text-transform: uppercase;
+                            " onclick="window.open('/my-account/view-order/${order.id}/', '_blank')">
+                                View
+                            </button>
+                        </div>
+                    `;
+
+                    ordersTable.appendChild(orderRow);
+                });
+
+                ordersSection.appendChild(ordersTable);
+            } else {
+                ordersSection.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <p style="color: #888888; margin: 0;">
+                            No orders found. Start shopping to see your order history here.
+                        </p>
+                    </div>
+                `;
+            }
+
+            container.appendChild(ordersSection);
+        } catch (error) {
+            console.error('Failed to load order history:', error);
+            container.innerHTML += `
+                <div style="text-align: center; padding: 40px 20px;">
+                    <p style="color: #ff6b6b; margin: 0;">
+                        Unable to load order history. Please try again later.
+                    </p>
+                </div>
+            `;
+        }
+
+        this.productGridContainer.appendChild(container);
+    }
+
+    /**
+     * Render account details edit form
+     */
+    async renderAccountDetails() {
+        const container = this.createAccountPageContainer('Account Details');
+
+        try {
+            // Fetch current customer data
+            const customer = await this.fetchCustomerData();
+
+            const detailsForm = document.createElement('form');
+            detailsForm.style.cssText = `
+                display: grid;
+                gap: 20px;
+                padding: 20px 0;
+                max-width: 500px;
+                margin: 0 auto;
+            `;
+
+            detailsForm.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="display: block; color: #00ff00; margin-bottom: 5px; text-transform: uppercase;">
+                            First Name *
+                        </label>
+                        <input type="text" id="first_name" value="${customer.first_name || ''}" style="
+                            width: 100%;
+                            padding: 10px;
+                            background: rgba(0, 0, 0, 0.7);
+                            border: 1px solid #00ff00;
+                            color: #ffffff;
+                            font-family: 'Courier New', monospace;
+                        " required>
+                    </div>
+                    <div>
+                        <label style="display: block; color: #00ff00; margin-bottom: 5px; text-transform: uppercase;">
+                            Last Name *
+                        </label>
+                        <input type="text" id="last_name" value="${customer.last_name || ''}" style="
+                            width: 100%;
+                            padding: 10px;
+                            background: rgba(0, 0, 0, 0.7);
+                            border: 1px solid #00ff00;
+                            color: #ffffff;
+                            font-family: 'Courier New', monospace;
+                        " required>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; color: #00ff00; margin-bottom: 5px; text-transform: uppercase;">
+                        Email Address *
+                    </label>
+                    <input type="email" id="email" value="${customer.email || ''}" style="
+                        width: 100%;
+                        padding: 10px;
+                        background: rgba(0, 0, 0, 0.7);
+                        border: 1px solid #00ff00;
+                        color: #ffffff;
+                        font-family: 'Courier New', monospace;
+                    " required>
+                </div>
+
+                <div style="border-top: 1px solid rgba(0, 255, 0, 0.3); padding-top: 20px; margin-top: 10px;">
+                    <h4 style="color: #00ff00; margin: 0 0 15px 0; text-transform: uppercase;">Change Password</h4>
+
+                    <div style="display: grid; gap: 15px;">
+                        <div>
+                            <label style="display: block; color: #00ff00; margin-bottom: 5px; text-transform: uppercase;">
+                                Current Password
+                            </label>
+                            <input type="password" id="current_password" style="
+                                width: 100%;
+                                padding: 10px;
+                                background: rgba(0, 0, 0, 0.7);
+                                border: 1px solid #555555;
+                                color: #ffffff;
+                                font-family: 'Courier New', monospace;
+                            ">
+                        </div>
+
+                        <div>
+                            <label style="display: block; color: #00ff00; margin-bottom: 5px; text-transform: uppercase;">
+                                New Password
+                            </label>
+                            <input type="password" id="new_password" style="
+                                width: 100%;
+                                padding: 10px;
+                                background: rgba(0, 0, 0, 0.7);
+                                border: 1px solid #555555;
+                                color: #ffffff;
+                                font-family: 'Courier New', monospace;
+                            ">
+                        </div>
+
+                        <div>
+                            <label style="display: block; color: #00ff00; margin-bottom: 5px; text-transform: uppercase;">
+                                Confirm New Password
+                            </label>
+                            <input type="password" id="confirm_password" style="
+                                width: 100%;
+                                padding: 10px;
+                                background: rgba(0, 0, 0, 0.7);
+                                border: 1px solid #555555;
+                                color: #ffffff;
+                                font-family: 'Courier New', monospace;
+                            ">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                    <button type="submit" style="
+                        background: #00ff00;
+                        border: none;
+                        color: #000000;
+                        padding: 12px 24px;
+                        cursor: pointer;
+                        font-family: 'Courier New', monospace;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                    ">Save Changes</button>
+
+                    <button type="button" id="cancelBtn" style="
+                        background: transparent;
+                        border: 2px solid #00ff00;
+                        color: #00ff00;
+                        padding: 10px 22px;
+                        cursor: pointer;
+                        font-family: 'Courier New', monospace;
+                        text-transform: uppercase;
+                    ">Cancel</button>
+                </div>
+            `;
+
+            // Add form event listeners
+            detailsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.saveAccountDetails(detailsForm);
+            });
+
+            detailsForm.querySelector('#cancelBtn').addEventListener('click', () => {
+                this.renderAccountDashboard();
+            });
+
+            container.appendChild(detailsForm);
+        } catch (error) {
+            console.error('Failed to load account details:', error);
+            container.innerHTML += `
+                <div style="text-align: center; padding: 40px 20px;">
+                    <p style="color: #ff6b6b; margin: 0;">
+                        Unable to load account details. Please try again later.
+                    </p>
+                </div>
+            `;
+        }
+
+        this.productGridContainer.appendChild(container);
+    }
+
+    /**
+     * Create common page container for account pages
+     * @param {string} title - Page title
+     * @returns {HTMLElement} Container element
+     */
+    createAccountPageContainer(title) {
+        const container = document.createElement('div');
+        container.className = 'woocommerce-account-page';
+        container.style.cssText = `
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.9);
+            font-family: 'Courier New', monospace;
+        `;
+
+        // Page header with back button and title
+        const pageHeader = document.createElement('div');
+        pageHeader.style.cssText = `
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #00ff00;
+        `;
+
+        const headerTitle = document.createElement('h2');
+        headerTitle.textContent = title;
+        headerTitle.style.cssText = `
+            color: #00ff00;
+            margin: 0;
+            font-size: 24px;
+            text-transform: uppercase;
+        `;
+
+        const backBtn = document.createElement('button');
+        backBtn.textContent = '← Back';
+        backBtn.style.cssText = `
+            background: transparent;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        `;
+
+        backBtn.addEventListener('click', () => {
+            this.renderAccountDashboard();
+        });
+
+        pageHeader.appendChild(headerTitle);
+        pageHeader.appendChild(backBtn);
+        container.appendChild(pageHeader);
+
+        return container;
+    }
+
+    /**
+     * Fetch customer orders from WooCommerce API
+     * @returns {Promise<Array>} Customer orders
+     */
+    async fetchCustomerOrders() {
+        try {
+            const response = await fetch(getConfig('ENDPOINTS.STORES') + '/../orders', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': getConfig('nonce')
+                },
+                credentials: 'same-origin'
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Failed to fetch customer orders:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Fetch current customer data from WooCommerce API
+     * @returns {Promise<Object>} Customer data
+     */
+    async fetchCustomerData() {
+        try {
+            const response = await fetch(getConfig('ENDPOINTS.STORES') + '/../customers/me', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': getConfig('nonce')
+                },
+                credentials: 'same-origin'
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Failed to fetch customer data:', error);
+            return { first_name: '', last_name: '', email: '' }; // Return empty defaults
+        }
+    }
+
+    /**
+     * Save account details via WooCommerce API
+     * @param {HTMLFormElement} form - The form element
+     */
+    async saveAccountDetails(form) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+
+        try {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            const formData = new FormData(form);
+            const firstName = form.querySelector('#first_name').value;
+            const lastName = form.querySelector('#last_name').value;
+            const email = form.querySelector('#email').value;
+            const currentPassword = form.querySelector('#current_password').value;
+            const newPassword = form.querySelector('#new_password').value;
+            const confirmPassword = form.querySelector('#confirm_password').value;
+
+            // Validate password fields if they're filled
+            if (newPassword || confirmPassword) {
+                if (newPassword !== confirmPassword) {
+                    throw new Error('New passwords do not match');
+                }
+                if (!currentPassword) {
+                    throw new Error('Current password is required to change password');
+                }
+                if (newPassword.length < 8) {
+                    throw new Error('New password must be at least 8 characters long');
+                }
+            }
+
+            const updateData = {
+                first_name: firstName,
+                last_name: lastName,
+                email: email
+            };
+
+            // Add password if changing
+            if (newPassword) {
+                updateData.password = newPassword;
+            }
+
+            const response = await fetch(getConfig('ENDPOINTS.STORES') + '/../customers/me', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': getConfig('nonce')
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(updateData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to update account details');
+            }
+
+            // Show success message
+            this.showAccountMessage('Account details updated successfully!', 'success');
+
+            // Clear password fields
+            form.querySelector('#current_password').value = '';
+            form.querySelector('#new_password').value = '';
+            form.querySelector('#confirm_password').value = '';
+
+        } catch (error) {
+            console.error('Failed to save account details:', error);
+            this.showAccountMessage(error.message, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    }
+
+    /**
+     * Show message in account forms
+     * @param {string} message - Message to display
+     * @param {string} type - Message type (success/error)
+     */
+    showAccountMessage(message, type = 'info') {
+        // Remove existing messages
+        const existingMessage = document.querySelector('.account-message');
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'account-message';
+
+        const bgColor = type === 'success' ? 'rgba(0, 255, 0, 0.1)' :
+                       type === 'error' ? 'rgba(255, 107, 107, 0.1)' : 'rgba(0, 124, 186, 0.1)';
+        const borderColor = type === 'success' ? '#00ff00' :
+                           type === 'error' ? '#ff6b6b' : '#007cba';
+        const textColor = type === 'success' ? '#00ff00' :
+                         type === 'error' ? '#ff6b6b' : '#007cba';
+
+        messageDiv.style.cssText = `
+            background: ${bgColor};
+            border: 1px solid ${borderColor};
+            color: ${textColor};
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        `;
+
+        messageDiv.textContent = message;
+
+        // Insert at the top of the container
+        const container = this.productGridContainer.querySelector('.woocommerce-account-page');
+        if (container) {
+            container.insertBefore(messageDiv, container.children[1]); // After header
+        }
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.remove();
+            }
+        }, 5000);
+    }
+
+    /**
+     * Get color for order status
+     * @param {string} status - Order status
+     * @returns {string} Color code
+     */
+    getOrderStatusColor(status) {
+        const colors = {
+            'pending': '#ffa500',
+            'processing': '#007cba',
+            'on-hold': '#f56500',
+            'completed': '#00ff00',
+            'cancelled': '#ff6b6b',
+            'refunded': '#ff6b6b',
+            'failed': '#ff6b6b'
+        };
+        return colors[status] || '#ffffff';
+    }
+
+    /**
+     * Placeholder for addresses management
+     */
+    renderAddresses() {
+        const container = this.createAccountPageContainer('Manage Addresses');
+
+        container.innerHTML += `
+            <div style="text-align: center; padding: 40px 20px;">
+                <p style="color: #888888; margin: 0;">
+                    Address management will be available soon. For now, please update your addresses during checkout.
+                </p>
+            </div>
+        `;
+
+        this.productGridContainer.appendChild(container);
+    }
+
+    /**
+     * Placeholder for payment methods management
+     */
+    renderPaymentMethods() {
+        const container = this.createAccountPageContainer('Payment Methods');
+
+        container.innerHTML += `
+            <div style="text-align: center; padding: 40px 20px;">
+                <p style="color: #888888; margin: 0;">
+                    Payment method management will be available soon. Currently, we only support bank transfers.
+                </p>
+            </div>
+        `;
+
+        this.productGridContainer.appendChild(container);
     }
 
     /**
