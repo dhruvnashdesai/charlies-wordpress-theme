@@ -4436,6 +4436,13 @@ class ProductMenu {
             console.log('ProductMenu: Restored cart marker');
         }
 
+        // Show account marker if it exists
+        const accountMarker = window.charlieApp?.mapManager?.markers?.get('account_marker')?.element;
+        if (accountMarker) {
+            accountMarker.style.display = 'block';
+            console.log('ProductMenu: Restored account marker');
+        }
+
         // Also ensure vignette is visible on desktop (restore from category circles behavior)
         if (!isMobile) {
             const vignette = document.getElementById('radiusVignette');
