@@ -434,9 +434,9 @@ class CharlieStoreApp {
             accountX = cartX + 80; // 80px to the right
             accountY = cartY + 20; // Slightly below
         } else {
-            // Desktop: 200px directly below cart marker
+            // Desktop: 300px directly below cart marker
             accountX = cartX;
-            accountY = cartY + 200;
+            accountY = cartY + 300;
         }
 
         // Create account marker data
