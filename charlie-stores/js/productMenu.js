@@ -1497,6 +1497,10 @@ class ProductMenu {
 
         this.isVisible = false;
 
+        // Reset view back to products when closing menu
+        this.currentView = 'products';
+        console.log('ProductMenu: Reset currentView to products');
+
         // Wait for animation to complete, then dispatch close event
         setTimeout(() => {
             // Exit product view when menu closes
