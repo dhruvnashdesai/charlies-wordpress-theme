@@ -393,7 +393,7 @@ class CharlieStoreApp {
             const edgeY = centerPoint.y + (vignetteRadius * Math.sin(radians));
 
             // Position cart marker on the vignette edge
-            screenX = edgeX + markerRadius; // Adjust for marker size
+            screenX = edgeX + markerRadius + 100; // Adjust for marker size + move 100px right
             screenY = edgeY - markerRadius; // Adjust for marker size
         }
 
