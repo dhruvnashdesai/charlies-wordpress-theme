@@ -152,6 +152,12 @@ class ProductMenu {
             this.handleCartClicked(e.detail);
         });
 
+        // Listen for account marker clicks
+        document.addEventListener('accountClicked', (e) => {
+            console.log('ProductMenu: accountClicked event received!', e.detail);
+            this.handleAccountClicked(e.detail);
+        });
+
         // Close menu on escape key (but not in checkout mode)
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isVisible) {
@@ -819,6 +825,31 @@ class ProductMenu {
     }
 
     /**
+     * Handle account marker click to open customer dashboard
+     * @param {object} detail - Account marker detail data
+     */
+    async handleAccountClicked(detail) {
+        console.log('ProductMenu: Account clicked, opening account dashboard:', detail);
+
+        // Set up basic state for account view
+        this.currentView = 'account';
+        this.currentStoreId = 1; // Use default store ID
+
+        // Show menu immediately
+        console.log('ProductMenu: Showing menu with account dashboard');
+        this.showMenu();
+
+        // Update menu to show account dashboard
+        this.updateMenuLayout();
+
+        // Track account access
+        this.trackEvent('account_opened', {
+            source: 'map_marker',
+            user_logged_in: this.isUserLoggedIn()
+        });
+    }
+
+    /**
      * Set loading state for the entire menu
      * @param {boolean} loading - Whether to show loading state
      */
@@ -1335,6 +1366,9 @@ class ProductMenu {
         } else if (this.currentView === 'checkout') {
             // Show checkout page
             this.renderCheckoutPage();
+        } else if (this.currentView === 'account') {
+            // Show account dashboard
+            this.renderAccountDashboard();
         } else {
             // Show products page - first clear any cart content
             console.log('updateMenuLayout: Showing products page');
@@ -4414,6 +4448,260 @@ class ProductMenu {
         // Restore warehouse mode class if needed (for safe area background)
         document.body.classList.remove('warehouse-mode');
         console.log('ProductMenu: Cleaned up warehouse-mode class');
+    }
+
+    /**
+     * Render the WooCommerce account dashboard
+     */
+    renderAccountDashboard() {
+        if (!this.productGridContainer) return;
+
+        this.productGridContainer.innerHTML = '';
+
+        const accountContainer = document.createElement('div');
+        accountContainer.className = 'woocommerce-account-container';
+        accountContainer.style.cssText = `
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.9);
+            font-family: 'Courier New', monospace;
+        `;
+
+        // Account header with back button
+        const accountHeader = document.createElement('div');
+        accountHeader.style.cssText = `
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #00ff00;
+        `;
+
+        const headerTitle = document.createElement('h2');
+        headerTitle.textContent = 'My Account';
+        headerTitle.style.cssText = `
+            color: #00ff00;
+            margin: 0;
+            font-size: 24px;
+            text-transform: uppercase;
+        `;
+
+        const backBtn = document.createElement('button');
+        backBtn.textContent = '← Back to Map';
+        backBtn.style.cssText = `
+            background: transparent;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        `;
+
+        backBtn.addEventListener('click', () => {
+            this.restoreMapMarkers();
+            this.hideMenu();
+        });
+
+        accountHeader.appendChild(headerTitle);
+        accountHeader.appendChild(backBtn);
+
+        // Check if user is logged in
+        const isLoggedIn = this.isUserLoggedIn();
+
+        if (!isLoggedIn) {
+            // Show login form
+            this.renderLoginForm(accountContainer, accountHeader);
+        } else {
+            // Show account dashboard
+            this.renderUserDashboard(accountContainer, accountHeader);
+        }
+
+        this.productGridContainer.appendChild(accountContainer);
+    }
+
+    /**
+     * Check if user is currently logged in to WooCommerce
+     * @returns {boolean} True if user is logged in
+     */
+    isUserLoggedIn() {
+        // Check for WordPress/WooCommerce login indicators
+        return document.body.classList.contains('logged-in') ||
+               (typeof window.wc_customer_data !== 'undefined' && window.wc_customer_data.customer_id > 0) ||
+               (typeof wpApiSettings !== 'undefined' && wpApiSettings.nonce) ||
+               document.querySelector('body.logged-in') !== null;
+    }
+
+    /**
+     * Render login form for non-logged-in users
+     * @param {HTMLElement} container - Main container
+     * @param {HTMLElement} header - Header element
+     */
+    renderLoginForm(container, header) {
+        container.appendChild(header);
+
+        const loginSection = document.createElement('div');
+        loginSection.style.cssText = `
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        `;
+
+        loginSection.innerHTML = `
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h3 style="color: #00ff00; margin: 0 0 10px 0;">Account Access Required</h3>
+                <p style="color: #ffffff; margin: 0; line-height: 1.5;">
+                    Sign in to view your order history, manage addresses, and access your account settings.
+                </p>
+            </div>
+
+            <div style="display: grid; gap: 20px;">
+                <button id="loginButton" style="
+                    background: #00ff00;
+                    border: none;
+                    color: #000000;
+                    padding: 15px 20px;
+                    cursor: pointer;
+                    font-family: 'Courier New', monospace;
+                    font-size: 16px;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                    transition: all 0.3s ease;
+                ">Login to Existing Account</button>
+
+                <button id="registerButton" style="
+                    background: transparent;
+                    border: 2px solid #00ff00;
+                    color: #00ff00;
+                    padding: 15px 20px;
+                    cursor: pointer;
+                    font-family: 'Courier New', monospace;
+                    font-size: 16px;
+                    text-transform: uppercase;
+                    transition: all 0.3s ease;
+                ">Create New Account</button>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="color: #888888; font-size: 14px; margin: 0;">
+                        Your account gives you access to order tracking,
+                        <br>purchase history, and exclusive member benefits.
+                    </p>
+                </div>
+            </div>
+        `;
+
+        // Add event listeners for login/register buttons
+        const loginButton = loginSection.querySelector('#loginButton');
+        const registerButton = loginSection.querySelector('#registerButton');
+
+        loginButton.addEventListener('click', () => {
+            // Redirect to WooCommerce login page
+            const loginUrl = getConfig('WOOCOMMERCE.LOGIN_URL') || '/my-account/';
+            window.location.href = loginUrl;
+        });
+
+        registerButton.addEventListener('click', () => {
+            // Redirect to WooCommerce registration page
+            const registerUrl = getConfig('WOOCOMMERCE.REGISTER_URL') || '/my-account/?action=register';
+            window.location.href = registerUrl;
+        });
+
+        container.appendChild(loginSection);
+    }
+
+    /**
+     * Render user dashboard for logged-in users
+     * @param {HTMLElement} container - Main container
+     * @param {HTMLElement} header - Header element
+     */
+    renderUserDashboard(container, header) {
+        container.appendChild(header);
+
+        const dashboardSection = document.createElement('div');
+        dashboardSection.style.cssText = `
+            display: grid;
+            gap: 20px;
+            padding: 20px 0;
+        `;
+
+        // Welcome section
+        const welcomeSection = document.createElement('div');
+        welcomeSection.style.cssText = `
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            border-radius: 4px;
+        `;
+
+        welcomeSection.innerHTML = `
+            <h3 style="color: #00ff00; margin: 0 0 10px 0;">Welcome Back!</h3>
+            <p style="color: #ffffff; margin: 0;">
+                Access your account information and order history below.
+            </p>
+        `;
+
+        // Quick actions grid
+        const actionsGrid = document.createElement('div');
+        actionsGrid.style.cssText = `
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        `;
+
+        const actions = [
+            { title: 'Order History', desc: 'View past orders and track current ones', url: '/my-account/orders/' },
+            { title: 'Account Details', desc: 'Update your personal information', url: '/my-account/edit-account/' },
+            { title: 'Addresses', desc: 'Manage billing and shipping addresses', url: '/my-account/edit-address/' },
+            { title: 'Payment Methods', desc: 'Manage saved payment methods', url: '/my-account/payment-methods/' }
+        ];
+
+        actions.forEach(action => {
+            const actionCard = document.createElement('button');
+            actionCard.style.cssText = `
+                background: rgba(0, 0, 0, 0.7);
+                border: 2px solid #00ff00;
+                color: #ffffff;
+                padding: 20px;
+                text-align: left;
+                cursor: pointer;
+                font-family: 'Courier New', monospace;
+                transition: all 0.3s ease;
+                border-radius: 4px;
+            `;
+
+            actionCard.innerHTML = `
+                <div style="color: #00ff00; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">
+                    ${action.title}
+                </div>
+                <div style="color: #cccccc; font-size: 14px; line-height: 1.4;">
+                    ${action.desc}
+                </div>
+            `;
+
+            actionCard.addEventListener('click', () => {
+                window.location.href = action.url;
+            });
+
+            actionCard.addEventListener('mouseenter', () => {
+                actionCard.style.background = 'rgba(0, 255, 0, 0.1)';
+                actionCard.style.transform = 'translateY(-2px)';
+            });
+
+            actionCard.addEventListener('mouseleave', () => {
+                actionCard.style.background = 'rgba(0, 0, 0, 0.7)';
+                actionCard.style.transform = 'translateY(0)';
+            });
+
+            actionsGrid.appendChild(actionCard);
+        });
+
+        dashboardSection.appendChild(welcomeSection);
+        dashboardSection.appendChild(actionsGrid);
+        container.appendChild(dashboardSection);
     }
 
     /**

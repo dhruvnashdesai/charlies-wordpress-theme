@@ -410,6 +410,48 @@ class CharlieStoreApp {
         this.mapManager.addCartMarker(cartMarker);
 
         console.log('Cart marker positioned at:', { screenX, screenY });
+
+        // Add account marker 500px below cart marker
+        this.addAccountMarker(screenX, screenY);
+    }
+
+    /**
+     * Add an account marker positioned below the cart marker
+     * @param {number} cartX - Cart marker X position
+     * @param {number} cartY - Cart marker Y position
+     */
+    addAccountMarker(cartX, cartY) {
+        if (!this.mapManager.isMapInitialized()) return;
+
+        const isMobile = window.innerWidth <= 768;
+
+        // Position account marker 500px below cart (only on desktop)
+        // On mobile, position it differently to avoid going off-screen
+        let accountX, accountY;
+
+        if (isMobile) {
+            // Mobile: Position to the right of cart marker
+            accountX = cartX + 80; // 80px to the right
+            accountY = cartY + 20; // Slightly below
+        } else {
+            // Desktop: 500px directly below cart marker
+            accountX = cartX;
+            accountY = cartY + 500;
+        }
+
+        // Create account marker data
+        const accountMarker = {
+            id: 'account_marker',
+            name: 'My Account',
+            type: 'account',
+            screenPosition: { x: accountX, y: accountY },
+            description: 'Access your account and order history'
+        };
+
+        // Add the account marker using map manager
+        this.mapManager.addAccountMarker(accountMarker);
+
+        console.log('Account marker positioned at:', { x: accountX, y: accountY });
     }
 
     /**

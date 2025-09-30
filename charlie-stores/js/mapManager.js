@@ -1184,6 +1184,156 @@ class MapManager {
     }
 
     /**
+     * Add account marker for customer dashboard access
+     * @param {object} account - Account marker data
+     * @returns {HTMLElement} Marker element
+     */
+    addAccountMarker(account) {
+        if (!this.isInitialized) return;
+
+        const markerId = account.id;
+
+        // Remove existing marker if it exists
+        this.removeMarker(markerId);
+
+        // Create custom account marker element
+        const markerElement = this.createAccountMarkerElement(account);
+
+        // Position marker at fixed screen coordinates (not geographic)
+        if (account.screenPosition) {
+            markerElement.style.position = 'fixed';
+            markerElement.style.left = `${account.screenPosition.x}px`;
+            markerElement.style.top = `${account.screenPosition.y}px`;
+            markerElement.style.zIndex = '600'; // Above vignette but below crosshair
+            markerElement.style.transform = 'translate(-50%, -50%)';
+
+            // Add directly to the map container instead of using Mapbox marker
+            this.mapContainer.appendChild(markerElement);
+        }
+
+        // Add click event for account interaction
+        markerElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            // Handle account click - open account dashboard
+            this.handleAccountClick(account);
+        });
+
+        // Store marker reference
+        this.markers.set(markerId, {
+            marker: null, // No Mapbox marker, just DOM element
+            element: markerElement,
+            account: account,
+            isSelected: false,
+            isScreenMarker: true // Flag to indicate this is a screen-positioned marker
+        });
+
+        console.log(`Account marker placed at screen position: ${account.screenPosition.x}, ${account.screenPosition.y}`);
+        return markerElement;
+    }
+
+    /**
+     * Create custom account marker element
+     * @param {object} account - Account data
+     * @returns {HTMLElement} Marker element
+     */
+    createAccountMarkerElement(account) {
+        const element = document.createElement('div');
+        element.className = 'account-marker';
+        element.setAttribute('role', 'button');
+        element.setAttribute('aria-label', `${account.name} - Click to access account dashboard`);
+        element.setAttribute('tabindex', '0');
+
+        // Mobile-responsive sizing (reduced to 60px for mobile)
+        const isMobile = window.innerWidth <= 768;
+        const markerSize = isMobile ? 60 : 80; // Reduced to 60px on mobile
+        const borderWidth = isMobile ? 3 : 4;
+
+        // Use account/user icon with blue styling to differentiate from cart
+        element.style.cssText = `
+            width: ${markerSize}px;
+            height: ${markerSize}px;
+            background-color: #007cba;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+            background-size: 60%;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            border: ${borderWidth}px solid #007cba;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 124, 186, 0.4);
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+            position: relative;
+            z-index: 600;
+        `;
+
+        // Add hover effects
+        element.addEventListener('mouseenter', () => {
+            element.style.transform = 'translate(-50%, -50%) scale(1.1)';
+            element.style.boxShadow = '0 6px 20px rgba(0, 124, 186, 0.6)';
+        });
+
+        element.addEventListener('mouseleave', () => {
+            element.style.transform = 'translate(-50%, -50%) scale(1)';
+            element.style.boxShadow = '0 4px 12px rgba(0, 124, 186, 0.4)';
+        });
+
+        // Add keyboard support
+        element.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                element.click();
+            }
+        });
+
+        return element;
+    }
+
+    /**
+     * Handle account marker click
+     * @param {object} account - Account data
+     */
+    handleAccountClick(account) {
+        console.log('Account clicked:', account.name);
+
+        // Hide the account marker immediately (like warehouse marker)
+        const accountMarkerElement = this.markers.get(account.id)?.element;
+        if (accountMarkerElement) {
+            accountMarkerElement.style.display = 'none';
+        }
+
+        // Check if we're on mobile to handle differently
+        const isMobile = window.innerWidth <= 768;
+        if (!isMobile) {
+            // Desktop: enable sliding animation to product mode
+            this.slideToProductMode();
+
+            // Hide vignette overlay on desktop (match warehouse behavior exactly)
+            const vignette = document.getElementById('radiusVignette');
+            if (vignette) {
+                vignette.style.display = 'none';
+            }
+            console.log('Desktop: Hiding vignette overlay for account menu');
+        }
+        // Mobile: skip animation to keep map static
+
+        // Dispatch event to open account dashboard in the product menu modal
+        document.dispatchEvent(new CustomEvent('accountClicked', {
+            detail: {
+                account: account,
+                openAccountDashboard: true // Flag to indicate we want to open account dashboard
+            }
+        }));
+
+        // Track account access for analytics
+        this.trackEvent('account_accessed', {
+            source: 'map_marker',
+            account_id: account.id
+        });
+    }
+
+    /**
      * Track analytics events
      * @param {string} eventName - Event name
      * @param {object} eventData - Additional event data
