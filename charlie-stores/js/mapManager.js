@@ -1001,7 +1001,8 @@ class MapManager {
             this.mapContainer.appendChild(markerElement);
         }
 
-        // Add click event for warehouse interaction
+        // The container already has click events attached in createWarehouseMarkerElement
+        // Just need to override the click behavior for warehouse-specific actions
         markerElement.addEventListener('click', (e) => {
             e.stopPropagation();
 
@@ -1061,7 +1062,8 @@ class MapManager {
             this.mapContainer.appendChild(markerElement);
         }
 
-        // Add click event for cart interaction
+        // The container already has click events attached in createCartMarkerElement
+        // Just need to override the click behavior for cart-specific actions
         markerElement.addEventListener('click', (e) => {
             e.stopPropagation();
 
@@ -1094,20 +1096,21 @@ class MapManager {
         container.setAttribute('role', 'button');
         container.setAttribute('aria-label', `${cart.name} - Click to access cart`);
         container.setAttribute('tabindex', '0');
+
+        // Mobile-responsive sizing (reduced to 60px for mobile)
+        const isMobile = window.innerWidth <= 768;
         container.style.cssText = `
             display: flex;
-            flex-direction: column;
+            flex-direction: ${isMobile ? 'column' : 'row'};
             align-items: center;
             cursor: pointer;
             z-index: 600;
+            gap: ${isMobile ? '5px' : '10px'};
         `;
 
         // Create the actual marker element
         const element = document.createElement('div');
         element.className = 'cart-marker';
-
-        // Mobile-responsive sizing (reduced to 60px for mobile)
-        const isMobile = window.innerWidth <= 768;
         const markerSize = isMobile ? 60 : 80; // Reduced to 60px on mobile
         const borderWidth = isMobile ? 3 : 4;
 
@@ -1135,7 +1138,7 @@ class MapManager {
         label.className = 'cart-marker-label';
         label.textContent = 'CART';
         label.style.cssText = `
-            margin-top: 5px;
+            ${isMobile ? 'margin-top: 5px;' : 'margin-left: 10px;'}
             color: #ffffff;
             font-family: 'Courier New', monospace;
             font-size: ${isMobile ? '10px' : '12px'};
@@ -1144,6 +1147,7 @@ class MapManager {
             text-align: center;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             pointer-events: none;
+            white-space: nowrap;
         `;
 
         // Add elements to container
@@ -1243,7 +1247,8 @@ class MapManager {
             this.mapContainer.appendChild(markerElement);
         }
 
-        // Add click event for account interaction
+        // The container already has click events attached in createAccountMarkerElement
+        // Just need to override the click behavior for account-specific actions
         markerElement.addEventListener('click', (e) => {
             e.stopPropagation();
 
@@ -1276,20 +1281,21 @@ class MapManager {
         container.setAttribute('role', 'button');
         container.setAttribute('aria-label', `${account.name} - Click to access account dashboard`);
         container.setAttribute('tabindex', '0');
+
+        // Mobile-responsive sizing (reduced to 60px for mobile)
+        const isMobile = window.innerWidth <= 768;
         container.style.cssText = `
             display: flex;
-            flex-direction: column;
+            flex-direction: ${isMobile ? 'column' : 'row'};
             align-items: center;
             cursor: pointer;
             z-index: 600;
+            gap: ${isMobile ? '5px' : '10px'};
         `;
 
         // Create the actual marker element
         const element = document.createElement('div');
         element.className = 'account-marker';
-
-        // Mobile-responsive sizing (reduced to 60px for mobile)
-        const isMobile = window.innerWidth <= 768;
         const markerSize = isMobile ? 60 : 80; // Reduced to 60px on mobile
         const borderWidth = isMobile ? 3 : 4;
 
@@ -1317,7 +1323,7 @@ class MapManager {
         label.className = 'account-marker-label';
         label.textContent = 'ACCOUNT';
         label.style.cssText = `
-            margin-top: 5px;
+            ${isMobile ? 'margin-top: 5px;' : 'margin-left: 10px;'}
             color: #ffffff;
             font-family: 'Courier New', monospace;
             font-size: ${isMobile ? '10px' : '12px'};
@@ -1326,6 +1332,7 @@ class MapManager {
             text-align: center;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             pointer-events: none;
+            white-space: nowrap;
         `;
 
         // Add elements to container
@@ -1431,11 +1438,14 @@ class MapManager {
         container.setAttribute('role', 'button');
         container.setAttribute('aria-label', `${warehouse.name} - Click for details`);
         container.setAttribute('tabindex', '0');
+
+        const isMobile = window.innerWidth <= 768;
         container.style.cssText = `
             display: flex;
-            flex-direction: column;
+            flex-direction: ${isMobile ? 'column' : 'row'};
             align-items: center;
             cursor: pointer;
+            gap: ${isMobile ? '5px' : '10px'};
         `;
 
         // Create the actual marker element
@@ -1443,7 +1453,6 @@ class MapManager {
         element.className = 'warehouse-marker';
 
         // Mobile-responsive sizing (reduced to 60px for mobile)
-        const isMobile = window.innerWidth <= 768;
         const markerSize = isMobile ? 60 : 80; // Reduced to 60px on mobile
         const borderWidth = isMobile ? 3 : 4;  // Reduced border width
 
@@ -1477,7 +1486,7 @@ class MapManager {
         label.className = 'warehouse-marker-label';
         label.textContent = 'SUPPLY';
         label.style.cssText = `
-            margin-top: 5px;
+            ${isMobile ? 'margin-top: 5px;' : 'margin-left: 10px;'}
             color: #ffffff;
             font-family: 'Courier New', monospace;
             font-size: ${isMobile ? '10px' : '12px'};
@@ -1486,6 +1495,7 @@ class MapManager {
             text-align: center;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             pointer-events: none;
+            white-space: nowrap;
         `;
 
         // Add elements to container
