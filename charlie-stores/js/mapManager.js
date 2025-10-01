@@ -1088,11 +1088,23 @@ class MapManager {
      * @returns {HTMLElement} Marker element
      */
     createCartMarkerElement(cart) {
+        // Create container for marker and label
+        const container = document.createElement('div');
+        container.className = 'cart-marker-container';
+        container.setAttribute('role', 'button');
+        container.setAttribute('aria-label', `${cart.name} - Click to access cart`);
+        container.setAttribute('tabindex', '0');
+        container.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            z-index: 600;
+        `;
+
+        // Create the actual marker element
         const element = document.createElement('div');
         element.className = 'cart-marker';
-        element.setAttribute('role', 'button');
-        element.setAttribute('aria-label', `${cart.name} - Click to access cart`);
-        element.setAttribute('tabindex', '0');
 
         // Mobile-responsive sizing (reduced to 60px for mobile)
         const isMobile = window.innerWidth <= 768;
@@ -1118,26 +1130,46 @@ class MapManager {
             z-index: 600;
         `;
 
-        // Add hover effects
-        element.addEventListener('mouseenter', () => {
-            element.style.transform = 'translate(-50%, -50%) scale(1.1)';
+        // Create text label
+        const label = document.createElement('div');
+        label.className = 'cart-marker-label';
+        label.textContent = 'CART';
+        label.style.cssText = `
+            margin-top: 5px;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: ${isMobile ? '10px' : '12px'};
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+        `;
+
+        // Add elements to container
+        container.appendChild(element);
+        container.appendChild(label);
+
+        // Add hover effects (apply to container)
+        container.addEventListener('mouseenter', () => {
+            element.style.transform = 'scale(1.1)';
             element.style.boxShadow = '0 6px 20px rgba(40, 167, 69, 0.6)';
         });
 
-        element.addEventListener('mouseleave', () => {
-            element.style.transform = 'translate(-50%, -50%) scale(1)';
+        container.addEventListener('mouseleave', () => {
+            element.style.transform = 'scale(1)';
             element.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.4)';
         });
 
-        // Add keyboard support
-        element.addEventListener('keydown', (e) => {
+        // Add keyboard support (apply to container)
+        container.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                element.click();
+                container.click();
             }
         });
 
-        return element;
+        return container;
     }
 
     /**
@@ -1238,11 +1270,23 @@ class MapManager {
      * @returns {HTMLElement} Marker element
      */
     createAccountMarkerElement(account) {
+        // Create container for marker and label
+        const container = document.createElement('div');
+        container.className = 'account-marker-container';
+        container.setAttribute('role', 'button');
+        container.setAttribute('aria-label', `${account.name} - Click to access account dashboard`);
+        container.setAttribute('tabindex', '0');
+        container.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            z-index: 600;
+        `;
+
+        // Create the actual marker element
         const element = document.createElement('div');
         element.className = 'account-marker';
-        element.setAttribute('role', 'button');
-        element.setAttribute('aria-label', `${account.name} - Click to access account dashboard`);
-        element.setAttribute('tabindex', '0');
 
         // Mobile-responsive sizing (reduced to 60px for mobile)
         const isMobile = window.innerWidth <= 768;
@@ -1268,26 +1312,46 @@ class MapManager {
             z-index: 600;
         `;
 
-        // Add hover effects
-        element.addEventListener('mouseenter', () => {
-            element.style.transform = 'translate(-50%, -50%) scale(1.1)';
+        // Create text label
+        const label = document.createElement('div');
+        label.className = 'account-marker-label';
+        label.textContent = 'ACCOUNT';
+        label.style.cssText = `
+            margin-top: 5px;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: ${isMobile ? '10px' : '12px'};
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+        `;
+
+        // Add elements to container
+        container.appendChild(element);
+        container.appendChild(label);
+
+        // Add hover effects (apply to container)
+        container.addEventListener('mouseenter', () => {
+            element.style.transform = 'scale(1.1)';
             element.style.boxShadow = '0 6px 20px rgba(0, 124, 186, 0.6)';
         });
 
-        element.addEventListener('mouseleave', () => {
-            element.style.transform = 'translate(-50%, -50%) scale(1)';
+        container.addEventListener('mouseleave', () => {
+            element.style.transform = 'scale(1)';
             element.style.boxShadow = '0 4px 12px rgba(0, 124, 186, 0.4)';
         });
 
-        // Add keyboard support
-        element.addEventListener('keydown', (e) => {
+        // Add keyboard support (apply to container)
+        container.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                element.click();
+                container.click();
             }
         });
 
-        return element;
+        return container;
     }
 
     /**
@@ -1361,11 +1425,22 @@ class MapManager {
      * @returns {HTMLElement} Marker element
      */
     createWarehouseMarkerElement(warehouse) {
+        // Create container for marker and label
+        const container = document.createElement('div');
+        container.className = 'warehouse-marker-container';
+        container.setAttribute('role', 'button');
+        container.setAttribute('aria-label', `${warehouse.name} - Click for details`);
+        container.setAttribute('tabindex', '0');
+        container.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        `;
+
+        // Create the actual marker element
         const element = document.createElement('div');
         element.className = 'warehouse-marker';
-        element.setAttribute('role', 'button');
-        element.setAttribute('aria-label', `${warehouse.name} - Click for details`);
-        element.setAttribute('tabindex', '0');
 
         // Mobile-responsive sizing (reduced to 60px for mobile)
         const isMobile = window.innerWidth <= 768;
@@ -1396,27 +1471,47 @@ class MapManager {
             transform-origin: center center;
             animation: warehousePulse 2s ease-in-out infinite;
         `;
+
+        // Create text label
+        const label = document.createElement('div');
+        label.className = 'warehouse-marker-label';
+        label.textContent = 'SUPPLY';
+        label.style.cssText = `
+            margin-top: 5px;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: ${isMobile ? '10px' : '12px'};
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+        `;
+
+        // Add elements to container
+        container.appendChild(element);
+        container.appendChild(label);
         
-        // Hover effects - enhanced for pulsing marker
-        element.addEventListener('mouseenter', () => {
+        // Hover effects - enhanced for pulsing marker (apply to container)
+        container.addEventListener('mouseenter', () => {
             element.style.animationDuration = '1s'; // Faster pulse on hover
             element.style.borderColor = '#D67D2A'; // Darker orange on hover
         });
 
-        element.addEventListener('mouseleave', () => {
+        container.addEventListener('mouseleave', () => {
             element.style.animationDuration = '2s'; // Back to normal pulse
             element.style.borderColor = '#F08F34'; // Back to orange
         });
-        
-        // Keyboard support
-        element.addEventListener('keydown', (e) => {
+
+        // Keyboard support (apply to container)
+        container.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                element.click();
+                container.click();
             }
         });
 
-        return element;
+        return container;
     }
 
     /**
