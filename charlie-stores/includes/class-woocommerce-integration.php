@@ -38,6 +38,8 @@ class Charlie_WooCommerce_Integration {
         add_action('wp_ajax_nopriv_get_payment_instructions', array($this, 'ajax_get_payment_instructions'));
         add_action('wp_ajax_charlie_get_order_status', array($this, 'ajax_get_order_status'));
         add_action('wp_ajax_nopriv_charlie_get_order_status', array($this, 'ajax_get_order_status'));
+        add_action('wp_ajax_get_customer_data', array($this, 'ajax_get_customer_data'));
+        add_action('wp_ajax_nopriv_get_customer_data', array($this, 'ajax_get_customer_data'));
 
         // Add store location field to products (only in admin)
         if (is_admin()) {
@@ -1255,6 +1257,57 @@ class Charlie_WooCommerce_Integration {
         } catch (Exception $e) {
             error_log('Charlie Order Status Error: ' . $e->getMessage());
             wp_send_json_error('Failed to load order status');
+        }
+    }
+
+    /**
+     * AJAX handler to get current customer data
+     */
+    public function ajax_get_customer_data() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'charlie_nonce')) {
+            wp_send_json_error('Security check failed');
+            return;
+        }
+
+        try {
+            // Check if user is logged in
+            if (!is_user_logged_in()) {
+                wp_send_json_error('User not logged in');
+                return;
+            }
+
+            $current_user = wp_get_current_user();
+            $user_id = $current_user->ID;
+
+            // Get user meta data
+            $first_name = get_user_meta($user_id, 'first_name', true);
+            $last_name = get_user_meta($user_id, 'last_name', true);
+            $billing_first_name = get_user_meta($user_id, 'billing_first_name', true);
+            $billing_last_name = get_user_meta($user_id, 'billing_last_name', true);
+
+            // Use billing names if regular names are empty
+            if (empty($first_name) && !empty($billing_first_name)) {
+                $first_name = $billing_first_name;
+            }
+            if (empty($last_name) && !empty($billing_last_name)) {
+                $last_name = $billing_last_name;
+            }
+
+            $customer_data = array(
+                'first_name' => $first_name ?: '',
+                'last_name' => $last_name ?: '',
+                'email' => $current_user->user_email ?: '',
+                'display_name' => $current_user->display_name ?: '',
+                'user_login' => $current_user->user_login ?: ''
+            );
+
+            error_log('Charlie Customer Data: Retrieved for user ' . $user_id . ': ' . json_encode($customer_data));
+            wp_send_json_success($customer_data);
+
+        } catch (Exception $e) {
+            error_log('Charlie Customer Data Error: ' . $e->getMessage());
+            wp_send_json_error('Failed to load customer data: ' . $e->getMessage());
         }
     }
 }

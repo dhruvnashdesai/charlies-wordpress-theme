@@ -5115,25 +5115,35 @@ class ProductMenu {
     }
 
     /**
-     * Fetch current customer data from WooCommerce API
+     * Fetch current customer data from WordPress
      * @returns {Promise<Object>} Customer data
      */
     async fetchCustomerData() {
         try {
-            const response = await fetch(getConfig('ENDPOINTS.STORES') + '/../customers/me', {
-                method: 'GET',
+            const response = await fetch(getConfig('ajax_url'), {
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': getConfig('nonce')
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                credentials: 'same-origin'
+                credentials: 'same-origin',
+                body: new URLSearchParams({
+                    action: 'get_customer_data',
+                    nonce: getConfig('nonce')
+                })
             });
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            return await response.json();
+            const result = await response.json();
+
+            if (result.success) {
+                console.log('Customer data loaded:', result.data);
+                return result.data;
+            } else {
+                throw new Error(result.data || 'Failed to fetch customer data');
+            }
         } catch (error) {
             console.error('Failed to fetch customer data:', error);
             return { first_name: '', last_name: '', email: '' }; // Return empty defaults
