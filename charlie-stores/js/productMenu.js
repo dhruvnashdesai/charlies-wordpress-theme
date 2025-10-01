@@ -1324,15 +1324,21 @@ class ProductMenu {
                 this.menuElement.style.transition = 'top 0.4s ease-out';
             }, 10);
         } else {
-            // Desktop: Fixed width on right side
+            // Desktop: Fixed width on right side with slide-in animation
             const menuWidth = 1000; // Compact width for 4-column grid with good marker visibility
             this.menuElement.style.width = menuWidth + 'px';
             this.menuElement.style.height = '80vh';
-            this.menuElement.style.right = '20px';
+            this.menuElement.style.right = '-1050px'; // Start off-screen to the right
             this.menuElement.style.top = '50%';
             this.menuElement.style.left = 'auto';
             this.menuElement.style.transform = 'translateY(-50%)';
             this.menuElement.style.borderRadius = '8px';
+
+            // Animate slide in from right
+            setTimeout(() => {
+                this.menuElement.style.right = '20px'; // Final position
+                this.menuElement.style.transition = 'right 0.4s ease-out';
+            }, 10);
         }
 
         this.menuElement.style.display = 'block';
