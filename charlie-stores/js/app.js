@@ -313,8 +313,8 @@ class CharlieStoreApp {
             const edgeY = centerPoint.y + (vignetteRadius * Math.sin(radians));
 
             // Fine-tuning: move more to the right and slightly more up
-            screenX = edgeX + markerRadius + 120; // Move right by marker radius + 120px
-            screenY = edgeY - 35; // Move up by 35px
+            screenX = edgeX + markerRadius + 170; // Move right by marker radius + 170px (120 + 50)
+            screenY = edgeY - 15; // Move up by 15px (35 - 20)
         }
 
         console.log('Warehouse final position:', { screenX, screenY });
