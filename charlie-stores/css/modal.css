@@ -22,13 +22,13 @@
 
 .modal-content {
     background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #00ff00;
+    border: 2px solid #0099ff;
     border-radius: 12px;
     padding: 2rem;
     max-width: 500px;
     width: 90%;
     text-align: center;
-    box-shadow: 0 20px 60px rgba(0, 255, 0, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 153, 255, 0.3);
     animation: modalFadeIn 0.3s ease-out;
     font-family: 'Courier New', monospace;
 }
@@ -49,12 +49,12 @@
 }
 
 .modal-header h2 {
-    color: #00ff00;
+    color: #0099ff;
     font-size: 1.8rem;
     margin-bottom: 0;
     font-family: 'Courier New', monospace;
     font-weight: bold;
-    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    text-shadow: 0 0 10px rgba(0, 153, 255, 0.5);
 }
 
 .modal-body {
@@ -95,17 +95,17 @@
 }
 
 .age-buttons .btn-primary {
-    background: rgba(0, 255, 0, 0.2);
-    border: 2px solid #00ff00;
-    color: #00ff00;
-    box-shadow: 0 4px 15px rgba(0, 255, 0, 0.3);
+    background: rgba(0, 153, 255, 0.2);
+    border: 2px solid #0099ff;
+    color: #0099ff;
+    box-shadow: 0 4px 15px rgba(0, 153, 255, 0.3);
 }
 
 .age-buttons .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 255, 0, 0.5);
-    background: rgba(0, 255, 0, 0.3);
-    border-color: #00ff44;
+    box-shadow: 0 6px 20px rgba(0, 153, 255, 0.5);
+    background: rgba(0, 153, 255, 0.3);
+    border-color: #33aaff;
 }
 
 .age-buttons .btn-secondary {
