@@ -1,0 +1,286 @@
+/**
+ * WooCommerce Styles
+ * Clean, modern styling for shop pages
+ */
+
+/* Shop Header */
+.shop-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.shop-header .page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.shop-header .shop-description {
+    font-size: 1.2rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* WooCommerce Product Grid */
+.woocommerce ul.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+}
+
+.woocommerce ul.products li.product {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    border: 1px solid #f0f0f0;
+    text-align: center;
+}
+
+.woocommerce ul.products li.product:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.woocommerce ul.products li.product img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.woocommerce ul.products li.product h2,
+.woocommerce ul.products li.product .woocommerce-loop-product__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 1rem;
+    color: #333;
+}
+
+.woocommerce ul.products li.product .price {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #000;
+    margin: 0 1rem 1rem;
+}
+
+.woocommerce ul.products li.product .price del {
+    color: #999;
+    font-weight: normal;
+}
+
+/* Add to Cart Button */
+.woocommerce ul.products li.product .button,
+.woocommerce ul.products li.product .add_to_cart_button {
+    width: calc(100% - 2rem);
+    margin: 0 1rem 1rem;
+    padding: 12px;
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.woocommerce ul.products li.product .button:hover,
+.woocommerce ul.products li.product .add_to_cart_button:hover {
+    background: #333;
+    color: white;
+}
+
+/* Product Filters and Sorting */
+.woocommerce .woocommerce-ordering,
+.woocommerce .woocommerce-result-count {
+    margin-bottom: 1rem;
+}
+
+.woocommerce .woocommerce-ordering select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+}
+
+/* Pagination */
+.woocommerce nav.woocommerce-pagination {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.woocommerce nav.woocommerce-pagination ul {
+    display: inline-flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 0.5rem;
+}
+
+.woocommerce nav.woocommerce-pagination ul li {
+    margin: 0;
+}
+
+.woocommerce nav.woocommerce-pagination ul li a,
+.woocommerce nav.woocommerce-pagination ul li span {
+    display: block;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.woocommerce nav.woocommerce-pagination ul li a:hover,
+.woocommerce nav.woocommerce-pagination ul li span.current {
+    background: #000;
+    color: white;
+    border-color: #000;
+}
+
+/* Single Product Page */
+.woocommerce div.product {
+    margin-bottom: 3rem;
+}
+
+.woocommerce div.product .summary {
+    margin-bottom: 2rem;
+}
+
+.woocommerce div.product .product_title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.woocommerce div.product .price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 1rem;
+}
+
+.woocommerce div.product .single_add_to_cart_button {
+    background: #000;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.woocommerce div.product .single_add_to_cart_button:hover {
+    background: #333;
+}
+
+/* Cart Page */
+.woocommerce-cart table.cart {
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.woocommerce-cart table.cart th,
+.woocommerce-cart table.cart td {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.woocommerce-cart .cart-collaterals {
+    margin-top: 2rem;
+}
+
+/* Checkout Page */
+.woocommerce-checkout .checkout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+}
+
+.woocommerce-checkout .checkout .form-row {
+    margin-bottom: 1rem;
+}
+
+.woocommerce-checkout .checkout input[type="text"],
+.woocommerce-checkout .checkout input[type="email"],
+.woocommerce-checkout .checkout input[type="tel"],
+.woocommerce-checkout .checkout select,
+.woocommerce-checkout .checkout textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.woocommerce-checkout .checkout .place-order {
+    margin-top: 2rem;
+}
+
+.woocommerce-checkout .checkout #place_order {
+    width: 100%;
+    background: #000;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.woocommerce-checkout .checkout #place_order:hover {
+    background: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .woocommerce ul.products {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .shop-header .page-title {
+        font-size: 2rem;
+    }
+
+    .woocommerce-checkout .checkout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .woocommerce nav.woocommerce-pagination ul {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* Remove WooCommerce default styling conflicts */
+.woocommerce ul.products li.product .star-rating {
+    margin: 0.5rem auto;
+}
+
+.woocommerce ul.products li.product .woocommerce-loop-product__link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.woocommerce ul.products li.product .woocommerce-loop-product__link:hover {
+    text-decoration: none;
+    color: inherit;
+}

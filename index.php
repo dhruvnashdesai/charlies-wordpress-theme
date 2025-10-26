@@ -1,7 +1,7 @@
 <?php get_header(); ?>
 
 <main class="charlies-main">
-    <?php if (is_home() && !have_posts()) : ?>
+    <?php if (is_front_page() || (is_home() && !have_posts())) : ?>
         <!-- Show landing page content if this is homepage with no posts -->
         <section class="charlies-hero">
             <div class="charlies-container">
