@@ -1,0 +1,398 @@
+/**
+ * Landing Page Styles - Lucy.co Inspired
+ * Clean, modern ecommerce design
+ */
+
+/* Container */
+.charlies-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Hero Section */
+.charlies-hero {
+    background: linear-gradient(135deg, #000 0%, #333 100%);
+    color: white;
+    text-align: center;
+    padding: 5rem 0;
+    margin-bottom: 4rem;
+}
+
+.charlies-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+}
+
+.charlies-hero p {
+    font-size: 1.3rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.5;
+}
+
+.charlies-hero .btn {
+    background: white;
+    color: #000;
+    padding: 18px 40px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.charlies-hero .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+}
+
+/* Section Titles */
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 3rem;
+    color: #333;
+}
+
+/* Featured Products Section */
+.charlies-featured-products {
+    margin-bottom: 5rem;
+}
+
+.charlies-view-all {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #333;
+    border: 2px solid #333;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+    background: #333;
+    color: white;
+}
+
+/* About Section */
+.charlies-about {
+    background: #f8f9fa;
+    padding: 5rem 0;
+    margin-bottom: 5rem;
+}
+
+.charlies-about-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.charlies-about-text h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.charlies-about-text p {
+    font-size: 1.2rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.charlies-features {
+    list-style: none;
+    padding: 0;
+}
+
+.charlies-features li {
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #eee;
+    font-size: 1.1rem;
+    color: #333;
+    position: relative;
+    padding-left: 2rem;
+}
+
+.charlies-features li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #28a745;
+    font-weight: bold;
+}
+
+.charlies-about-image {
+    background: #e9ecef;
+    height: 400px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholder-image {
+    color: #6c757d;
+    font-size: 1.2rem;
+}
+
+/* Categories Section */
+.charlies-categories {
+    margin-bottom: 5rem;
+}
+
+.charlies-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.charlies-category-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.charlies-category-card:hover {
+    transform: translateY(-5px);
+}
+
+.charlies-category-card a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+}
+
+.charlies-category-image {
+    height: 200px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.charlies-category-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.placeholder-category {
+    color: #6c757d;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.charlies-category-card h3 {
+    padding: 1.5rem 1.5rem 0.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.charlies-category-card p {
+    padding: 0 1.5rem 1.5rem;
+    color: #666;
+    margin: 0;
+}
+
+/* Navigation */
+.charlies-nav {
+    background: white;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.charlies-nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.charlies-logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+    text-decoration: none;
+}
+
+.charlies-nav-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 2.5rem;
+}
+
+.charlies-nav-menu a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.charlies-nav-menu a:hover {
+    color: #007cba;
+}
+
+.charlies-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.charlies-account-link {
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.charlies-cart-icon {
+    position: relative;
+    color: #333;
+    font-size: 1.2rem;
+    text-decoration: none;
+}
+
+.charlies-cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+/* Footer */
+.charlies-footer {
+    background: #333;
+    color: white;
+    padding: 3rem 0 1rem;
+}
+
+.charlies-footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.charlies-footer-section h3,
+.charlies-footer-section h4 {
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.charlies-footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.charlies-footer-section li {
+    margin-bottom: 0.5rem;
+}
+
+.charlies-footer-section a {
+    color: #ccc;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.charlies-footer-section a:hover {
+    color: white;
+}
+
+.charlies-footer-bottom {
+    border-top: 1px solid #555;
+    padding-top: 1rem;
+    text-align: center;
+}
+
+.age-warning {
+    color: #ffc107;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .charlies-container {
+        padding: 0 1rem;
+    }
+
+    .charlies-hero {
+        padding: 3rem 0;
+    }
+
+    .charlies-hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .charlies-hero p {
+        font-size: 1.1rem;
+    }
+
+    .charlies-about-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .charlies-nav-container {
+        flex-direction: column;
+        height: auto;
+        padding: 1rem;
+    }
+
+    .charlies-nav-menu {
+        margin: 1rem 0;
+        gap: 1.5rem;
+    }
+
+    .charlies-nav-actions {
+        margin-top: 1rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .charlies-about-text h2 {
+        font-size: 2rem;
+    }
+
+    .charlies-categories-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,8 +1,8 @@
 /*
-Theme Name: Charlie's Store Finder Theme
-Description: Custom WordPress theme for Charlie's Nicotine Store Finder with full-screen map, age verification, and GTA-style interface
+Theme Name: Charlie's Ecommerce Theme
+Description: Clean, modern WordPress ecommerce theme for nicotine products with WooCommerce integration and age verification
 Author: Charlie's Team
-Version: 1.0.0
+Version: 2.0.0
 Text Domain: charlies-stores
 Domain Path: /languages
 Requires at least: 5.0
@@ -75,26 +75,9 @@ body {
     color: #0073aa;
 }
 
-/* Store Finder Integration */
-.charlie-store-finder {
+/* Ecommerce Integration */
+.charlies-ecommerce {
     position: relative;
-}
-
-/* Full-screen mode overrides */
-body.charlie-full-screen {
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-}
-
-body.charlie-full-screen .site-header,
-body.charlie-full-screen .site-footer,
-body.charlie-full-screen .site-content {
-    display: none !important;
-}
-
-body.charlie-full-screen #wpadminbar {
-    display: none !important;
 }
 
 /* Responsive Design */
