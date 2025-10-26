@@ -17,51 +17,42 @@
 
 <nav class="charlies-nav">
     <div class="charlies-nav-container">
-        <!-- Logo -->
-        <a href="<?php echo esc_url(home_url('/')); ?>" class="charlies-logo">
-            <?php if (has_custom_logo()) : ?>
-                <?php the_custom_logo(); ?>
-            <?php else : ?>
-                <?php bloginfo('name'); ?>
-            <?php endif; ?>
-        </a>
+        <!-- Left Navigation -->
+        <div class="charlies-nav-left">
+            <ul class="charlies-nav-menu">
+                <?php if (class_exists('WooCommerce')) : ?>
+                    <li><a href="<?php echo esc_url(home_url('/devices')); ?>">Devices</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/pouches')); ?>">Pouches</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/sticks')); ?>">Sticks</a></li>
+                    <li><a href="<?php echo wc_get_page_permalink('shop'); ?>">All Products</a></li>
+                <?php endif; ?>
+            </ul>
+        </div>
 
-        <!-- Main Navigation -->
-        <ul class="charlies-nav-menu">
-            <li><a href="<?php echo esc_url(home_url('/')); ?>">Home</a></li>
+        <!-- Center Logo -->
+        <div class="charlies-nav-center">
+            <a href="<?php echo esc_url(home_url('/')); ?>" class="charlies-logo">
+                <?php if (has_custom_logo()) : ?>
+                    <?php the_custom_logo(); ?>
+                <?php else : ?>
+                    <?php bloginfo('name'); ?>
+                <?php endif; ?>
+            </a>
+        </div>
+
+        <!-- Right Navigation -->
+        <div class="charlies-nav-right">
             <?php if (class_exists('WooCommerce')) : ?>
-                <li><a href="<?php echo wc_get_page_permalink('shop'); ?>">Products</a></li>
-            <?php endif; ?>
-
-            <?php
-            // Display product categories in navigation
-            if (class_exists('WooCommerce')) :
-                $categories = get_terms(array(
-                    'taxonomy' => 'product_cat',
-                    'hide_empty' => true,
-                    'parent' => 0,
-                    'number' => 3
-                ));
-
-                if ($categories) :
-                    foreach ($categories as $category) : ?>
-                        <li><a href="<?php echo get_term_link($category); ?>"><?php echo esc_html($category->name); ?></a></li>
-                    <?php endforeach;
-                endif;
-            endif; ?>
-
-            <li><a href="<?php echo esc_url(home_url('/about')); ?>">About</a></li>
-            <li><a href="<?php echo esc_url(home_url('/contact')); ?>">Contact</a></li>
-        </ul>
-
-        <!-- Cart & Account -->
-        <div class="charlies-nav-actions">
-            <?php if (class_exists('WooCommerce')) : ?>
-                <a href="<?php echo wc_get_account_endpoint_url('dashboard'); ?>" class="charlies-account-link">
-                    Account
+                <a href="<?php echo wc_get_account_endpoint_url('dashboard'); ?>" class="charlies-account-icon" title="Account">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
                 </a>
-                <a href="<?php echo wc_get_cart_url(); ?>" class="charlies-cart-icon">
-                    🛒 <span class="charlies-cart-count"><?php echo WC()->cart->get_cart_contents_count(); ?></span>
+                <a href="<?php echo wc_get_cart_url(); ?>" class="charlies-cart-icon" title="Cart">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
+                    <span class="charlies-cart-count"><?php echo WC()->cart->get_cart_contents_count(); ?></span>
                 </a>
             <?php endif; ?>
         </div>
