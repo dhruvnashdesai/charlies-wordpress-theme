@@ -8,6 +8,13 @@
 </head>
 <body <?php body_class(); ?>>
 
+<!-- Warning Section - Above Header -->
+<div class="charlies-warning-bar">
+    <div class="charlies-container">
+        <p>WARNING: This product contains nicotine. Nicotine is an addictive chemical.</p>
+    </div>
+</div>
+
 <nav class="charlies-nav">
     <div class="charlies-nav-container">
         <!-- Logo -->

@@ -3,16 +3,8 @@
  * Template for Home Page (slug: home)
  * This will automatically be used for the page with slug "home"
  */
-?>
 
-<!-- Warning Section - Above Header -->
-<div class="charlies-warning-bar">
-    <div class="charlies-container">
-        <p>WARNING: This product contains nicotine. Nicotine is an addictive chemical.</p>
-    </div>
-</div>
-
-<?php get_header(); ?>
+get_header(); ?>
 
 <main class="charlies-main">
     <!-- Hero Section -->
