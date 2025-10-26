@@ -20,10 +20,21 @@
         <!-- Left Navigation -->
         <div class="charlies-nav-left">
             <ul class="charlies-nav-menu">
-                <?php if (class_exists('WooCommerce')) : ?>
-                    <li><a href="<?php echo esc_url(home_url('/devices')); ?>">Devices</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/pouches')); ?>">Pouches</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/sticks')); ?>">Sticks</a></li>
+                <?php if (class_exists('WooCommerce')) :
+                    // Get WooCommerce product categories
+                    $devices_term = get_term_by('slug', 'devices', 'product_cat');
+                    $pouches_term = get_term_by('slug', 'pouches', 'product_cat');
+                    $sticks_term = get_term_by('slug', 'sticks', 'product_cat');
+                ?>
+                    <?php if ($devices_term) : ?>
+                        <li><a href="<?php echo get_term_link($devices_term); ?>">Devices</a></li>
+                    <?php endif; ?>
+                    <?php if ($pouches_term) : ?>
+                        <li><a href="<?php echo get_term_link($pouches_term); ?>">Pouches</a></li>
+                    <?php endif; ?>
+                    <?php if ($sticks_term) : ?>
+                        <li><a href="<?php echo get_term_link($sticks_term); ?>">Sticks</a></li>
+                    <?php endif; ?>
                     <li><a href="<?php echo wc_get_page_permalink('shop'); ?>">All Products</a></li>
                 <?php endif; ?>
             </ul>
