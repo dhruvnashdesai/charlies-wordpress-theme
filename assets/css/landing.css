@@ -8,7 +8,8 @@
 
 @font-face {
     font-family: 'Binneref';
-    src: url('../fonts/Binner%20EF.ttf') format('truetype');
+    src: url('./fonts/Binner%20EF.ttf?v=1.0') format('truetype'),
+         url('./fonts/Binner EF.ttf?v=1.0') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
