@@ -61,32 +61,56 @@
     </div>
 </nav>
 
-<?php
-// Show simple age verification on first visit
-if (!isset($_COOKIE['charlies_age_verified'])) : ?>
-    <div id="charlies-age-overlay" class="charlies-modal-overlay">
-        <div class="charlies-modal">
-            <div class="charlies-modal-content">
-                <h2>Age Verification</h2>
-                <p>You must be 19 years or older to access this site.</p>
-                <p>Are you 19 years of age or older?</p>
-                <div class="charlies-age-buttons">
-                    <button id="charlies-age-yes" class="btn btn-primary">Yes, I'm 19+</button>
-                    <button id="charlies-age-no" class="btn btn-secondary">No, I'm under 19</button>
+<script>
+// Simple age verification check - will be enhanced by the main script
+document.addEventListener('DOMContentLoaded', function() {
+    const isVerified = localStorage.getItem('charlies_age_verified');
+    const expirationTime = localStorage.getItem('charlies_age_verified_expires');
+    const now = new Date().getTime();
+
+    // If not verified or expired, show modal
+    if (!isVerified || !expirationTime || now > parseInt(expirationTime)) {
+        showSimpleAgeModal();
+    }
+
+    function showSimpleAgeModal() {
+        const modalHTML = `
+            <div id="charlies-age-modal" class="charlies-modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                <div class="charlies-modal" style="background: white; border-radius: 12px; padding: 2rem; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);">
+                    <div class="charlies-modal-content">
+                        <h2 style="margin-bottom: 1rem; color: #333; font-weight: 600;">Age Verification</h2>
+                        <p style="margin-bottom: 1rem; color: #666; line-height: 1.5;">You must be 19 years or older to access this site.</p>
+                        <p style="margin-bottom: 1rem; color: #666; line-height: 1.5;">Are you 19 years of age or older?</p>
+                        <div class="charlies-age-buttons" style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+                            <button id="charlies-age-yes" style="padding: 12px 24px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; background: #000; color: white; min-width: 120px;">Yes, I'm 19+</button>
+                            <button id="charlies-age-no" style="padding: 12px 24px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; background: #f5f5f5; color: #333; min-width: 120px;">No, I'm under 19</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        `;
 
-    <script>
-    document.getElementById('charlies-age-yes').addEventListener('click', function() {
-        document.cookie = 'charlies_age_verified=true; path=/; max-age=' + (24 * 60 * 60); // 24 hours
-        document.getElementById('charlies-age-overlay').style.display = 'none';
-    });
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        document.body.style.overflow = 'hidden';
 
-    document.getElementById('charlies-age-no').addEventListener('click', function() {
-        alert('You must be 19 or older to access this site.');
-        window.location.href = 'https://www.google.com';
-    });
-    </script>
-<?php endif; ?>
+        // Handle button clicks
+        document.getElementById('charlies-age-yes').addEventListener('click', function() {
+            // Set verification for 24 hours
+            const expirationTime = new Date().getTime() + (24 * 60 * 60 * 1000);
+            localStorage.setItem('charlies_age_verified', 'true');
+            localStorage.setItem('charlies_age_verified_expires', expirationTime.toString());
+
+            // Remove modal
+            const modal = document.getElementById('charlies-age-modal');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+            modal.remove();
+        });
+
+        document.getElementById('charlies-age-no').addEventListener('click', function() {
+            alert('You must be 19 or older to access this site.');
+            window.location.href = 'https://www.google.com';
+        });
+    }
+});
+</script>
