@@ -3,6 +3,23 @@
  * Clean, modern ecommerce design
  */
 
+/* Warning Bar - Above Header */
+.charlies-warning-bar {
+    background: #000;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    position: relative;
+    z-index: 1001;
+}
+
+.charlies-warning-bar p {
+    margin: 0;
+    padding: 0;
+}
+
 /* Container */
 .charlies-container {
     max-width: 1200px;
