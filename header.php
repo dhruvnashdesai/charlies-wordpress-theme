@@ -32,11 +32,7 @@
         <!-- Center Logo -->
         <div class="charlies-nav-center">
             <a href="<?php echo esc_url(home_url('/')); ?>" class="charlies-logo">
-                <?php if (has_custom_logo()) : ?>
-                    <?php the_custom_logo(); ?>
-                <?php else : ?>
-                    <?php bloginfo('name'); ?>
-                <?php endif; ?>
+                <img src="<?php echo get_template_directory_uri(); ?>/assets/images/sitelogo.png" alt="<?php bloginfo('name'); ?>" class="charlies-logo-image">
             </a>
         </div>
 

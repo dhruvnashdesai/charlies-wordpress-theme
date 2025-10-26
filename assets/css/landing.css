@@ -281,15 +281,20 @@
 }
 
 .charlies-logo {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #333;
+    display: inline-block;
     text-decoration: none;
+    transition: opacity 0.3s ease;
 }
 
-.charlies-logo img {
-    height: 40px;
+.charlies-logo:hover {
+    opacity: 0.8;
+}
+
+.charlies-logo-image {
+    height: 50px;
     width: auto;
+    max-width: 200px;
+    object-fit: contain;
 }
 
 /* Right Navigation */
@@ -433,8 +438,9 @@
         font-size: 0.9rem;
     }
 
-    .charlies-logo {
-        font-size: 1.5rem;
+    .charlies-logo-image {
+        height: 40px;
+        max-width: 150px;
     }
 
     .section-title {
