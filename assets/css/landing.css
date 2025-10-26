@@ -222,10 +222,26 @@
     margin-bottom: 5rem;
 }
 
+.charlies-categories-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.charlies-categories-title h2 {
+    font-family: "Neue Montreal", sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    line-height: 1.1;
+}
+
 .charlies-categories-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
 }
 
 .charlies-category-card {
@@ -502,7 +518,18 @@
         font-size: 2rem;
     }
 
+    .charlies-categories-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .charlies-categories-title h2 {
+        font-size: 2.5rem;
+    }
+
     .charlies-categories-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }
