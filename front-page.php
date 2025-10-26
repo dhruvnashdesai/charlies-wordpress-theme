@@ -18,6 +18,47 @@ get_header(); ?>
         </div>
     </section>
 
+    <!-- Categories Section -->
+    <?php if (class_exists('WooCommerce')) : ?>
+        <section class="charlies-categories">
+            <div class="charlies-container">
+                <h2 class="section-title">Shop by Category</h2>
+                <div class="charlies-categories-grid">
+                    <?php
+                    $product_categories = get_terms(array(
+                        'taxonomy' => 'product_cat',
+                        'hide_empty' => true,
+                        'parent' => 0,
+                        'number' => 4
+                    ));
+
+                    if ($product_categories) :
+                        foreach ($product_categories as $category) : ?>
+                            <div class="charlies-category-card">
+                                <a href="<?php echo get_term_link($category); ?>">
+                                    <div class="charlies-category-image">
+                                        <?php
+                                        $thumbnail_id = get_term_meta($category->term_id, 'thumbnail_id', true);
+                                        if ($thumbnail_id) {
+                                            echo wp_get_attachment_image($thumbnail_id, 'medium');
+                                        } else {
+                                            echo '<div class="placeholder-category">' . esc_html($category->name) . '</div>';
+                                        }
+                                        ?>
+                                    </div>
+                                    <h3><?php echo esc_html($category->name); ?></h3>
+                                    <p><?php echo $category->count; ?> products</p>
+                                </a>
+                            </div>
+                        <?php endforeach;
+                    else : ?>
+                        <p>No product categories found.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </section>
+    <?php endif; ?>
+
     <!-- Featured Products -->
     <?php if (class_exists('WooCommerce')) : ?>
         <section class="charlies-featured-products">
@@ -94,44 +135,6 @@ get_header(); ?>
         </div>
     </section>
 
-    <!-- Categories Section -->
-    <?php if (class_exists('WooCommerce')) : ?>
-        <section class="charlies-categories">
-            <div class="charlies-container">
-                <h2 class="section-title">Shop by Category</h2>
-                <div class="charlies-categories-grid">
-                    <?php
-                    $product_categories = get_terms(array(
-                        'taxonomy' => 'product_cat',
-                        'hide_empty' => true,
-                        'parent' => 0, // Only top-level categories
-                        'number' => 4
-                    ));
-
-                    if ($product_categories) :
-                        foreach ($product_categories as $category) : ?>
-                            <div class="charlies-category-card">
-                                <a href="<?php echo get_term_link($category); ?>">
-                                    <div class="charlies-category-image">
-                                        <?php
-                                        $thumbnail_id = get_term_meta($category->term_id, 'thumbnail_id', true);
-                                        if ($thumbnail_id) {
-                                            echo wp_get_attachment_image($thumbnail_id, 'medium');
-                                        } else {
-                                            echo '<div class="placeholder-category">' . esc_html($category->name) . '</div>';
-                                        }
-                                        ?>
-                                    </div>
-                                    <h3><?php echo esc_html($category->name); ?></h3>
-                                    <p><?php echo $category->count; ?> products</p>
-                                </a>
-                            </div>
-                        <?php endforeach;
-                    endif; ?>
-                </div>
-            </div>
-        </section>
-    <?php endif; ?>
 
 </main>
 
