@@ -10,7 +10,7 @@ get_header(); ?>
     <!-- Hero Section -->
     <section class="charlies-hero">
         <div class="charlies-container">
-            <h1>Premium Nicotine Products</h1>
+            <h1 class="font-binneref">Join the Club</h1>
             <p>Discover our carefully curated selection of high-quality nicotine products designed for the modern consumer.</p>
             <?php if (class_exists('WooCommerce')) : ?>
                 <a href="<?php echo wc_get_page_permalink('shop'); ?>" class="btn btn-primary">Shop Now</a>
