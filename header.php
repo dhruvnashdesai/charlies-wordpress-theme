@@ -61,56 +61,49 @@
     </div>
 </nav>
 
+<!-- Age Verification Modal -->
+<div id="charlies-age-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10000; display: none; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);">
+        <h2 style="margin-bottom: 1rem; color: #333; font-weight: 600;">Age Verification</h2>
+        <p style="margin-bottom: 1rem; color: #666; line-height: 1.5;">You must be 19 years or older to access this site.</p>
+        <p style="margin-bottom: 1.5rem; color: #666; line-height: 1.5;">Are you 19 years of age or older?</p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <button onclick="verifyAge(true)" style="padding: 12px 24px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; background: #000; color: white; min-width: 120px;">Yes, I'm 19+</button>
+            <button onclick="verifyAge(false)" style="padding: 12px 24px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; background: #f5f5f5; color: #333; min-width: 120px;">No, I'm under 19</button>
+        </div>
+    </div>
+</div>
+
 <script>
-// Simple age verification check - will be enhanced by the main script
-document.addEventListener('DOMContentLoaded', function() {
-    const isVerified = localStorage.getItem('charlies_age_verified');
-    const expirationTime = localStorage.getItem('charlies_age_verified_expires');
+// Check if user needs age verification
+function checkAgeVerification() {
+    const verified = localStorage.getItem('charlies_age_verified');
+    const expires = localStorage.getItem('charlies_age_verified_expires');
     const now = new Date().getTime();
 
-    // If not verified or expired, show modal
-    if (!isVerified || !expirationTime || now > parseInt(expirationTime)) {
-        showSimpleAgeModal();
-    }
-
-    function showSimpleAgeModal() {
-        const modalHTML = `
-            <div id="charlies-age-modal" class="charlies-modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
-                <div class="charlies-modal" style="background: white; border-radius: 12px; padding: 2rem; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);">
-                    <div class="charlies-modal-content">
-                        <h2 style="margin-bottom: 1rem; color: #333; font-weight: 600;">Age Verification</h2>
-                        <p style="margin-bottom: 1rem; color: #666; line-height: 1.5;">You must be 19 years or older to access this site.</p>
-                        <p style="margin-bottom: 1rem; color: #666; line-height: 1.5;">Are you 19 years of age or older?</p>
-                        <div class="charlies-age-buttons" style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
-                            <button id="charlies-age-yes" style="padding: 12px 24px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; background: #000; color: white; min-width: 120px;">Yes, I'm 19+</button>
-                            <button id="charlies-age-no" style="padding: 12px 24px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; background: #f5f5f5; color: #333; min-width: 120px;">No, I'm under 19</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    if (!verified || !expires || now > parseInt(expires)) {
+        document.getElementById('charlies-age-modal').style.display = 'flex';
         document.body.style.overflow = 'hidden';
-
-        // Handle button clicks
-        document.getElementById('charlies-age-yes').addEventListener('click', function() {
-            // Set verification for 24 hours
-            const expirationTime = new Date().getTime() + (24 * 60 * 60 * 1000);
-            localStorage.setItem('charlies_age_verified', 'true');
-            localStorage.setItem('charlies_age_verified_expires', expirationTime.toString());
-
-            // Remove modal
-            const modal = document.getElementById('charlies-age-modal');
-            modal.style.display = 'none';
-            document.body.style.overflow = '';
-            modal.remove();
-        });
-
-        document.getElementById('charlies-age-no').addEventListener('click', function() {
-            alert('You must be 19 or older to access this site.');
-            window.location.href = 'https://www.google.com';
-        });
     }
-});
+}
+
+// Handle age verification
+function verifyAge(isOfAge) {
+    if (isOfAge) {
+        // Store verification for 24 hours
+        const expires = new Date().getTime() + (24 * 60 * 60 * 1000);
+        localStorage.setItem('charlies_age_verified', 'true');
+        localStorage.setItem('charlies_age_verified_expires', expires.toString());
+
+        // Hide modal
+        document.getElementById('charlies-age-modal').style.display = 'none';
+        document.body.style.overflow = '';
+    } else {
+        alert('You must be 19 or older to access this site.');
+        window.location.href = 'https://www.google.com';
+    }
+}
+
+// Run check when page loads
+checkAgeVerification();
 </script>
