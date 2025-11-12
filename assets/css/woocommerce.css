@@ -11,12 +11,35 @@ body.woocommerce-page ul.products,
 .post-type-archive-product ul.products,
 .tax-product_cat ul.products {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
-    gap: 1.5rem !important;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+    gap: 1rem !important;
     list-style: none !important;
     padding: 0 !important;
     margin: 2rem 0 !important;
     background: transparent !important;
+}
+
+/* Force 3:4 aspect ratio on all product cards */
+.woocommerce ul.products li.product,
+.woocommerce-page ul.products li.product,
+body.woocommerce ul.products li.product,
+body.woocommerce-page ul.products li.product,
+.charlies-product-card {
+    aspect-ratio: 3/4 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Product image sizing for 3:4 cards */
+.woocommerce ul.products li.product .woocommerce-loop-product__link,
+.woocommerce ul.products li.product img,
+.woocommerce-page ul.products li.product .woocommerce-loop-product__link,
+.woocommerce-page ul.products li.product img {
+    aspect-ratio: 1 !important;
+    width: 100% !important;
+    height: auto !important;
+    object-fit: cover !important;
+    flex-shrink: 0 !important;
 }
 
 /* Shop Page - Light Theme for ALL WooCommerce Pages */
@@ -671,6 +694,7 @@ body.woocommerce-page .charlies-logo-image {
     flex-direction: column !important;
     text-decoration: none !important;
     color: inherit !important;
+    aspect-ratio: 3/4 !important;
 }
 
 .charlies-category-products .charlies-product-card:hover {
@@ -689,6 +713,7 @@ body.woocommerce-page .charlies-logo-image {
     aspect-ratio: 1;
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .charlies-category-products .charlies-product-image img {
