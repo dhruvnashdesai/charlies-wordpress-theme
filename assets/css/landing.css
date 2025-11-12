@@ -71,7 +71,13 @@ section {
 .charlies-featured-products h2,
 .charlies-featured-products p,
 .section-title {
-    color: #ffffff;
+    color: #ffffff !important;
+}
+
+/* Specifically ensure "Everything You Need" uses Binner EF and white */
+.charlies-categories-title h2 {
+    font-family: "Binner EF", Georgia, "Times New Roman", serif !important;
+    color: #ffffff !important;
 }
 
 /* Links should be visible */
