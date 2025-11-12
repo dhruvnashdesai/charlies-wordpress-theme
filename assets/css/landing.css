@@ -84,10 +84,10 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .charlies-hero h1 {
-    font-size: 6rem;
+    font-size: 10rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
-    line-height: 1.1;
+    line-height: 1.0;
 }
 
 .charlies-hero p {
@@ -470,7 +470,7 @@ h1, h2, h3, h4, h5, h6,
     }
 
     .charlies-hero h1 {
-        font-size: 4rem;
+        font-size: 6rem;
     }
 
     .charlies-hero p {
