@@ -187,7 +187,9 @@ h2, h3, .woocommerce-loop-product__title {
 .woocommerce ul.products li.product .woocommerce-loop-product__title,
 .woocommerce ul.products li.product h3,
 body.woocommerce-shop h2,
-body.woocommerce-shop .woocommerce-loop-product__title {
+body.woocommerce-shop .woocommerce-loop-product__title,
+.charlies-product-content .product-title,
+.charlies-product-card .product-title {
     color: #000000 !important;
     font-size: 1rem !important;
     font-weight: 600 !important;
@@ -195,6 +197,7 @@ body.woocommerce-shop .woocommerce-loop-product__title {
     visibility: visible !important;
     opacity: 1 !important;
     font-family: "Neue Montreal", sans-serif !important;
+    margin-bottom: 0.5rem !important;
 }
 
 .price, .woocommerce-Price-amount {
@@ -210,13 +213,16 @@ body.woocommerce-shop .woocommerce-loop-product__title {
 .woocommerce ul.products li.product .price,
 .woocommerce ul.products li.product span.price,
 .woocommerce ul.products li.product .woocommerce-Price-amount,
-body.woocommerce-shop .price {
+body.woocommerce-shop .price,
+.charlies-product-content .product-price,
+.charlies-product-card .product-price {
     color: #000000 !important;
     font-size: 0.95rem !important;
     font-weight: 600 !important;
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+    font-family: "Neue Montreal", sans-serif !important;
 }
 
 /* Product Title - Line Clamped */
