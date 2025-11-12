@@ -58,17 +58,14 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 				?>
 			</div>
 
-			<div class="charlies-product-actions">
-				<?php
-				/**
-				 * Hook: woocommerce_after_shop_loop_item.
-				 *
-				 * @hooked woocommerce_template_loop_product_link_close - 5
-				 * @hooked woocommerce_template_loop_add_to_cart - 10
-				 */
-				do_action( 'woocommerce_after_shop_loop_item' );
-				?>
-			</div>
+		<?php
+		/**
+		 * Hook: woocommerce_after_shop_loop_item.
+		 * Note: Add to cart button removed via functions.php
+		 * @hooked woocommerce_template_loop_product_link_close - 5
+		 */
+		do_action( 'woocommerce_after_shop_loop_item' );
+		?>
 
 		</div>
 

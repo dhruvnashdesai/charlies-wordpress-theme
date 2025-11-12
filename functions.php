@@ -180,3 +180,11 @@ function charlies_add_woocommerce_support() {
 }
 add_action('after_setup_theme', 'charlies_add_woocommerce_support');
 
+/**
+ * Remove add to cart buttons from shop page products
+ */
+function charlies_remove_add_to_cart_buttons() {
+    remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
+}
+add_action('init', 'charlies_remove_add_to_cart_buttons');
+
