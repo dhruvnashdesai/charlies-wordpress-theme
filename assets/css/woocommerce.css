@@ -163,14 +163,37 @@ body.woocommerce-page ul.products li.product:hover,
     overflow: visible !important;
 }
 
-/* Ensure main shop page product cards show content */
+/* DEBUG: Ensure main shop page product cards show content */
 .woocommerce.woocommerce-shop ul.products li.product {
     position: relative !important;
+    border: 5px solid red !important;
 }
 
 .woocommerce.woocommerce-shop ul.products li.product .charlies-product-content {
     position: relative !important;
     z-index: 1 !important;
+    background: yellow !important;
+    padding: 10px !important;
+}
+
+/* DEBUG: Try targeting ALL shop page elements */
+.woocommerce ul.products li.product {
+    border: 3px solid blue !important;
+}
+
+body.woocommerce-shop .woocommerce ul.products li.product h2,
+body.woocommerce-shop .woocommerce ul.products li.product .woocommerce-loop-product__title {
+    background: green !important;
+    color: white !important;
+    padding: 5px !important;
+    display: block !important;
+}
+
+body.woocommerce-shop .woocommerce ul.products li.product .price {
+    background: orange !important;
+    color: black !important;
+    padding: 5px !important;
+    display: block !important;
 }
 
 /* Product Title - Line Clamped */
