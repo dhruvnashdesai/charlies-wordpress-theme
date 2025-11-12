@@ -11,9 +11,8 @@ get_header(); ?>
     <section class="charlies-hero">
         <div class="charlies-container">
             <h1>Join the Club</h1>
-            <p>Discover our carefully curated selection of high-quality nicotine products designed for the modern consumer.</p>
             <?php if (class_exists('WooCommerce')) : ?>
-                <a href="<?php echo wc_get_page_permalink('shop'); ?>" class="btn btn-primary">Shop Now</a>
+                <a href="<?php echo wc_get_page_permalink('shop'); ?>" class="btn btn-primary font-neue">Shop Now</a>
             <?php endif; ?>
         </div>
     </section>
