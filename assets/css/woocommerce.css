@@ -3,53 +3,80 @@
  * Clean, modern styling for shop pages
  */
 
+/* Critical CSS Override - Force Grid Layout */
+.woocommerce ul.products:not(.columns-1):not(.columns-2):not(.columns-3):not(.columns-4):not(.columns-5) {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 1.5rem !important;
+}
+
+/* Shop Page - Dark Theme Integration */
+.woocommerce-page main.charlies-main,
+.woocommerce main.charlies-main {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
 /* Shop Header */
 .shop-header {
     text-align: center;
     margin-bottom: 3rem;
     padding: 2rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #333333;
+    background-color: #000000;
 }
 
 .shop-header .page-title {
+    font-family: "Binner EF", Georgia, serif !important;
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    color: #333;
+    color: #ffffff !important;
 }
 
-.shop-header .shop-description {
+.shop-header .shop-description,
+.shop-header p {
+    font-family: "Neue Montreal", sans-serif !important;
     font-size: 1.2rem;
-    color: #666;
+    color: #cccccc !important;
     max-width: 600px;
     margin: 0 auto;
 }
 
-/* WooCommerce Product Grid - Modern Design */
-.woocommerce ul.products {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.5rem;
-    list-style: none;
-    padding: 0;
-    margin: 2rem 0;
+/* WooCommerce Product Grid - Modern Design - High Specificity */
+.woocommerce ul.products,
+.woocommerce.woocommerce-page ul.products {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 1.5rem !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 2rem 0 !important;
+    background: transparent !important;
 }
 
 .woocommerce ul.products li.product,
-.woocommerce ul.products li.charlies-product-card {
-    background: #ffffff;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+.woocommerce ul.products li.charlies-product-card,
+.woocommerce.woocommerce-page ul.products li.product {
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1) !important;
+    margin: 0 !important;
+    width: auto !important;
+    float: none !important;
 }
 
 .woocommerce ul.products li.product:hover,
-.woocommerce ul.products li.charlies-product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-    border-color: #d0d0d0;
+.woocommerce ul.products li.charlies-product-card:hover,
+.woocommerce.woocommerce-page ul.products li.product:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 16px 48px rgba(255, 255, 255, 0.15) !important;
+    border-color: #d0d0d0 !important;
 }
 
 /* Product Card Inner Structure */
@@ -171,17 +198,37 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Product Filters and Sorting */
+/* Product Filters and Sorting - Dark Theme */
 .woocommerce .woocommerce-ordering,
 .woocommerce .woocommerce-result-count {
-    margin-bottom: 1rem;
+    margin-bottom: 1rem !important;
+    color: #ffffff !important;
+    font-family: "Neue Montreal", sans-serif !important;
+}
+
+.woocommerce .woocommerce-result-count {
+    font-size: 0.95rem;
+    color: #cccccc !important;
 }
 
 .woocommerce .woocommerce-ordering select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: white;
+    padding: 8px 12px !important;
+    border: 1px solid #444444 !important;
+    border-radius: 6px !important;
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+    font-family: "Neue Montreal", sans-serif !important;
+}
+
+/* WooCommerce Breadcrumbs */
+.woocommerce .woocommerce-breadcrumb {
+    color: #cccccc !important;
+    font-family: "Neue Montreal", sans-serif !important;
+    margin-bottom: 2rem;
+}
+
+.woocommerce .woocommerce-breadcrumb a {
+    color: #ffffff !important;
 }
 
 /* Pagination */
@@ -385,4 +432,41 @@
 .woocommerce ul.products li.product .woocommerce-loop-product__link:hover {
     text-decoration: none;
     color: inherit;
+}
+
+/* Force Modern Grid Layout - Override All WooCommerce Column Classes */
+.woocommerce ul.products.columns-1,
+.woocommerce ul.products.columns-2,
+.woocommerce ul.products.columns-3,
+.woocommerce ul.products.columns-4,
+.woocommerce ul.products.columns-5,
+.woocommerce ul.products.columns-6 {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 1.5rem !important;
+    width: 100% !important;
+}
+
+/* Force Product Card Styling */
+.woocommerce ul.products li.product {
+    width: auto !important;
+    float: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid #e0e0e0 !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Reset any width constraints */
+.woocommerce ul.products li.product,
+.woocommerce ul.products li.product.first,
+.woocommerce ul.products li.product.last {
+    width: auto !important;
+    clear: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
