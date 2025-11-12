@@ -19,15 +19,15 @@ body.woocommerce-page ul.products,
     background: transparent !important;
 }
 
-/* Shop Page - Dark Theme Integration for ALL WooCommerce Pages */
+/* Shop Page - Light Theme for ALL WooCommerce Pages */
 .woocommerce-page main.charlies-main,
 .woocommerce main.charlies-main,
 body.woocommerce main.charlies-main,
 body.woocommerce-page main.charlies-main,
 body.post-type-archive-product main.charlies-main,
 body.tax-product_cat main.charlies-main {
-    background-color: #000000 !important;
-    color: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
     min-height: 100vh;
     padding: 2rem 0;
 }
@@ -37,8 +37,8 @@ body.tax-product_cat main.charlies-main {
     text-align: center;
     margin-bottom: 3rem;
     padding: 2rem 0;
-    border-bottom: 1px solid #333333;
-    background-color: #000000;
+    border-bottom: 1px solid #dddddd;
+    background-color: #ffffff;
 }
 
 .shop-header .page-title {
@@ -46,7 +46,7 @@ body.tax-product_cat main.charlies-main {
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    color: #ffffff !important;
+    color: #000000 !important;
 }
 
 .shop-header .shop-description,
@@ -509,8 +509,8 @@ body.post-type-archive-product ul.products {
 
 /* Shop Custom Layout */
 .charlies-shop-custom {
-    background-color: #000000 !important;
-    color: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
     min-height: 100vh;
 }
 
@@ -525,14 +525,14 @@ body.post-type-archive-product ul.products {
     font-family: "Binner EF", Georgia, serif !important;
     font-size: 3rem;
     font-weight: 700;
-    color: #ffffff !important;
+    color: #000000 !important;
     margin-bottom: 1rem;
 }
 
 .charlies-shop-header .shop-subtitle {
     font-family: "Neue Montreal", sans-serif !important;
     font-size: 1.2rem;
-    color: #cccccc !important;
+    color: #666666 !important;
     max-width: 600px;
     margin: 0 auto;
 }
@@ -547,11 +547,12 @@ body.post-type-archive-product ul.products {
 
 /* Left Sidebar - Filtering */
 .charlies-shop-sidebar {
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: #f8f8f8;
     border-radius: 12px;
     padding: 2rem;
     position: sticky;
     top: 2rem;
+    border: 1px solid #e0e0e0;
 }
 
 .charlies-filter-section {
@@ -566,7 +567,7 @@ body.post-type-archive-product ul.products {
     font-family: "Neue Montreal", sans-serif !important;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #ffffff !important;
+    color: #000000 !important;
     margin-bottom: 1rem;
 }
 
@@ -583,12 +584,12 @@ body.post-type-archive-product ul.products {
     cursor: pointer;
     font-family: "Neue Montreal", sans-serif !important;
     font-size: 0.95rem;
-    color: #cccccc !important;
+    color: #666666 !important;
     transition: color 0.2s ease;
 }
 
 .charlies-filter-item:hover {
-    color: #ffffff !important;
+    color: #000000 !important;
 }
 
 /* Custom Checkbox Styling */
@@ -643,7 +644,7 @@ body.post-type-archive-product ul.products {
     font-family: "Binner EF", Georgia, serif !important;
     font-size: 2.5rem;
     font-weight: 700;
-    color: #ffffff !important;
+    color: #000000 !important;
     margin-bottom: 0.5rem;
     text-transform: uppercase;
 }
@@ -651,7 +652,7 @@ body.post-type-archive-product ul.products {
 .charlies-category-header .category-description {
     font-family: "Neue Montreal", sans-serif !important;
     font-size: 1.1rem;
-    color: #cccccc !important;
+    color: #666666 !important;
     line-height: 1.5;
 }
 
