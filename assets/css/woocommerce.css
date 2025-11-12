@@ -684,6 +684,8 @@ body.woocommerce-page .charlies-logo-image {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     display: flex !important;
     flex-direction: column !important;
+    text-decoration: none !important;
+    color: inherit !important;
 }
 
 .charlies-category-products .charlies-product-card:hover {
@@ -699,13 +701,14 @@ body.woocommerce-page .charlies-logo-image {
 }
 
 .charlies-category-products .charlies-product-image {
+    aspect-ratio: 1;
     position: relative;
     overflow: hidden;
 }
 
 .charlies-category-products .charlies-product-image img {
     width: 100%;
-    height: 120px;
+    height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
 }
@@ -737,7 +740,7 @@ body.woocommerce-page .charlies-logo-image {
 }
 
 .charlies-category-products .charlies-product-meta {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
 }
 
 .charlies-category-products .product-price {
@@ -748,7 +751,7 @@ body.woocommerce-page .charlies-logo-image {
 }
 
 .charlies-category-products .charlies-product-actions {
-    margin-top: auto;
+    display: none !important;
 }
 
 .charlies-category-products .charlies-add-to-cart {

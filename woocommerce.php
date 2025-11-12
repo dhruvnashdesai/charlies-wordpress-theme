@@ -139,39 +139,28 @@ if (is_shop()) {
                                     <?php foreach ($products as $product) :
                                         $product_id = $product->get_id(); ?>
 
-                                        <div class="charlies-product-card" data-product-id="<?php echo $product_id; ?>">
+                                        <a href="<?php echo get_permalink($product_id); ?>" class="charlies-product-card" data-product-id="<?php echo $product_id; ?>">
                                             <div class="charlies-product-inner">
 
                                                 <!-- Product Image -->
                                                 <div class="charlies-product-image">
-                                                    <a href="<?php echo get_permalink($product_id); ?>">
-                                                        <?php echo $product->get_image('medium'); ?>
-                                                    </a>
+                                                    <?php echo $product->get_image('medium'); ?>
                                                 </div>
 
                                                 <!-- Product Content -->
                                                 <div class="charlies-product-content">
                                                     <h3 class="product-title">
-                                                        <a href="<?php echo get_permalink($product_id); ?>">
-                                                            <?php echo esc_html($product->get_name()); ?>
-                                                        </a>
+                                                        <?php echo esc_html($product->get_name()); ?>
                                                     </h3>
 
                                                     <div class="charlies-product-meta">
                                                         <span class="product-price"><?php echo $product->get_price_html(); ?></span>
                                                     </div>
 
-                                                    <div class="charlies-product-actions">
-                                                        <a href="<?php echo $product->add_to_cart_url(); ?>"
-                                                           class="charlies-add-to-cart"
-                                                           data-product-id="<?php echo $product_id; ?>">
-                                                            Add to cart
-                                                        </a>
-                                                    </div>
                                                 </div>
 
                                             </div>
-                                        </div>
+                                        </a>
 
                                     <?php endforeach; ?>
                                 </div>
