@@ -163,13 +163,25 @@ body.woocommerce-page ul.products li.product:hover,
     overflow: visible !important;
 }
 
+/* Ensure main shop page product cards show content */
+.woocommerce.woocommerce-shop ul.products li.product {
+    position: relative !important;
+}
+
+.woocommerce.woocommerce-shop ul.products li.product .charlies-product-content {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
 /* Product Title - Line Clamped */
 .woocommerce ul.products li.product h2,
 .woocommerce ul.products li.product .woocommerce-loop-product__title,
 .woocommerce ul.products li.product h3,
 .charlies-product-content h2,
 .charlies-product-content h3,
-.charlies-product-content .woocommerce-loop-product__title {
+.charlies-product-content .woocommerce-loop-product__title,
+.woocommerce.woocommerce-shop ul.products li.product h2,
+.woocommerce.woocommerce-shop ul.products li.product .woocommerce-loop-product__title {
     font-family: "Neue Montreal", sans-serif !important;
     font-size: 0.8rem !important;
     font-weight: 600 !important;
@@ -181,6 +193,8 @@ body.woocommerce-page ul.products li.product:hover,
     -webkit-box-orient: vertical !important;
     overflow: hidden !important;
     height: auto !important;
+    position: relative !important;
+    z-index: 2 !important;
 }
 
 /* Product Meta Section */
@@ -192,7 +206,8 @@ body.woocommerce-page ul.products li.product:hover,
 .woocommerce ul.products li.product .price,
 .charlies-product-meta .price,
 .woocommerce-price-amount,
-.woocommerce ul.products li.product .woocommerce-Price-amount {
+.woocommerce ul.products li.product .woocommerce-Price-amount,
+.woocommerce.woocommerce-shop ul.products li.product .price {
     font-family: "Neue Montreal", sans-serif !important;
     font-size: 0.85rem !important;
     font-weight: 600 !important;
@@ -200,6 +215,8 @@ body.woocommerce-page ul.products li.product:hover,
     margin: 0 !important;
     display: block !important;
     line-height: 1.2 !important;
+    position: relative !important;
+    z-index: 2 !important;
 }
 
 .woocommerce ul.products li.product .price del,
