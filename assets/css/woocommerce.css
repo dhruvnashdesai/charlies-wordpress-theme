@@ -504,3 +504,319 @@ body.post-type-archive-product ul.products {
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
+
+/* ===== CUSTOM SHOP PAGE LAYOUT (Lucy.co Style) ===== */
+
+/* Shop Custom Layout */
+.charlies-shop-custom {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    min-height: 100vh;
+}
+
+/* Shop Header */
+.charlies-shop-header {
+    text-align: center;
+    padding: 3rem 0;
+    margin-bottom: 3rem;
+}
+
+.charlies-shop-header .shop-title {
+    font-family: "Binner EF", Georgia, serif !important;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #ffffff !important;
+    margin-bottom: 1rem;
+}
+
+.charlies-shop-header .shop-subtitle {
+    font-family: "Neue Montreal", sans-serif !important;
+    font-size: 1.2rem;
+    color: #cccccc !important;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Shop Layout - Two Column */
+.charlies-shop-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+/* Left Sidebar - Filtering */
+.charlies-shop-sidebar {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 2rem;
+    position: sticky;
+    top: 2rem;
+}
+
+.charlies-filter-section {
+    margin-bottom: 2.5rem;
+}
+
+.charlies-filter-section:last-child {
+    margin-bottom: 0;
+}
+
+.charlies-filter-section .filter-title {
+    font-family: "Neue Montreal", sans-serif !important;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff !important;
+    margin-bottom: 1rem;
+}
+
+.charlies-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.charlies-filter-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-family: "Neue Montreal", sans-serif !important;
+    font-size: 0.95rem;
+    color: #cccccc !important;
+    transition: color 0.2s ease;
+}
+
+.charlies-filter-item:hover {
+    color: #ffffff !important;
+}
+
+/* Custom Checkbox Styling */
+.charlies-filter-item input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-custom {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #444444;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.charlies-filter-item input[type="checkbox"]:checked + .checkbox-custom {
+    background-color: #ffffff;
+    border-color: #ffffff;
+}
+
+.charlies-filter-item input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: "✓";
+    color: #000000;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Shop Content - Right Side */
+.charlies-shop-content {
+    padding: 0;
+}
+
+/* Category Sections */
+.charlies-category-section {
+    margin-bottom: 4rem;
+}
+
+.charlies-category-section:last-child {
+    margin-bottom: 0;
+}
+
+/* Category Headers */
+.charlies-category-header {
+    margin-bottom: 2rem;
+}
+
+.charlies-category-header .category-title {
+    font-family: "Binner EF", Georgia, serif !important;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff !important;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.charlies-category-header .category-description {
+    font-family: "Neue Montreal", sans-serif !important;
+    font-size: 1.1rem;
+    color: #cccccc !important;
+    line-height: 1.5;
+}
+
+/* Category Products Grid */
+.charlies-category-products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Product Cards within Categories */
+.charlies-category-products .charlies-product-card {
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1) !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.charlies-category-products .charlies-product-card:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 16px 48px rgba(255, 255, 255, 0.15) !important;
+    border-color: #d0d0d0 !important;
+}
+
+.charlies-category-products .charlies-product-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.charlies-category-products .charlies-product-image {
+    position: relative;
+    overflow: hidden;
+}
+
+.charlies-category-products .charlies-product-image img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.charlies-category-products .charlies-product-card:hover .charlies-product-image img {
+    transform: scale(1.05);
+}
+
+.charlies-category-products .charlies-product-content {
+    padding: 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.charlies-category-products .product-title {
+    font-family: "Neue Montreal", sans-serif !important;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #1a1a1a;
+    line-height: 1.3;
+}
+
+.charlies-category-products .product-title a {
+    color: #1a1a1a;
+    text-decoration: none;
+}
+
+.charlies-category-products .charlies-product-meta {
+    margin-bottom: 1rem;
+}
+
+.charlies-category-products .product-price {
+    font-family: "Neue Montreal", sans-serif !important;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #000000;
+}
+
+.charlies-category-products .charlies-product-actions {
+    margin-top: auto;
+}
+
+.charlies-category-products .charlies-add-to-cart {
+    width: 100%;
+    margin: 0;
+    padding: 10px 16px;
+    background: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-family: "Neue Montreal", sans-serif !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.charlies-category-products .charlies-add-to-cart:hover {
+    background: #2c2c2c;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile Responsiveness for Custom Shop Layout */
+@media (max-width: 1024px) {
+    .charlies-shop-layout {
+        grid-template-columns: 260px 1fr;
+        gap: 2rem;
+    }
+
+    .charlies-shop-sidebar {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .charlies-shop-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .charlies-shop-sidebar {
+        position: static;
+        order: 2;
+        margin-top: 2rem;
+    }
+
+    .charlies-shop-content {
+        order: 1;
+    }
+
+    .charlies-category-header .category-title {
+        font-size: 2rem;
+    }
+
+    .charlies-category-products {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .charlies-shop-header .shop-title {
+        font-size: 2.5rem;
+    }
+
+    .charlies-category-header .category-title {
+        font-size: 1.75rem;
+    }
+
+    .charlies-category-products {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .charlies-shop-sidebar {
+        padding: 1rem;
+    }
+}

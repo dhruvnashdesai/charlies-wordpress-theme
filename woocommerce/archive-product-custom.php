@@ -46,7 +46,7 @@ get_header( 'shop' ); ?>
                     </div>
                 </div>
 
-                <!-- Additional Filter Sections -->
+                <!-- Additional Filter Sections can go here -->
                 <div class="charlies-filter-section">
                     <h3 class="filter-title">Strength</h3>
                     <div class="charlies-filter-group">
@@ -166,11 +166,10 @@ get_header( 'shop' ); ?>
                                                     </div>
 
                                                     <div class="charlies-product-actions">
-                                                        <a href="<?php echo $product->add_to_cart_url(); ?>"
-                                                           class="charlies-add-to-cart"
-                                                           data-product-id="<?php echo $product_id; ?>">
-                                                            Add to cart
-                                                        </a>
+                                                        <?php
+                                                        // Add to cart button
+                                                        woocommerce_template_loop_add_to_cart();
+                                                        ?>
                                                     </div>
                                                 </div>
 
