@@ -8,14 +8,7 @@
 /* Load Neue Montreal from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Neue+Montreal:wght@300;400;500;600;700&display=swap');
 
-/* Load Binner EF from local files */
-@font-face {
-    font-family: 'Binner EF';
-    src: url('../fonts/Binner%20EF.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
+/* Binner EF font loaded via functions.php */
 
 /* Default body font - Neue Montreal */
 body {

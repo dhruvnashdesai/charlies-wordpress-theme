@@ -58,6 +58,18 @@ function charlies_enqueue_assets() {
     // Theme stylesheet
     wp_enqueue_style('charlies-style', get_stylesheet_uri(), array(), '1.0.0');
 
+    // Add custom font CSS inline
+    $font_css = "
+    @font-face {
+        font-family: 'Binner EF';
+        src: url('" . get_template_directory_uri() . "/assets/fonts/Binner%20EF.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+    }
+    ";
+    wp_add_inline_style('charlies-style', $font_css);
+
     // Theme JavaScript (if needed) - commented out since file doesn't exist
     // wp_enqueue_script('charlies-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), '1.0.0', true);
 }
