@@ -163,50 +163,28 @@ body.woocommerce-page ul.products li.product:hover,
     overflow: visible !important;
 }
 
-/* DEBUG: Ensure main shop page product cards show content */
-.woocommerce.woocommerce-shop ul.products li.product {
-    position: relative !important;
-    border: 5px solid red !important;
-}
-
-.woocommerce.woocommerce-shop ul.products li.product .charlies-product-content {
-    position: relative !important;
-    z-index: 1 !important;
-    background: yellow !important;
-    padding: 10px !important;
-}
-
-/* DEBUG: Try targeting ALL possible elements */
+/* Fix main shop page layout - allow content to expand naturally */
 .woocommerce ul.products li.product {
-    border: 3px solid blue !important;
+    aspect-ratio: auto !important; /* Remove fixed aspect ratio */
+    min-height: 250px !important; /* Set minimum height instead */
+    height: auto !important;
 }
 
-.woocommerce ul.products li {
-    border: 2px solid purple !important;
-}
-
-ul.products li {
-    border: 1px solid cyan !important;
-}
-
-li.product {
-    border: 1px solid magenta !important;
-}
-
-/* Try every possible title selector */
+/* Ensure titles and prices are visible */
 h2, h3, .woocommerce-loop-product__title {
-    background: green !important;
-    color: white !important;
-    padding: 5px !important;
+    color: #000000 !important;
+    font-size: 0.8rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.5rem !important;
     display: block !important;
+    overflow: visible !important;
 }
 
-/* Try every possible price selector */
 .price, .woocommerce-Price-amount {
-    background: orange !important;
-    color: black !important;
-    padding: 5px !important;
+    color: #000000 !important;
+    font-size: 0.85rem !important;
     display: block !important;
+    margin-top: 0.25rem !important;
 }
 
 /* Product Title - Line Clamped */
