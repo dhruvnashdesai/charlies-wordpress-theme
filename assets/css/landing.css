@@ -3,24 +3,34 @@
  * Clean, modern ecommerce design
  */
 
-/* Custom Fonts */
+/* ===== FONTS ===== */
+
+/* Load Neue Montreal from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Neue+Montreal:wght@300;400;500;600;700&display=swap');
 
+/* Load Binner EF from local files */
 @font-face {
-    font-family: 'Binneref';
+    font-family: 'Binner EF';
     src: url('../fonts/Binner%20EF.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
 }
 
-/* Font Utility Classes */
-.font-neue-montreal {
-    font-family: "Neue Montreal", sans-serif;
+/* Default body font - Neue Montreal */
+body {
+    font-family: "Neue Montreal", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.font-binneref {
-    font-family: "Binneref", "Times New Roman", serif !important;
+/* Binner EF for headings and special elements */
+h1, h2, h3, h4, h5, h6,
+.font-binner {
+    font-family: "Binner EF", Georgia, "Times New Roman", serif;
+}
+
+/* Neue Montreal override class */
+.font-neue {
+    font-family: "Neue Montreal", sans-serif;
 }
 
 /* Warning Bar - Above Header */
