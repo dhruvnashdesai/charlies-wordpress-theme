@@ -3,16 +3,29 @@
  * Clean, modern styling for shop pages
  */
 
-/* Critical CSS Override - Force Grid Layout */
-.woocommerce ul.products:not(.columns-1):not(.columns-2):not(.columns-3):not(.columns-4):not(.columns-5) {
+/* Critical CSS Override - Force Grid Layout for ALL WooCommerce Pages */
+.woocommerce ul.products,
+.woocommerce-page ul.products,
+body.woocommerce ul.products,
+body.woocommerce-page ul.products,
+.post-type-archive-product ul.products,
+.tax-product_cat ul.products {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
     gap: 1.5rem !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 2rem 0 !important;
+    background: transparent !important;
 }
 
-/* Shop Page - Dark Theme Integration */
+/* Shop Page - Dark Theme Integration for ALL WooCommerce Pages */
 .woocommerce-page main.charlies-main,
-.woocommerce main.charlies-main {
+.woocommerce main.charlies-main,
+body.woocommerce main.charlies-main,
+body.woocommerce-page main.charlies-main,
+body.post-type-archive-product main.charlies-main,
+body.tax-product_cat main.charlies-main {
     background-color: #000000 !important;
     color: #ffffff !important;
     min-height: 100vh;
@@ -58,8 +71,12 @@
 }
 
 .woocommerce ul.products li.product,
-.woocommerce ul.products li.charlies-product-card,
-.woocommerce.woocommerce-page ul.products li.product {
+.woocommerce-page ul.products li.product,
+body.woocommerce ul.products li.product,
+body.woocommerce-page ul.products li.product,
+.post-type-archive-product ul.products li.product,
+.tax-product_cat ul.products li.product,
+.woocommerce ul.products li.charlies-product-card {
     background: #ffffff !important;
     border-radius: 12px !important;
     overflow: hidden !important;
@@ -69,11 +86,17 @@
     margin: 0 !important;
     width: auto !important;
     float: none !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 .woocommerce ul.products li.product:hover,
-.woocommerce ul.products li.charlies-product-card:hover,
-.woocommerce.woocommerce-page ul.products li.product:hover {
+.woocommerce-page ul.products li.product:hover,
+body.woocommerce ul.products li.product:hover,
+body.woocommerce-page ul.products li.product:hover,
+.post-type-archive-product ul.products li.product:hover,
+.tax-product_cat ul.products li.product:hover,
+.woocommerce ul.products li.charlies-product-card:hover {
     transform: translateY(-6px) !important;
     box-shadow: 0 16px 48px rgba(255, 255, 255, 0.15) !important;
     border-color: #d0d0d0 !important;
@@ -440,11 +463,22 @@
 .woocommerce ul.products.columns-3,
 .woocommerce ul.products.columns-4,
 .woocommerce ul.products.columns-5,
-.woocommerce ul.products.columns-6 {
+.woocommerce ul.products.columns-6,
+.woocommerce-page ul.products.columns-1,
+.woocommerce-page ul.products.columns-2,
+.woocommerce-page ul.products.columns-3,
+.woocommerce-page ul.products.columns-4,
+.woocommerce-page ul.products.columns-5,
+.woocommerce-page ul.products.columns-6,
+body.woocommerce ul.products.columns-3,
+body.post-type-archive-product ul.products {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
     gap: 1.5rem !important;
     width: 100% !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 2rem 0 !important;
 }
 
 /* Force Product Card Styling */
