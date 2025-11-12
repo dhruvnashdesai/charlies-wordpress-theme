@@ -176,20 +176,33 @@ body.woocommerce-page ul.products li.product:hover,
     padding: 10px !important;
 }
 
-/* DEBUG: Try targeting ALL shop page elements */
+/* DEBUG: Try targeting ALL possible elements */
 .woocommerce ul.products li.product {
     border: 3px solid blue !important;
 }
 
-body.woocommerce-shop .woocommerce ul.products li.product h2,
-body.woocommerce-shop .woocommerce ul.products li.product .woocommerce-loop-product__title {
+.woocommerce ul.products li {
+    border: 2px solid purple !important;
+}
+
+ul.products li {
+    border: 1px solid cyan !important;
+}
+
+li.product {
+    border: 1px solid magenta !important;
+}
+
+/* Try every possible title selector */
+h2, h3, .woocommerce-loop-product__title {
     background: green !important;
     color: white !important;
     padding: 5px !important;
     display: block !important;
 }
 
-body.woocommerce-shop .woocommerce ul.products li.product .price {
+/* Try every possible price selector */
+.price, .woocommerce-Price-amount {
     background: orange !important;
     color: black !important;
     padding: 5px !important;
