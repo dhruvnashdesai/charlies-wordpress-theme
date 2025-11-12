@@ -4,15 +4,7 @@
  * This template is used for all WooCommerce pages (shop, product archives, etc.)
  */
 
-// TEST: Output directly to verify file is loading
-echo '<div style="background: blue; color: white; padding: 10px;">WOOCOMMERCE.PHP FILE IS EXECUTING</div>';
-
 get_header();
-
-// DEBUG: Show which template is loading with timestamp
-echo '<!-- DEBUG: woocommerce.php template is loading at ' . date('Y-m-d H:i:s') . ' -->';
-echo '<!-- DEBUG: Current URL: ' . $_SERVER['REQUEST_URI'] . ' -->';
-echo '<!-- DEBUG: is_shop(): ' . (is_shop() ? 'true' : 'false') . ' -->';
 
 // Check if this is the shop page
 if (is_shop()) {
@@ -20,11 +12,6 @@ if (is_shop()) {
     ?>
 <main class="charlies-main charlies-shop-custom">
     <div class="charlies-container">
-
-        <!-- TESTING: Very visible indicator that new template is loading -->
-        <div style="background: red; color: white; padding: 20px; font-size: 24px; text-align: center; margin: 20px 0; border: 5px solid yellow;">
-            🚨 NEW TEMPLATE IS LOADING - THIS SHOULD BE VISIBLE 🚨
-        </div>
 
         <!-- Shop Layout: Sidebar + Content -->
         <div class="charlies-shop-layout">
