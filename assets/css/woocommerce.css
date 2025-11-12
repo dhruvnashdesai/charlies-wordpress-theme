@@ -173,12 +173,13 @@ body.woocommerce-page ul.products li.product:hover,
 /* Ensure titles and prices are visible */
 h2, h3, .woocommerce-loop-product__title {
     color: #000000 !important;
-    font-size: 0.8rem !important;
+    font-size: 0.95rem !important;
     line-height: 1.3 !important;
     margin-bottom: 0.5rem !important;
     display: block !important;
     overflow: visible !important;
     background: none !important;
+    font-weight: 600 !important;
 }
 
 .price, .woocommerce-Price-amount {
