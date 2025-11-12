@@ -30,7 +30,7 @@ body.woocommerce-page ul.products li.product,
     flex-direction: column !important;
 }
 
-/* Product image sizing for 3:4 cards - smaller for text space */
+/* Product image sizing for 3:4 cards */
 .woocommerce ul.products li.product .woocommerce-loop-product__link,
 .woocommerce ul.products li.product img,
 .woocommerce-page ul.products li.product .woocommerce-loop-product__link,
@@ -40,7 +40,6 @@ body.woocommerce-page ul.products li.product,
     height: auto !important;
     object-fit: cover !important;
     flex-shrink: 0 !important;
-    max-height: 45% !important;
 }
 
 /* Shop Page - Light Theme for ALL WooCommerce Pages */
@@ -161,11 +160,10 @@ body.woocommerce-page ul.products li.product:hover,
     flex-direction: column !important;
     text-align: left !important;
     background: transparent !important;
-    min-height: 55% !important;
     overflow: visible !important;
 }
 
-/* Product Title - DEBUG */
+/* Product Title - Line Clamped */
 .woocommerce ul.products li.product h2,
 .woocommerce ul.products li.product .woocommerce-loop-product__title,
 .woocommerce ul.products li.product h3,
@@ -175,13 +173,14 @@ body.woocommerce-page ul.products li.product:hover,
     font-family: "Neue Montreal", sans-serif !important;
     font-size: 0.8rem !important;
     font-weight: 600 !important;
-    margin: 0 0 0.25rem 0 !important;
+    margin: 0 0 0.5rem 0 !important;
     color: #000000 !important;
-    line-height: 1.2 !important;
-    background: red !important;
-    padding: 5px !important;
-    display: block !important;
-    overflow: visible !important;
+    line-height: 1.3 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    height: auto !important;
 }
 
 /* Product Meta Section */
@@ -189,7 +188,7 @@ body.woocommerce-page ul.products li.product:hover,
     margin-bottom: 1rem;
 }
 
-/* Product Price - DEBUG */
+/* Product Price */
 .woocommerce ul.products li.product .price,
 .charlies-product-meta .price,
 .woocommerce-price-amount,
@@ -200,8 +199,7 @@ body.woocommerce-page ul.products li.product:hover,
     color: #000000 !important;
     margin: 0 !important;
     display: block !important;
-    background: blue !important;
-    padding: 5px !important;
+    line-height: 1.2 !important;
 }
 
 .woocommerce ul.products li.product .price del,
