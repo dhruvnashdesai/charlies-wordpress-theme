@@ -162,10 +162,12 @@ body.woocommerce-page ul.products li.product:hover,
     background: transparent !important;
 }
 
-/* Product Title */
+/* Product Title - DEBUG */
 .woocommerce ul.products li.product h2,
 .woocommerce ul.products li.product .woocommerce-loop-product__title,
+.woocommerce ul.products li.product h3,
 .charlies-product-content h2,
+.charlies-product-content h3,
 .charlies-product-content .woocommerce-loop-product__title {
     font-family: "Neue Montreal", sans-serif !important;
     font-size: 0.8rem !important;
@@ -173,10 +175,10 @@ body.woocommerce-page ul.products li.product:hover,
     margin: 0 0 0.25rem 0 !important;
     color: #000000 !important;
     line-height: 1.2 !important;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    background: red !important;
+    padding: 5px !important;
+    display: block !important;
+    overflow: visible !important;
 }
 
 /* Product Meta Section */
@@ -184,16 +186,19 @@ body.woocommerce-page ul.products li.product:hover,
     margin-bottom: 1rem;
 }
 
-/* Product Price */
+/* Product Price - DEBUG */
 .woocommerce ul.products li.product .price,
 .charlies-product-meta .price,
-.woocommerce-price-amount {
+.woocommerce-price-amount,
+.woocommerce ul.products li.product .woocommerce-Price-amount {
     font-family: "Neue Montreal", sans-serif !important;
     font-size: 0.85rem !important;
     font-weight: 600 !important;
     color: #000000 !important;
     margin: 0 !important;
     display: block !important;
+    background: blue !important;
+    padding: 5px !important;
 }
 
 .woocommerce ul.products li.product .price del,
