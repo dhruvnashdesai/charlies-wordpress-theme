@@ -182,12 +182,41 @@ h2, h3, .woocommerce-loop-product__title {
     font-weight: 600 !important;
 }
 
+/* Specific targeting for shop page product titles */
+.woocommerce ul.products li.product h2,
+.woocommerce ul.products li.product .woocommerce-loop-product__title,
+.woocommerce ul.products li.product h3,
+body.woocommerce-shop h2,
+body.woocommerce-shop .woocommerce-loop-product__title {
+    color: #000000 !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-family: "Neue Montreal", sans-serif !important;
+}
+
 .price, .woocommerce-Price-amount {
     color: #000000 !important;
-    font-size: 0.85rem !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
     display: block !important;
     margin-top: 0.25rem !important;
     background: none !important;
+}
+
+/* More specific targeting for main shop page */
+.woocommerce ul.products li.product .price,
+.woocommerce ul.products li.product span.price,
+.woocommerce ul.products li.product .woocommerce-Price-amount,
+body.woocommerce-shop .price {
+    color: #000000 !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 /* Product Title - Line Clamped */
