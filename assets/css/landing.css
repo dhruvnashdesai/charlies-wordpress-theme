@@ -48,6 +48,19 @@ h1, h2, h3, h4, h5, h6,
 main > section:not(.charlies-hero) {
     background-color: #000000;
     color: #ffffff;
+    margin: 0;
+    padding: 4rem 0;
+}
+
+/* Remove all gaps between sections */
+section {
+    margin: 0 !important;
+}
+
+/* Ensure no spacing on main container */
+.charlies-main {
+    margin: 0;
+    padding: 0;
 }
 
 /* Ensure all text elements are white */
@@ -108,7 +121,7 @@ main > section:not(.charlies-hero) {
     /* Ensure hero maintains its own background, not affected by body dark theme */
     text-align: center;
     padding: 8rem 0;
-    margin-bottom: 4rem;
+    margin-bottom: 0;
     min-height: 60vh;
     display: flex;
     align-items: center;
