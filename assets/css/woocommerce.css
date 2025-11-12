@@ -505,6 +505,16 @@ body.post-type-archive-product ul.products {
     margin-right: 0 !important;
 }
 
+/* Logo Consistency on WooCommerce Pages */
+.woocommerce .charlies-logo-image,
+.woocommerce-page .charlies-logo-image,
+body.woocommerce .charlies-logo-image,
+body.woocommerce-page .charlies-logo-image {
+    height: 50px !important;
+    width: auto !important;
+    max-width: 200px !important;
+}
+
 /* ===== CUSTOM SHOP PAGE LAYOUT (Lucy.co Style) ===== */
 
 /* Shop Custom Layout */
