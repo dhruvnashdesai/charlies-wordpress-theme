@@ -13,20 +13,20 @@
 /* Default body font - Neue Montreal */
 body {
     font-family: "Neue Montreal", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background-color: #000000 !important;
-    color: #ffffff;
+    background-color: #ffffff !important;
+    color: #000000;
     margin: 0;
     padding: 0;
 }
 
-/* Ensure html element is also black */
+/* Ensure html element is also white */
 html {
-    background-color: #000000 !important;
+    background-color: #ffffff !important;
 }
 
-/* Main container should be black */
+/* Main container should be white */
 .charlies-main {
-    background-color: #000000;
+    background-color: #ffffff;
 }
 
 /* Binner EF for headings and special elements */
@@ -40,14 +40,14 @@ h1, h2, h3, h4, h5, h6,
     font-family: "Neue Montreal", sans-serif;
 }
 
-/* Dark theme styles - everything after hero */
+/* Light theme styles - everything after hero */
 .charlies-categories,
 .charlies-about,
 .charlies-featured-products,
 .charlies-footer,
 main > section:not(.charlies-hero) {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: #ffffff;
+    color: #000000;
     margin: 0;
     padding: 4rem 0;
 }
@@ -63,7 +63,7 @@ section {
     padding: 0;
 }
 
-/* Ensure all text elements are white */
+/* Ensure all text elements are black */
 .charlies-categories h2,
 .charlies-categories p,
 .charlies-about h2,
@@ -71,38 +71,39 @@ section {
 .charlies-featured-products h2,
 .charlies-featured-products p,
 .section-title {
-    color: #ffffff !important;
+    color: #000000 !important;
 }
 
-/* Specifically ensure "Everything You Need" uses Binner EF and white */
+/* Specifically ensure "Everything You Need" uses Binner EF and black */
 .charlies-categories-title h2 {
     font-family: "Binner EF", Georgia, "Times New Roman", serif !important;
-    color: #ffffff !important;
+    color: #000000 !important;
 }
 
 /* Links should be visible */
 .charlies-categories a,
 .charlies-about a,
 .charlies-featured-products a {
-    color: #ffffff;
+    color: #000000;
 }
 
 .charlies-categories a:hover,
 .charlies-about a:hover,
 .charlies-featured-products a:hover {
-    color: #cccccc;
+    color: #666666;
 }
 
 /* Warning Bar - Above Header */
 .charlies-warning-bar {
-    background: #000;
-    color: white;
+    background: #f0f0f0;
+    color: #000000;
     padding: 10px 0;
     text-align: center;
     font-size: 0.9rem;
     font-weight: 500;
     position: relative;
     z-index: 1001;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .charlies-warning-bar p {
