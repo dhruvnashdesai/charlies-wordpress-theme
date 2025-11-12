@@ -11,11 +11,6 @@ get_header( 'shop' ); ?>
 <main class="charlies-main charlies-shop-custom">
     <div class="charlies-container">
 
-        <!-- Shop Header -->
-        <div class="charlies-shop-header">
-            <h1 class="shop-title">All Products</h1>
-            <p class="shop-subtitle">Discover our carefully curated selection of high-quality nicotine products designed for the modern consumer.</p>
-        </div>
 
         <!-- Shop Layout: Sidebar + Content -->
         <div class="charlies-shop-layout">
