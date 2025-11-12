@@ -13,8 +13,20 @@
 /* Default body font - Neue Montreal */
 body {
     font-family: "Neue Montreal", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background-color: #000000;
+    background-color: #000000 !important;
     color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+/* Ensure html element is also black */
+html {
+    background-color: #000000 !important;
+}
+
+/* Main container should be black */
+.charlies-main {
+    background-color: #000000;
 }
 
 /* Binner EF for headings and special elements */
