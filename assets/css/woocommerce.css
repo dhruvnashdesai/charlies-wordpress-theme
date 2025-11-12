@@ -188,38 +188,23 @@ body.woocommerce-page ul.products li.product:hover,
     margin-top: auto;
 }
 
-/* Add to Cart Button - Modern Design */
+/* Hide All Add to Cart Buttons on Shop Pages */
 .woocommerce ul.products li.product .button,
 .woocommerce ul.products li.product .add_to_cart_button,
+.woocommerce ul.products li.product a.button,
 .charlies-product-actions .button,
-.charlies-product-actions .add_to_cart_button {
-    width: 100%;
-    margin: 0;
-    padding: 10px 16px;
-    background: #000000;
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    font-family: "Neue Montreal", sans-serif !important;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-    box-shadow: none;
+.charlies-product-actions .add_to_cart_button,
+.woocommerce-page ul.products li.product .button,
+.woocommerce-page ul.products li.product .add_to_cart_button,
+.woocommerce-page ul.products li.product a.button,
+body.woocommerce ul.products li.product .button,
+body.woocommerce ul.products li.product .add_to_cart_button,
+body.woocommerce ul.products li.product a.button,
+.woocommerce .products .product .add_to_cart_button,
+.woocommerce .products .product a.button {
+    display: none !important;
 }
 
-.woocommerce ul.products li.product .button:hover,
-.woocommerce ul.products li.product .add_to_cart_button:hover,
-.charlies-product-actions .button:hover,
-.charlies-product-actions .add_to_cart_button:hover {
-    background: #2c2c2c;
-    color: #ffffff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
 
 /* Product Filters and Sorting - Dark Theme */
 .woocommerce .woocommerce-ordering,
