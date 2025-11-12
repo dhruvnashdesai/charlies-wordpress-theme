@@ -40,6 +40,7 @@ body.woocommerce-page ul.products li.product,
     height: auto !important;
     object-fit: cover !important;
     flex-shrink: 0 !important;
+    max-height: 60% !important;
 }
 
 /* Shop Page - Light Theme for ALL WooCommerce Pages */
@@ -160,6 +161,8 @@ body.woocommerce-page ul.products li.product:hover,
     flex-direction: column !important;
     text-align: left !important;
     background: transparent !important;
+    min-height: 40% !important;
+    overflow: visible !important;
 }
 
 /* Product Title - DEBUG */
