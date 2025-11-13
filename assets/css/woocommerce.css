@@ -937,3 +937,209 @@ body.woocommerce-page .charlies-logo-image {
         padding: 1rem;
     }
 }
+
+/* ===== LUCY.CO INSPIRED PRODUCT CARDS ===== */
+
+/* Lucy-style Product Cards */
+.charlies-product-card.lucy-style {
+    display: flex !important;
+    flex-direction: column !important;
+    text-decoration: none !important;
+    color: inherit !important;
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transition: all 0.3s ease !important;
+    overflow: hidden !important;
+    aspect-ratio: 3/4 !important;
+    min-height: auto !important;
+    height: auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+}
+
+/* Lucy-style Product Image */
+.lucy-style .charlies-product-image {
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    aspect-ratio: 1 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.lucy-style .charlies-product-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transition: all 0.3s ease !important;
+    transform: scale(0.8) !important;
+    opacity: 0.5 !important;
+    mix-blend-mode: multiply !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+/* Lucy-style Hover Effects */
+.lucy-style:hover .charlies-product-image img {
+    transform: scale(0.9) !important;
+    opacity: 1 !important;
+}
+
+/* Lucy-style Product Content */
+.lucy-style .charlies-product-content {
+    padding: 1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    flex-grow: 1 !important;
+    background: transparent !important;
+    position: relative !important;
+    text-align: left !important;
+    margin: 0 !important;
+}
+
+/* Lucy-style Typography */
+.lucy-style .product-title {
+    font-family: "Neue Montreal", sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase !important;
+    color: #000000 !important;
+    line-height: 1.2 !important;
+    margin: 0 0 0.25rem 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+}
+
+.lucy-style .product-price {
+    font-family: "Neue Montreal", sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase !important;
+    color: #000000 !important;
+    line-height: 1.2 !important;
+    margin: 0 0 0.25rem 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+}
+
+.lucy-style .product-details {
+    font-family: "Neue Montreal", sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase !important;
+    color: #000000 !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Remove all price styling conflicts for Lucy style */
+.lucy-style .product-price .woocommerce-Price-amount,
+.lucy-style .product-price .amount,
+.lucy-style .product-price span {
+    font-family: inherit !important;
+    font-weight: inherit !important;
+    font-size: inherit !important;
+    text-transform: inherit !important;
+    color: inherit !important;
+    line-height: inherit !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline !important;
+    text-decoration: inherit !important;
+}
+
+/* Override WooCommerce default product loop styling for Lucy cards */
+.woocommerce ul.products li.lucy-style,
+.woocommerce-page ul.products li.lucy-style {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+    float: none !important;
+    clear: none !important;
+}
+
+.woocommerce ul.products li.lucy-style:hover,
+.woocommerce-page ul.products li.lucy-style:hover {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Override WooCommerce link styling for Lucy cards */
+.lucy-style a,
+.lucy-style:hover,
+.lucy-style:focus,
+.lucy-style:active,
+.lucy-style:visited {
+    text-decoration: none !important;
+    color: inherit !important;
+    background: transparent !important;
+}
+
+/* Ensure proper grid layout for Lucy cards */
+.charlies-category-products {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+    gap: 1rem !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 1rem 0 !important;
+}
+
+/* Mobile responsiveness for Lucy cards */
+@media (max-width: 768px) {
+    .charlies-category-products {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+        gap: 0.75rem !important;
+    }
+
+    .lucy-style .charlies-product-content {
+        padding: 0.75rem !important;
+    }
+
+    .lucy-style .product-title,
+    .lucy-style .product-price,
+    .lucy-style .product-details {
+        font-size: 0.7rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .charlies-category-products {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+    }
+
+    .lucy-style .charlies-product-content {
+        padding: 0.5rem !important;
+    }
+
+    .lucy-style .product-title,
+    .lucy-style .product-price,
+    .lucy-style .product-details {
+        font-size: 0.65rem !important;
+    }
+}

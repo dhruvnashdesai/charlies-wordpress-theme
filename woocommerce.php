@@ -139,26 +139,62 @@ if (is_shop()) {
                                     <?php foreach ($products as $product) :
                                         $product_id = $product->get_id(); ?>
 
-                                        <a href="<?php echo get_permalink($product_id); ?>" class="charlies-product-card" data-product-id="<?php echo $product_id; ?>">
-                                            <div class="charlies-product-inner">
+                                        <a href="<?php echo get_permalink($product_id); ?>" class="charlies-product-card lucy-style" data-product-id="<?php echo $product_id; ?>">
+                                            <!-- Product Image -->
+                                            <div class="charlies-product-image">
+                                                <?php echo $product->get_image('medium'); ?>
+                                            </div>
 
-                                                <!-- Product Image -->
-                                                <div class="charlies-product-image">
-                                                    <?php echo $product->get_image('medium'); ?>
-                                                </div>
+                                            <!-- Product Content -->
+                                            <div class="charlies-product-content">
+                                                <p class="product-title">
+                                                    <?php echo esc_html($product->get_name()); ?>
+                                                </p>
+                                                <p class="product-price">
+                                                    <?php echo $product->get_price_html(); ?>
+                                                </p>
+                                                <?php
+                                                // Get product attributes for additional info
+                                                $attributes = $product->get_attributes();
+                                                $strength = '';
+                                                $flavor = '';
 
-                                                <!-- Product Content -->
-                                                <div class="charlies-product-content">
-                                                    <h3 class="product-title">
-                                                        <?php echo esc_html($product->get_name()); ?>
-                                                    </h3>
+                                                foreach ($attributes as $attribute) {
+                                                    $name = strtolower($attribute->get_name());
+                                                    if (strpos($name, 'strength') !== false || strpos($name, 'mg') !== false) {
+                                                        $terms = wc_get_product_terms($product_id, $attribute->get_name(), array('fields' => 'names'));
+                                                        if (!empty($terms)) {
+                                                            $strength = $terms[0];
+                                                        }
+                                                    }
+                                                    if (strpos($name, 'flavor') !== false || strpos($name, 'taste') !== false) {
+                                                        $terms = wc_get_product_terms($product_id, $attribute->get_name(), array('fields' => 'names'));
+                                                        if (!empty($terms)) {
+                                                            $flavor = $terms[0];
+                                                        }
+                                                    }
+                                                }
 
-                                                    <div class="charlies-product-meta">
-                                                        <span class="product-price"><?php echo $product->get_price_html(); ?></span>
-                                                    </div>
+                                                $additional_info = '';
+                                                if ($strength && $flavor) {
+                                                    $additional_info = $strength . ' / ' . $flavor;
+                                                } elseif ($strength) {
+                                                    $additional_info = $strength;
+                                                } elseif ($flavor) {
+                                                    $additional_info = $flavor;
+                                                } else {
+                                                    // Fallback to category name
+                                                    $categories = wp_get_post_terms($product_id, 'product_cat', array('fields' => 'names'));
+                                                    if (!empty($categories)) {
+                                                        $additional_info = $categories[0];
+                                                    }
+                                                }
 
-                                                </div>
-
+                                                if ($additional_info) : ?>
+                                                <p class="product-details">
+                                                    <?php echo esc_html($additional_info); ?>
+                                                </p>
+                                                <?php endif; ?>
                                             </div>
                                         </a>
 
