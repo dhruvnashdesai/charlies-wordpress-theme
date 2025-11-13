@@ -946,14 +946,14 @@ body.woocommerce-page .charlies-logo-image {
     flex-direction: column !important;
     text-decoration: none !important;
     color: inherit !important;
-    background: #ffffff !important;
+    background: #f8f8f8 !important;
     border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     transition: all 0.3s ease !important;
-    overflow: visible !important;
+    overflow: hidden !important;
     aspect-ratio: 4/5 !important;
-    min-height: 280px !important;
+    min-height: 300px !important;
     height: auto !important;
     width: 100% !important;
     margin: 0 !important;
@@ -966,10 +966,11 @@ body.woocommerce-page .charlies-logo-image {
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
-    height: 160px !important;
+    height: 180px !important;
     background: transparent !important;
     padding: 0 !important;
     margin: 0 !important;
+    border-radius: 12px 12px 0 0 !important;
 }
 
 .lucy-style .charlies-product-image img {
@@ -988,6 +989,11 @@ body.woocommerce-page .charlies-logo-image {
 }
 
 /* Lucy-style Hover Effects */
+.lucy-style:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
 .lucy-style:hover .charlies-product-image img {
     transform: scale(0.9) !important;
     opacity: 1 !important;
@@ -1105,8 +1111,8 @@ body.woocommerce-page .charlies-logo-image {
 /* Ensure proper grid layout for Lucy cards */
 .charlies-category-products {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
-    gap: 1rem !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    gap: 1.5rem !important;
     list-style: none !important;
     padding: 0 !important;
     margin: 1rem 0 !important;
@@ -1115,21 +1121,21 @@ body.woocommerce-page .charlies-logo-image {
 /* Mobile responsiveness for Lucy cards */
 @media (max-width: 768px) {
     .charlies-category-products {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
-        gap: 0.75rem !important;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+        gap: 1rem !important;
     }
 
     .charlies-product-card.lucy-style {
-        min-height: 240px !important;
+        min-height: 260px !important;
     }
 
     .lucy-style .charlies-product-image {
-        height: 130px !important;
+        height: 150px !important;
     }
 
     .lucy-style .charlies-product-content {
         padding: 0.75rem !important;
-        min-height: 80px !important;
+        min-height: 90px !important;
     }
 
     .lucy-style .product-title,
@@ -1142,15 +1148,15 @@ body.woocommerce-page .charlies-logo-image {
 @media (max-width: 480px) {
     .charlies-category-products {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 0.5rem !important;
+        gap: 0.75rem !important;
     }
 
     .charlies-product-card.lucy-style {
-        min-height: 200px !important;
+        min-height: 220px !important;
     }
 
     .lucy-style .charlies-product-image {
-        height: 110px !important;
+        height: 130px !important;
     }
 
     .lucy-style .charlies-product-content {
