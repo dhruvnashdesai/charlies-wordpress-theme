@@ -324,7 +324,17 @@ section {
 }
 
 .charlies-category-card:hover {
-    transform: translateY(-5px);
+    /* No card movement - only image should scale */
+}
+
+/* Add image scaling on hover for category cards */
+.charlies-category-card:hover .charlies-category-image img {
+    transform: scale(1.05);
+}
+
+/* Ensure category images have transition */
+.charlies-category-image img {
+    transition: transform 0.3s ease;
 }
 
 .charlies-category-card a {
