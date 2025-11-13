@@ -770,12 +770,31 @@ body.woocommerce-page .charlies-logo-image {
 /* Category Products Grid */
 .charlies-category-products {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
 }
 
-/* Product Cards within Categories */
-.charlies-category-products .charlies-product-card {
+/* Product Cards within Categories - Override for Lucy style */
+.charlies-category-products .charlies-product-card.lucy-style {
+    background: #f8f8f8 !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    text-decoration: none !important;
+    color: inherit !important;
+    aspect-ratio: 4/5 !important;
+    min-height: 300px !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Fallback for non-Lucy style cards */
+.charlies-category-products .charlies-product-card:not(.lucy-style) {
     background: #ffffff !important;
     border-radius: 8px !important;
     overflow: hidden !important;
@@ -789,7 +808,14 @@ body.woocommerce-page .charlies-logo-image {
     aspect-ratio: 3/4 !important;
 }
 
-.charlies-category-products .charlies-product-card:hover {
+/* Hover effects for Lucy-style cards */
+.charlies-category-products .charlies-product-card.lucy-style:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Hover effects for non-Lucy cards */
+.charlies-category-products .charlies-product-card:not(.lucy-style):hover {
     transform: translateY(-3px) !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
     border-color: #d0d0d0 !important;
@@ -801,7 +827,20 @@ body.woocommerce-page .charlies-logo-image {
     flex-direction: column;
 }
 
-.charlies-category-products .charlies-product-image {
+/* Image area for Lucy-style cards */
+.charlies-category-products .charlies-product-card.lucy-style .charlies-product-image {
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    height: 180px !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 12px 12px 0 0 !important;
+}
+
+/* Image area for non-Lucy cards */
+.charlies-category-products .charlies-product-card:not(.lucy-style) .charlies-product-image {
     aspect-ratio: 1;
     position: relative;
     overflow: hidden;
@@ -819,7 +858,24 @@ body.woocommerce-page .charlies-logo-image {
     transform: scale(1.05);
 }
 
-.charlies-category-products .charlies-product-content {
+/* Content area for Lucy-style cards */
+.charlies-category-products .charlies-product-card.lucy-style .charlies-product-content {
+    padding: 1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    gap: 0.25rem !important;
+    flex-grow: 1 !important;
+    min-height: 100px !important;
+    background: transparent !important;
+    position: relative !important;
+    text-align: left !important;
+    margin: 0 !important;
+    overflow: visible !important;
+}
+
+/* Content area for non-Lucy cards */
+.charlies-category-products .charlies-product-card:not(.lucy-style) .charlies-product-content {
     padding: 0.75rem;
     flex-grow: 1;
     display: flex;
@@ -914,7 +970,7 @@ body.woocommerce-page .charlies-logo-image {
     }
 
     .charlies-category-products {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         gap: 1rem;
     }
 }
