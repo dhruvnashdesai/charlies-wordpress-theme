@@ -66,7 +66,7 @@ body.tax-product_cat main.charlies-main {
 
 .shop-header .page-title {
     font-family: "Binner EF", Georgia, serif !important;
-    font-size: 2.5rem;
+    font-size: 4rem !important;
     font-weight: 700;
     margin-bottom: 1rem;
     color: #000000 !important;
@@ -85,8 +85,8 @@ body.tax-product_cat main.charlies-main {
 .woocommerce ul.products,
 .woocommerce.woocommerce-page ul.products {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
-    gap: 1.5rem !important;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+    gap: 2rem !important;
     list-style: none !important;
     padding: 0 !important;
     margin: 2rem 0 !important;
@@ -133,17 +133,24 @@ body.woocommerce-page ul.products li.product:hover,
 }
 
 /* Product Image Section */
-.charlies-product-image {
+.charlies-product-image,
+.woocommerce ul.products li.product .woocommerce-loop-product__link {
     position: relative;
     overflow: hidden;
+    display: block;
+    flex-shrink: 0;
 }
 
 .woocommerce ul.products li.product img,
-.charlies-product-image img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    transition: transform 0.3s ease;
+.charlies-product-image img,
+.woocommerce ul.products li.product .woocommerce-loop-product__link img {
+    width: 100% !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    transition: transform 0.3s ease !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .woocommerce ul.products li.product:hover img,
@@ -166,7 +173,7 @@ body.woocommerce-page ul.products li.product:hover,
 /* Fix main shop page layout - allow content to expand naturally */
 .woocommerce ul.products li.product {
     aspect-ratio: auto !important; /* Remove fixed aspect ratio */
-    min-height: 250px !important; /* Set minimum height instead */
+    min-height: 350px !important; /* Set minimum height instead */
     height: auto !important;
 }
 
@@ -235,9 +242,9 @@ body.woocommerce-shop .price,
 .woocommerce.woocommerce-shop ul.products li.product h2,
 .woocommerce.woocommerce-shop ul.products li.product .woocommerce-loop-product__title {
     font-family: "Neue Montreal", sans-serif !important;
-    font-size: 0.8rem !important;
+    font-size: 1.1rem !important;
     font-weight: 600 !important;
-    margin: 0 0 0.5rem 0 !important;
+    margin: 0 0 0.75rem 0 !important;
     color: #000000 !important;
     line-height: 1.3 !important;
     display: -webkit-box !important;
@@ -247,6 +254,8 @@ body.woocommerce-shop .price,
     height: auto !important;
     position: relative !important;
     z-index: 2 !important;
+    background: none !important;
+    text-decoration: none !important;
 }
 
 /* Product Meta Section */
@@ -261,7 +270,7 @@ body.woocommerce-shop .price,
 .woocommerce ul.products li.product .woocommerce-Price-amount,
 .woocommerce.woocommerce-shop ul.products li.product .price {
     font-family: "Neue Montreal", sans-serif !important;
-    font-size: 0.85rem !important;
+    font-size: 1rem !important;
     font-weight: 600 !important;
     color: #000000 !important;
     margin: 0 !important;
@@ -269,6 +278,9 @@ body.woocommerce-shop .price,
     line-height: 1.2 !important;
     position: relative !important;
     z-index: 2 !important;
+    background: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .woocommerce ul.products li.product .price del,
@@ -561,8 +573,8 @@ body.woocommerce ul.products li.product a.button,
 body.woocommerce ul.products.columns-3,
 body.post-type-archive-product ul.products {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
-    gap: 1.5rem !important;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+    gap: 2rem !important;
     width: 100% !important;
     list-style: none !important;
     padding: 0 !important;
@@ -621,7 +633,7 @@ body.woocommerce-page .charlies-logo-image {
 
 .charlies-shop-header .shop-title {
     font-family: "Binner EF", Georgia, serif !important;
-    font-size: 3rem;
+    font-size: 4rem !important;
     font-weight: 700;
     color: #000000 !important;
     margin-bottom: 1rem;
@@ -740,10 +752,10 @@ body.woocommerce-page .charlies-logo-image {
 
 .charlies-category-header .category-title {
     font-family: "Binner EF", Georgia, serif !important;
-    font-size: 1.5rem;
+    font-size: 3.5rem !important;
     font-weight: 700;
     color: #000000 !important;
-    margin-bottom: 0.1rem;
+    margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -898,7 +910,7 @@ body.woocommerce-page .charlies-logo-image {
     }
 
     .charlies-category-header .category-title {
-        font-size: 2rem;
+        font-size: 2.5rem !important;
     }
 
     .charlies-category-products {
