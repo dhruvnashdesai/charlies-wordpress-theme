@@ -808,10 +808,9 @@ body.woocommerce-page .charlies-logo-image {
     aspect-ratio: 3/4 !important;
 }
 
-/* Hover effects for Lucy-style cards */
+/* Hover effects for Lucy-style cards - No card movement */
 .charlies-category-products .charlies-product-card.lucy-style:hover {
-    transform: translateY(-4px) !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+    /* No transform or shadow changes - card stays in place */
 }
 
 /* Hover effects for non-Lucy cards */
@@ -854,7 +853,13 @@ body.woocommerce-page .charlies-logo-image {
     transition: transform 0.3s ease;
 }
 
-.charlies-category-products .charlies-product-card:hover .charlies-product-image img {
+/* Image hover effects for Lucy-style cards */
+.charlies-category-products .charlies-product-card.lucy-style:hover .charlies-product-image img {
+    transform: scale(1.05) !important;
+}
+
+/* Image hover effects for non-Lucy cards */
+.charlies-category-products .charlies-product-card:not(.lucy-style):hover .charlies-product-image img {
     transform: scale(1.05);
 }
 
@@ -1033,10 +1038,9 @@ body.woocommerce-page .charlies-logo-image {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
-    transition: all 0.3s ease !important;
-    transform: scale(0.8) !important;
-    opacity: 0.5 !important;
-    mix-blend-mode: multiply !important;
+    transition: transform 0.3s ease !important;
+    transform: scale(1) !important;
+    opacity: 1 !important;
     display: block !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -1044,15 +1048,9 @@ body.woocommerce-page .charlies-logo-image {
     border-radius: 0 !important;
 }
 
-/* Lucy-style Hover Effects */
-.lucy-style:hover {
-    transform: translateY(-4px) !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
-}
-
+/* Lucy-style Hover Effects - Only image scales */
 .lucy-style:hover .charlies-product-image img {
-    transform: scale(0.9) !important;
-    opacity: 1 !important;
+    transform: scale(1.05) !important;
 }
 
 /* Lucy-style Product Content */
