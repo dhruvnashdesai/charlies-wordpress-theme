@@ -657,12 +657,12 @@ body.woocommerce-page .charlies-logo-image {
 
 /* Left Sidebar - Filtering */
 .charlies-shop-sidebar {
-    background-color: #f8f8f8;
-    border-radius: 12px;
-    padding: 2rem;
+    background-color: transparent;
+    border-radius: 0;
+    padding: 2rem 1rem;
     position: sticky;
     top: 2rem;
-    border: 1px solid #e0e0e0;
+    border: none;
 }
 
 .charlies-filter-section {
@@ -950,7 +950,7 @@ body.woocommerce-page .charlies-logo-image {
     }
 
     .charlies-shop-sidebar {
-        padding: 1.5rem;
+        padding: 1.5rem 1rem;
     }
 }
 
