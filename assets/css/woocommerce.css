@@ -951,9 +951,9 @@ body.woocommerce-page .charlies-logo-image {
     border-radius: 0 !important;
     box-shadow: none !important;
     transition: all 0.3s ease !important;
-    overflow: hidden !important;
-    aspect-ratio: 3/4 !important;
-    min-height: auto !important;
+    overflow: visible !important;
+    aspect-ratio: 4/5 !important;
+    min-height: 280px !important;
     height: auto !important;
     width: 100% !important;
     margin: 0 !important;
@@ -966,7 +966,7 @@ body.woocommerce-page .charlies-logo-image {
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
-    aspect-ratio: 1 !important;
+    height: 160px !important;
     background: transparent !important;
     padding: 0 !important;
     margin: 0 !important;
@@ -998,12 +998,15 @@ body.woocommerce-page .charlies-logo-image {
     padding: 1rem !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: flex-start !important;
+    gap: 0.25rem !important;
     flex-grow: 1 !important;
+    min-height: 100px !important;
     background: transparent !important;
     position: relative !important;
     text-align: left !important;
     margin: 0 !important;
+    overflow: visible !important;
 }
 
 /* Lucy-style Typography */
@@ -1116,8 +1119,17 @@ body.woocommerce-page .charlies-logo-image {
         gap: 0.75rem !important;
     }
 
+    .charlies-product-card.lucy-style {
+        min-height: 240px !important;
+    }
+
+    .lucy-style .charlies-product-image {
+        height: 130px !important;
+    }
+
     .lucy-style .charlies-product-content {
         padding: 0.75rem !important;
+        min-height: 80px !important;
     }
 
     .lucy-style .product-title,
@@ -1133,8 +1145,17 @@ body.woocommerce-page .charlies-logo-image {
         gap: 0.5rem !important;
     }
 
+    .charlies-product-card.lucy-style {
+        min-height: 200px !important;
+    }
+
+    .lucy-style .charlies-product-image {
+        height: 110px !important;
+    }
+
     .lucy-style .charlies-product-content {
         padding: 0.5rem !important;
+        min-height: 70px !important;
     }
 
     .lucy-style .product-title,
