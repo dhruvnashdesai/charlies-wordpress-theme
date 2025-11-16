@@ -779,7 +779,7 @@ body.woocommerce-page .charlies-logo-image {
     background: #f8f8f8 !important;
     border-radius: 12px !important;
     overflow: hidden !important;
-    transition: all 0.3s ease !important;
+    /* Removed transition to prevent card movement */
     border: none !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     display: flex !important;
@@ -1011,7 +1011,7 @@ body.woocommerce-page .charlies-logo-image {
     border: none !important;
     border-radius: 12px !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
-    transition: all 0.3s ease !important;
+    /* Removed transition to prevent card movement */
     overflow: hidden !important;
     height: auto !important;
     min-height: auto !important;
