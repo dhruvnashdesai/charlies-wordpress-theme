@@ -19,18 +19,14 @@
 <div class="charlies-promo-banner">
     <div class="charlies-promo-content">
         <span class="charlies-promo-text">SAME DAY DELIVERY IN MONTREAL</span>
-        <span class="charlies-promo-separator">•</span>
         <span class="charlies-promo-text">NO TAX</span>
-        <span class="charlies-promo-separator">•</span>
         <span class="charlies-promo-text">US STRENGTHS</span>
-        <span class="charlies-promo-separator">•</span>
-        <!-- Repeat for seamless loop -->
         <span class="charlies-promo-text">SAME DAY DELIVERY IN MONTREAL</span>
-        <span class="charlies-promo-separator">•</span>
         <span class="charlies-promo-text">NO TAX</span>
-        <span class="charlies-promo-separator">•</span>
         <span class="charlies-promo-text">US STRENGTHS</span>
-        <span class="charlies-promo-separator">•</span>
+        <span class="charlies-promo-text">SAME DAY DELIVERY IN MONTREAL</span>
+        <span class="charlies-promo-text">NO TAX</span>
+        <span class="charlies-promo-text">US STRENGTHS</span>
     </div>
 </div>
 
