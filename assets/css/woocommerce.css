@@ -390,42 +390,223 @@ body.woocommerce ul.products li.product a.button,
     border-color: #000;
 }
 
-/* Single Product Page */
-.woocommerce div.product {
+/* ===== SINGLE PRODUCT PAGE LAYOUT ===== */
+
+/* Main Product Container */
+.charlies-single-product {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.charlies-product-detail {
     margin-bottom: 3rem;
 }
 
-.woocommerce div.product .summary {
-    margin-bottom: 2rem;
+/* Two-Column Layout */
+.charlies-product-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-bottom: 3rem;
 }
 
-.woocommerce div.product .product_title {
-    font-size: 2rem;
-    font-weight: 700;
+/* Left Column - Product Images */
+.charlies-product-images {
+    position: relative;
+}
+
+/* Default WooCommerce Image Container */
+.charlies-product-images .woocommerce-product-gallery {
+    margin: 0;
+    padding: 0;
+}
+
+.charlies-product-images .woocommerce-product-gallery__wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+/* Hero Image */
+.charlies-product-images .woocommerce-product-gallery__image:first-child {
+    grid-column: 1;
     margin-bottom: 1rem;
-    color: #333;
 }
 
-.woocommerce div.product .price {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #000;
-    margin-bottom: 1rem;
+.charlies-product-images .woocommerce-product-gallery__image img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    object-fit: cover;
 }
 
-.woocommerce div.product .single_add_to_cart_button {
-    background: #000;
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 6px;
-    font-weight: 600;
+/* Gallery Grid */
+.charlies-product-images .woocommerce-product-gallery__image:not(:first-child) {
+    display: inline-block;
+    width: calc(25% - 0.75rem);
+    margin: 0 0.25rem 0.5rem 0;
+}
+
+.charlies-product-images .woocommerce-product-gallery__image:not(:first-child) img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: opacity 0.3s ease;
 }
 
-.woocommerce div.product .single_add_to_cart_button:hover {
-    background: #333;
+.charlies-product-images .woocommerce-product-gallery__image:not(:first-child) img:hover {
+    opacity: 0.8;
+}
+
+/* Right Column - Product Info */
+.charlies-product-info {
+    position: sticky;
+    top: 2rem;
+}
+
+.charlies-product-info-box {
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Product Title */
+.charlies-product-info-box .product_title {
+    font-family: "Binner EF", Georgia, serif !important;
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: #000000 !important;
+    margin-bottom: 1rem !important;
+    line-height: 1.2 !important;
+}
+
+/* Product Price */
+.charlies-product-info-box .price {
+    font-family: "Neue Montreal", sans-serif !important;
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    color: #000000 !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Product Description */
+.charlies-product-info-box .woocommerce-product-details__short-description {
+    font-family: "Neue Montreal", sans-serif !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+    color: #333333 !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Add to Cart Section */
+.charlies-product-info-box .cart {
+    margin-bottom: 1.5rem !important;
+}
+
+.charlies-product-info-box .single_add_to_cart_button {
+    width: 100% !important;
+    background: #000000 !important;
+    color: #ffffff !important;
+    padding: 15px 20px !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-family: "Neue Montreal", sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.charlies-product-info-box .single_add_to_cart_button:hover {
+    background: #333333 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Quantity Input */
+.charlies-product-info-box .quantity {
+    margin-bottom: 1rem !important;
+}
+
+.charlies-product-info-box .quantity .qty {
+    width: 80px !important;
+    padding: 10px !important;
+    border: 2px solid #ddd !important;
+    border-radius: 6px !important;
+    font-family: "Neue Montreal", sans-serif !important;
+    font-size: 1rem !important;
+    text-align: center !important;
+}
+
+/* Product Meta */
+.charlies-product-info-box .product_meta {
+    border-top: 1px solid #ddd !important;
+    padding-top: 1.5rem !important;
+    margin-top: 1.5rem !important;
+}
+
+.charlies-product-info-box .product_meta span {
+    display: block !important;
+    margin-bottom: 0.5rem !important;
+    font-family: "Neue Montreal", sans-serif !important;
+    font-size: 0.9rem !important;
+    color: #666666 !important;
+}
+
+/* Product Tabs Section */
+.charlies-product-tabs {
+    margin-top: 3rem;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.charlies-product-tabs .woocommerce-tabs {
+    border: none !important;
+}
+
+.charlies-product-tabs .woocommerce-tabs ul.tabs {
+    border-bottom: 1px solid #eee !important;
+    padding-left: 2rem !important;
+    margin: 0 !important;
+}
+
+.charlies-product-tabs .woocommerce-tabs ul.tabs li {
+    border: none !important;
+    background: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.charlies-product-tabs .woocommerce-tabs ul.tabs li a {
+    padding: 1rem 2rem !important;
+    font-family: "Neue Montreal", sans-serif !important;
+    font-weight: 500 !important;
+    color: #666666 !important;
+    text-decoration: none !important;
+    border-bottom: 3px solid transparent !important;
+    transition: all 0.3s ease !important;
+}
+
+.charlies-product-tabs .woocommerce-tabs ul.tabs li.active a,
+.charlies-product-tabs .woocommerce-tabs ul.tabs li a:hover {
+    color: #000000 !important;
+    border-bottom-color: #000000 !important;
+}
+
+.charlies-product-tabs .woocommerce-tabs .panel {
+    padding: 2rem !important;
+    font-family: "Neue Montreal", sans-serif !important;
+    line-height: 1.6 !important;
+    color: #333333 !important;
 }
 
 /* Cart Page */
@@ -489,8 +670,49 @@ body.woocommerce ul.products li.product a.button,
     background: #333;
 }
 
-/* Responsive Design */
+/* ===== SINGLE PRODUCT RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
+    /* Single Product Mobile Layout */
+    .charlies-product-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .charlies-product-info {
+        position: static;
+        order: 2;
+    }
+
+    .charlies-product-images {
+        order: 1;
+    }
+
+    .charlies-product-info-box {
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .charlies-product-info-box .product_title {
+        font-size: 1.5rem !important;
+    }
+
+    .charlies-product-info-box .price {
+        font-size: 1.25rem !important;
+    }
+
+    .charlies-product-tabs .woocommerce-tabs ul.tabs {
+        padding-left: 1rem !important;
+    }
+
+    .charlies-product-tabs .woocommerce-tabs ul.tabs li a {
+        padding: 0.75rem 1rem !important;
+    }
+
+    .charlies-product-tabs .woocommerce-tabs .panel {
+        padding: 1.5rem !important;
+    }
+
+    /* Shop Products Mobile */
     .woocommerce ul.products {
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 1rem;
