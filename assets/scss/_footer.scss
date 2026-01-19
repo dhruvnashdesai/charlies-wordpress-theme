@@ -1,0 +1,126 @@
+// ==========================================================================
+// Footer Styles - Charlie's Theme
+// Matching dipski.co footer design
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// --------------------------------------------------------------------------
+// Site Footer
+// --------------------------------------------------------------------------
+
+.site-footer {
+	background-color: $color-bg;
+	border-top: 1px solid $color-border;
+	padding-top: $spacing-12;
+
+	&__grid {
+		display: grid;
+		gap: $spacing-8;
+		grid-template-columns: 1fr;
+
+		@include md {
+			grid-template-columns: 45% repeat(3, 1fr);
+			gap: $spacing-6;
+		}
+	}
+
+	&__col {
+		&--brand {
+			@include md {
+				padding-right: $spacing-8;
+			}
+		}
+	}
+
+	&__copyright {
+		margin-top: $spacing-12;
+		padding: $spacing-6 0;
+		border-top: 1px solid $color-border;
+
+		p {
+			font-size: $font-size-sm;
+			color: $color-muted;
+			margin: 0;
+			text-align: center;
+
+			@include md {
+				text-align: left;
+			}
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Footer Typography
+// --------------------------------------------------------------------------
+
+.footer-title {
+	font-size: 13px;
+	font-weight: $font-weight-semibold;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: $color-white;
+	margin-bottom: $spacing-4;
+}
+
+.footer-tagline {
+	font-size: $font-size-sm;
+	color: $color-muted;
+	line-height: $line-height-relaxed;
+	margin-bottom: $spacing-4;
+}
+
+// --------------------------------------------------------------------------
+// Footer Menu
+// --------------------------------------------------------------------------
+
+.footer-menu {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-2;
+
+	a {
+		display: inline-block;
+		font-size: $font-size-sm;
+		color: $color-white;
+		transition: color $transition-fast;
+
+		&:hover {
+			color: $color-accent;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Footer Social Links (optional enhancement)
+// --------------------------------------------------------------------------
+
+.footer-social {
+	display: flex;
+	gap: $spacing-3;
+	margin-top: $spacing-4;
+
+	a {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 36px;
+		height: 36px;
+		border: 1px solid $color-border;
+		border-radius: $border-radius-full;
+		color: $color-white;
+		transition: all $transition-fast;
+
+		&:hover {
+			border-color: $color-accent;
+			color: $color-accent;
+		}
+
+		svg {
+			width: 18px;
+			height: 18px;
+		}
+	}
+}

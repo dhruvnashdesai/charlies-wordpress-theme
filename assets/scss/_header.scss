@@ -1,0 +1,294 @@
+// ==========================================================================
+// Header Styles - Charlie's Theme
+// Matching dipski.co header design
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// --------------------------------------------------------------------------
+// Promo Bar
+// --------------------------------------------------------------------------
+
+.promo-bar {
+	background-color: $color-accent;
+	color: $color-white;
+	padding: $spacing-2 0;
+	text-align: center;
+
+	&__text {
+		font-size: $font-size-sm;
+		font-weight: $font-weight-semibold;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin: 0;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Site Header
+// --------------------------------------------------------------------------
+
+.site-header {
+	background-color: $color-bg;
+	border-bottom: 1px solid $color-border;
+	position: sticky;
+	top: 0;
+	z-index: $z-sticky;
+
+	&__inner {
+		@include flex-between;
+		height: $header-height;
+		gap: $spacing-4;
+	}
+
+	&__logo {
+		flex-shrink: 0;
+
+		.site-logo,
+		.custom-logo-link {
+			display: block;
+			font-size: $font-size-xl;
+			font-weight: $font-weight-bold;
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+			color: $color-white;
+
+			&:hover {
+				color: $color-white;
+			}
+		}
+
+		.custom-logo {
+			height: 40px;
+			width: auto;
+		}
+	}
+
+	&__nav {
+		flex: 1;
+		display: flex;
+		justify-content: center;
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		gap: $spacing-4;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Primary Menu
+// --------------------------------------------------------------------------
+
+.primary-menu {
+	display: flex;
+	align-items: center;
+	gap: $spacing-6;
+
+	li {
+		position: relative;
+	}
+
+	a {
+		display: block;
+		font-size: 15px;
+		font-weight: $font-weight-semibold;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: $color-white;
+		padding: $spacing-2 0;
+		transition: color $transition-fast;
+
+		&:hover {
+			color: $color-accent;
+		}
+	}
+
+	// Current page highlight
+	.current-menu-item > a,
+	.current_page_item > a {
+		color: $color-accent;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Header Icons
+// --------------------------------------------------------------------------
+
+.header-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	color: $color-white;
+	transition: color $transition-fast;
+
+	&:hover {
+		color: $color-accent;
+	}
+
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Cart Icon
+// --------------------------------------------------------------------------
+
+.header-cart {
+	display: flex;
+	align-items: center;
+	gap: $spacing-2;
+	color: $color-white;
+	font-weight: $font-weight-semibold;
+	transition: color $transition-fast;
+
+	&:hover {
+		color: $color-accent;
+	}
+
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+}
+
+.charlies-cart-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 $spacing-1;
+	background-color: $color-accent;
+	color: $color-white;
+	font-size: $font-size-xs;
+	font-weight: $font-weight-semibold;
+	border-radius: $border-radius-full;
+
+	&:empty,
+	&[data-count="0"] {
+		display: none;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Mobile Menu Toggle
+// --------------------------------------------------------------------------
+
+.mobile-menu-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	background: none;
+	border: none;
+	cursor: pointer;
+}
+
+.hamburger {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 5px;
+	width: 24px;
+	height: 24px;
+
+	span {
+		display: block;
+		width: 100%;
+		height: 2px;
+		background-color: $color-white;
+		transition: all $transition-fast;
+	}
+}
+
+// Hamburger animation when menu is open
+.menu-open .hamburger {
+	span:nth-child(1) {
+		transform: translateY(7px) rotate(45deg);
+	}
+
+	span:nth-child(2) {
+		opacity: 0;
+	}
+
+	span:nth-child(3) {
+		transform: translateY(-7px) rotate(-45deg);
+	}
+}
+
+// --------------------------------------------------------------------------
+// Mobile Menu
+// --------------------------------------------------------------------------
+
+.mobile-menu {
+	position: fixed;
+	top: calc(#{$promo-bar-height} + #{$header-height});
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: $color-bg;
+	z-index: $z-fixed;
+	transform: translateX(-100%);
+	transition: transform $transition-base;
+	overflow-y: auto;
+
+	&.is-open {
+		transform: translateX(0);
+	}
+
+	&__inner {
+		padding: $spacing-6;
+	}
+
+	&__list {
+		display: flex;
+		flex-direction: column;
+		gap: $spacing-2;
+
+		a {
+			display: block;
+			padding: $spacing-4;
+			font-size: $font-size-lg;
+			font-weight: $font-weight-semibold;
+			text-transform: uppercase;
+			color: $color-white;
+			border-bottom: 1px solid $color-border;
+
+			&:hover {
+				color: $color-accent;
+			}
+		}
+	}
+
+	&__link {
+		display: block;
+		padding: $spacing-4;
+		font-size: $font-size-lg;
+		font-weight: $font-weight-semibold;
+		text-transform: uppercase;
+		color: $color-white;
+		border-bottom: 1px solid $color-border;
+
+		&:hover {
+			color: $color-accent;
+		}
+	}
+}
+
+// Prevent body scroll when menu is open
+body.menu-open {
+	overflow: hidden;
+
+	@include md {
+		overflow: auto;
+	}
+}

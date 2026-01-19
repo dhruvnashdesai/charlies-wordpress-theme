@@ -1,0 +1,25 @@
+// ==========================================================================
+// Charlie's Theme - Main SCSS Entry Point
+// ==========================================================================
+
+// Core (order matters)
+@use 'variables';
+@use 'mixins';
+@use 'reset';
+@use 'base';
+
+// Components
+@use 'header';
+@use 'footer';
+@use 'products';
+@use 'forms';
+@use 'cart';
+@use 'checkout';
+
+// Page-specific
+@use 'homepage';
+@use 'single-product';
+@use '404' as error404;
+
+// Polish
+@use 'animations';

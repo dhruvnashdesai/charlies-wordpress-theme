@@ -1,0 +1,246 @@
+// ==========================================================================
+// Homepage Styles - Charlie's Theme
+// Matching dipski.co homepage design
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// --------------------------------------------------------------------------
+// Trust Badges Section
+// --------------------------------------------------------------------------
+
+.trust-badges {
+	padding: $spacing-6 0;
+	background-color: $color-bg;
+
+	&__list {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: $spacing-3;
+
+		@include md {
+			justify-content: flex-start;
+			gap: $spacing-4;
+		}
+	}
+}
+
+.trust-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: $spacing-2;
+	padding: $spacing-2 $spacing-3;
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: $border-radius-full;
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+
+	@include md {
+		padding: 9px 14px;
+	}
+
+	&__icon {
+		width: 16px;
+		height: 16px;
+		color: $color-accent-secondary;
+		flex-shrink: 0;
+	}
+
+	&__text {
+		font-size: $font-size-sm;
+		font-weight: $font-weight-semibold;
+		color: $color-white;
+		white-space: nowrap;
+
+		@include md {
+			font-size: 15px;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Brand Marquee Section
+// --------------------------------------------------------------------------
+
+.brand-marquee {
+	padding: $spacing-8 0;
+	background-color: $color-bg;
+	overflow: hidden;
+	position: relative;
+
+	// Edge fade masks
+	&::before,
+	&::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 100px;
+		z-index: 2;
+		pointer-events: none;
+	}
+
+	&::before {
+		left: 0;
+		background: linear-gradient(to right, $color-bg, transparent);
+	}
+
+	&::after {
+		right: 0;
+		background: linear-gradient(to left, $color-bg, transparent);
+	}
+
+	&__track {
+		width: 100%;
+		overflow: hidden;
+	}
+
+	&__inner {
+		display: flex;
+		gap: 18px;
+		animation: marquee 28s linear infinite;
+		width: max-content;
+	}
+
+	&__item {
+		flex-shrink: 0;
+		width: 120px;
+		aspect-ratio: 7 / 6;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		@include sm {
+			width: 150px;
+		}
+
+		@include md {
+			width: 180px;
+		}
+
+		@include lg {
+			width: 200px;
+		}
+
+		img {
+			max-width: 100%;
+			max-height: 100%;
+			object-fit: contain;
+			border-radius: $border-radius;
+			filter: grayscale(100%) brightness(0.8);
+			transition: filter $transition-base;
+
+			&:hover {
+				filter: grayscale(0%) brightness(1);
+			}
+		}
+	}
+
+	&__placeholder {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		background-color: $color-bg-card;
+		border: 1px solid $color-border;
+		border-radius: $border-radius;
+		font-size: $font-size-sm;
+		color: $color-muted;
+		text-align: center;
+		padding: $spacing-2;
+	}
+}
+
+@keyframes marquee {
+	0% {
+		transform: translateX(0);
+	}
+	100% {
+		transform: translateX(-50%);
+	}
+}
+
+// Pause on hover
+.brand-marquee:hover .brand-marquee__inner {
+	animation-play-state: paused;
+}
+
+// --------------------------------------------------------------------------
+// Newest Drops Section
+// --------------------------------------------------------------------------
+
+.newest-drops {
+	background-color: $color-bg;
+
+	&__cta {
+		margin-top: $spacing-10;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Why Choose Section
+// --------------------------------------------------------------------------
+
+.why-choose {
+	background-color: $color-bg;
+}
+
+.benefits-grid {
+	display: grid;
+	gap: $spacing-4;
+	grid-template-columns: 1fr;
+
+	@include sm {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	@include lg {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+.benefit-card {
+	@include card;
+	padding: $spacing-6;
+	text-align: center;
+	transition: transform $transition-base, border-color $transition-base;
+
+	&:hover {
+		transform: translateY(-4px);
+		border-color: $color-accent;
+	}
+
+	&__icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 64px;
+		height: 64px;
+		margin-bottom: $spacing-4;
+		background: rgba($color-accent, 0.1);
+		border-radius: $border-radius-full;
+		color: $color-accent;
+
+		svg {
+			width: 32px;
+			height: 32px;
+		}
+	}
+
+	&__title {
+		font-size: $font-size-lg;
+		font-weight: $font-weight-semibold;
+		margin-bottom: $spacing-2;
+		color: $color-white;
+	}
+
+	&__text {
+		font-size: $font-size-sm;
+		color: $color-muted;
+		margin: 0;
+	}
+}

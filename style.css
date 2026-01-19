@@ -1,102 +1,18 @@
 /*
-Theme Name: Charlie's Ecommerce Theme
-Description: Clean, modern WordPress ecommerce theme for nicotine products with WooCommerce integration and age verification
-Author: Charlie's Team
-Version: 2.0.0
-Text Domain: charlies-stores
-Domain Path: /languages
-Requires at least: 5.0
+Theme Name: Charlie's Theme
+Theme URI: https://example.com/charlies-theme
+Author: Dhruv Desai
+Author URI: https://example.com
+Description: Dark, minimal, premium WooCommerce theme for nicotine pouches. Inspired by dipski.co.
+Version: 1.0.0
+Requires at least: 6.0
 Tested up to: 6.4
-Requires PHP: 7.4
-License: GPL v2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Requires PHP: 8.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: charlies-theme
+Tags: woocommerce, dark, minimal, ecommerce
+
+This theme uses a separate compiled CSS file for styles.
+See assets/css/main.css for the actual styles.
 */
-
-/* Basic WordPress Theme Styles - Updated via WordPress deployment */
-body {
-    line-height: 1.6;
-    background-color: #000000 !important;
-    color: #ffffff;
-    margin: 0;
-    padding: 0;
-}
-
-.site-header {
-    background: #fff;
-    padding: 1rem 0;
-    border-bottom: 1px solid #eee;
-}
-
-.site-content {
-    margin: 2rem auto;
-    max-width: 1200px;
-    padding: 0 1rem;
-}
-
-.site-footer {
-    background: #333;
-    color: #fff;
-    text-align: center;
-    padding: 2rem 0;
-    margin-top: 2rem;
-}
-
-/* WordPress Content Styles */
-.entry-header h1,
-.page-title {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: #333;
-}
-
-.entry-content {
-    margin-bottom: 2rem;
-}
-
-/* Navigation Styles */
-.main-navigation ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-}
-
-.main-navigation li {
-    margin-right: 2rem;
-}
-
-.main-navigation a {
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-}
-
-.main-navigation a:hover {
-    color: #0073aa;
-}
-
-/* Ecommerce Integration */
-.charlies-ecommerce {
-    position: relative;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .site-content {
-        padding: 0 0.5rem;
-    }
-
-    .entry-header h1,
-    .page-title {
-        font-size: 2rem;
-    }
-
-    .main-navigation ul {
-        flex-direction: column;
-    }
-
-    .main-navigation li {
-        margin-right: 0;
-        margin-bottom: 0.5rem;
-    }
-}/* Deployment test - SSH key fixed */

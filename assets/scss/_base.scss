@@ -1,0 +1,175 @@
+// ==========================================================================
+// Base Styles - Charlie's Theme
+// Global styles that apply throughout the site
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// --------------------------------------------------------------------------
+// Layout
+// --------------------------------------------------------------------------
+
+.container {
+	@include container;
+}
+
+.site-main {
+	min-height: calc(100vh - #{$header-height} - #{$promo-bar-height} - 200px);
+}
+
+// --------------------------------------------------------------------------
+// Typography Utilities
+// --------------------------------------------------------------------------
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-muted { color: $color-muted; }
+.text-accent { color: $color-accent; }
+
+.text-sm { font-size: $font-size-sm; }
+.text-lg { font-size: $font-size-lg; }
+.text-xl { font-size: $font-size-xl; }
+
+.font-medium { font-weight: $font-weight-medium; }
+.font-semibold { font-weight: $font-weight-semibold; }
+.font-bold { font-weight: $font-weight-bold; }
+
+.uppercase {
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+// --------------------------------------------------------------------------
+// Section Spacing
+// --------------------------------------------------------------------------
+
+.section {
+	padding: $spacing-12 0;
+
+	@include md {
+		padding: $spacing-16 0;
+	}
+}
+
+.section-title {
+	font-size: $font-size-2xl;
+	font-weight: $font-weight-semibold;
+	margin-bottom: $spacing-8;
+
+	@include md {
+		font-size: $font-size-3xl;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Buttons
+// --------------------------------------------------------------------------
+
+.btn {
+	@include button-base;
+}
+
+.btn-primary {
+	@include button-primary;
+}
+
+.btn-outline {
+	@include button-outline;
+}
+
+.btn-sm {
+	padding: $spacing-2 $spacing-4;
+	font-size: $font-size-xs;
+}
+
+.btn-lg {
+	padding: $spacing-4 $spacing-8;
+	font-size: $font-size-base;
+}
+
+.btn-full {
+	width: 100%;
+}
+
+// --------------------------------------------------------------------------
+// Visibility Utilities
+// --------------------------------------------------------------------------
+
+.visually-hidden {
+	@include visually-hidden;
+}
+
+.hide-mobile {
+	@media (max-width: #{$breakpoint-md - 1px}) {
+		display: none;
+	}
+}
+
+.hide-desktop {
+	@include md {
+		display: none;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Spacing Utilities
+// --------------------------------------------------------------------------
+
+.mt-4 { margin-top: $spacing-4; }
+.mt-8 { margin-top: $spacing-8; }
+.mb-4 { margin-bottom: $spacing-4; }
+.mb-8 { margin-bottom: $spacing-8; }
+.my-4 { margin-top: $spacing-4; margin-bottom: $spacing-4; }
+.my-8 { margin-top: $spacing-8; margin-bottom: $spacing-8; }
+
+.pt-4 { padding-top: $spacing-4; }
+.pt-8 { padding-top: $spacing-8; }
+.pb-4 { padding-bottom: $spacing-4; }
+.pb-8 { padding-bottom: $spacing-8; }
+.py-4 { padding-top: $spacing-4; padding-bottom: $spacing-4; }
+.py-8 { padding-top: $spacing-8; padding-bottom: $spacing-8; }
+
+// --------------------------------------------------------------------------
+// Flex Utilities
+// --------------------------------------------------------------------------
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: $spacing-2; }
+.gap-4 { gap: $spacing-4; }
+.gap-8 { gap: $spacing-8; }
+
+// --------------------------------------------------------------------------
+// Grid Utilities
+// --------------------------------------------------------------------------
+
+.grid {
+	display: grid;
+	gap: $spacing-4;
+}
+
+// --------------------------------------------------------------------------
+// WordPress Core Styles
+// --------------------------------------------------------------------------
+
+.entry-content {
+	> * + * {
+		margin-top: $spacing-4;
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		margin-top: $spacing-8;
+		margin-bottom: $spacing-4;
+	}
+
+	ul, ol {
+		padding-left: $spacing-6;
+		list-style: revert;
+	}
+}

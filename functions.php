@@ -1,190 +1,149 @@
 <?php
 /**
- * Charlie's Store Finder Theme Functions
+ * Charlie's Theme Functions
+ *
+ * @package CharliesTheme
  */
 
-// Prevent direct access
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-// Include WooCommerce integration only
-require_once get_template_directory() . '/charlie-stores/includes/class-woocommerce-integration.php';
+define( 'CHARLIES_THEME_VERSION', '1.0.0' );
+define( 'CHARLIES_THEME_DIR', get_template_directory() );
+define( 'CHARLIES_THEME_URI', get_template_directory_uri() );
 
 /**
- * Theme setup
+ * Theme Setup
  */
 function charlies_theme_setup() {
-    // Add theme support
-    add_theme_support('title-tag');
-    add_theme_support('post-thumbnails');
-    add_theme_support('html5', array('search-form', 'comment-form', 'comment-list', 'gallery', 'caption'));
-    add_theme_support('custom-logo');
+	// Add theme support
+	add_theme_support( 'title-tag' );
+	add_theme_support( 'post-thumbnails' );
+	add_theme_support( 'html5', array(
+		'search-form',
+		'comment-form',
+		'comment-list',
+		'gallery',
+		'caption',
+		'style',
+		'script',
+	) );
 
-    // Add support for store posts
-    add_theme_support('post-thumbnails', array('charlie_store'));
+	// WooCommerce support
+	add_theme_support( 'woocommerce' );
+	add_theme_support( 'wc-product-gallery-zoom' );
+	add_theme_support( 'wc-product-gallery-lightbox' );
+	add_theme_support( 'wc-product-gallery-slider' );
 
-    // Register nav menus
-    register_nav_menus(array(
-        'primary' => __('Primary Menu', 'charlies-stores'),
-        'footer' => __('Footer Menu', 'charlies-stores'),
-    ));
+	// Register navigation menus
+	register_nav_menus( array(
+		'primary'   => __( 'Primary Menu', 'charlies-theme' ),
+		'footer-1'  => __( 'Footer Column 1', 'charlies-theme' ),
+		'footer-2'  => __( 'Footer Column 2', 'charlies-theme' ),
+		'footer-3'  => __( 'Footer Column 3', 'charlies-theme' ),
+	) );
+
+	// Custom logo support
+	add_theme_support( 'custom-logo', array(
+		'height'      => 100,
+		'width'       => 300,
+		'flex-height' => true,
+		'flex-width'  => true,
+	) );
 }
-add_action('after_setup_theme', 'charlies_theme_setup');
+add_action( 'after_setup_theme', 'charlies_theme_setup' );
 
 /**
- * Initialize WooCommerce integration
- */
-function charlie_woocommerce_init() {
-    if (class_exists('WooCommerce')) {
-        new Charlie_WooCommerce_Integration();
-    }
-}
-add_action('init', 'charlie_woocommerce_init');
-
-/**
- * Theme activation
- */
-function charlies_theme_activation() {
-    // Flush rewrite rules
-    flush_rewrite_rules();
-}
-add_action('after_switch_theme', 'charlies_theme_activation');
-
-/**
- * Enqueue theme styles and scripts
+ * Enqueue Styles and Scripts
  */
 function charlies_enqueue_assets() {
-    // Theme stylesheet
-    wp_enqueue_style('charlies-style', get_stylesheet_uri(), array(), '1.0.0');
+	// Google Fonts - Inter
+	wp_enqueue_style(
+		'charlies-google-fonts',
+		'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+		array(),
+		null
+	);
 
-    // Add custom font CSS inline
-    $font_css = "
-    @font-face {
-        font-family: 'Binner EF';
-        src: url('" . get_template_directory_uri() . "/assets/fonts/Binner%20EF.ttf') format('truetype');
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
-    }
-    ";
-    wp_add_inline_style('charlies-style', $font_css);
+	// Main stylesheet
+	wp_enqueue_style(
+		'charlies-main',
+		CHARLIES_THEME_URI . '/assets/css/main.css',
+		array( 'charlies-google-fonts' ),
+		CHARLIES_THEME_VERSION
+	);
 
-    // Theme JavaScript (if needed) - commented out since file doesn't exist
-    // wp_enqueue_script('charlies-theme-js', get_template_directory_uri() . '/js/theme.js', array('jquery'), '1.0.0', true);
+	// Main JavaScript
+	wp_enqueue_script(
+		'charlies-main',
+		CHARLIES_THEME_URI . '/assets/js/main.js',
+		array(),
+		CHARLIES_THEME_VERSION,
+		true
+	);
+
+	// Localize script for AJAX
+	wp_localize_script( 'charlies-main', 'charliesAjax', array(
+		'url'   => admin_url( 'admin-ajax.php' ),
+		'nonce' => wp_create_nonce( 'charlies_nonce' ),
+	) );
+
+	// Cart JS (only if WooCommerce is active)
+	if ( class_exists( 'WooCommerce' ) ) {
+		wp_enqueue_script(
+			'charlies-cart',
+			CHARLIES_THEME_URI . '/assets/js/cart.js',
+			array( 'charlies-main' ),
+			CHARLIES_THEME_VERSION,
+			true
+		);
+	}
 }
-add_action('wp_enqueue_scripts', 'charlies_enqueue_assets');
+add_action( 'wp_enqueue_scripts', 'charlies_enqueue_assets' );
 
 /**
- * Enqueue simple ecommerce assets
+ * WooCommerce: Remove default styles and add our own
  */
-function charlies_enqueue_ecommerce_assets() {
-    // Simple age verification for nicotine products
-    wp_enqueue_script(
-        'charlies-age-verification',
-        get_template_directory_uri() . '/assets/js/age-verification.js',
-        array('jquery'),
-        '1.0.0',
-        true
-    );
-
-    // WooCommerce integration (cart functionality)
-    if (class_exists('WooCommerce')) {
-        wp_enqueue_script(
-            'charlies-cart',
-            get_template_directory_uri() . '/assets/js/cart.js',
-            array('jquery'),
-            '1.0.0',
-            true
-        );
-
-        wp_enqueue_style(
-            'charlies-woocommerce',
-            get_template_directory_uri() . '/assets/css/woocommerce.css',
-            array('charlies-style'),
-            '1.0.0'
-        );
-    }
-
-    // Ecommerce styles
-    wp_enqueue_style(
-        'charlies-ecommerce',
-        get_template_directory_uri() . '/assets/css/ecommerce.css',
-        array('charlies-style'),
-        '1.0.0'
-    );
-
-    // Landing page styles
-    wp_enqueue_style(
-        'charlies-landing',
-        get_template_directory_uri() . '/assets/css/landing.css',
-        array('charlies-style'),
-        '1.0.0'
-    );
-
-    // Pass configuration to JavaScript
-    wp_localize_script('charlies-age-verification', 'charlies_config', array(
-        'minimum_age' => get_option('charlies_minimum_age', 19),
-        'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('charlies_nonce'),
-        'woocommerce' => array(
-            'shop_url' => class_exists('WooCommerce') ? wc_get_page_permalink('shop') : '',
-            'cart_url' => class_exists('WooCommerce') ? wc_get_cart_url() : '',
-            'checkout_url' => class_exists('WooCommerce') ? wc_get_checkout_url() : '',
-            'is_active' => class_exists('WooCommerce')
-        )
-    ));
+function charlies_woocommerce_setup() {
+	// Remove default WooCommerce styles
+	add_filter( 'woocommerce_enqueue_styles', '__return_empty_array' );
 }
-add_action('wp_enqueue_scripts', 'charlies_enqueue_ecommerce_assets');
+add_action( 'init', 'charlies_woocommerce_setup' );
 
 /**
- * Register widget areas
+ * WooCommerce: Customize add to cart fragments for AJAX
  */
-function charlies_widgets_init() {
-    register_sidebar(array(
-        'name' => __('Sidebar', 'charlies-stores'),
-        'id' => 'sidebar-1',
-        'description' => __('Add widgets here to appear in your sidebar.', 'charlies-stores'),
-        'before_widget' => '<section id="%1$s" class="widget %2$s">',
-        'after_widget' => '</section>',
-        'before_title' => '<h2 class="widget-title">',
-        'after_title' => '</h2>',
-    ));
+function charlies_cart_count_fragment( $fragments ) {
+	$fragments['span.charlies-cart-count'] = '<span class="charlies-cart-count">' . WC()->cart->get_cart_contents_count() . '</span>';
+	return $fragments;
 }
-add_action('widgets_init', 'charlies_widgets_init');
+add_filter( 'woocommerce_add_to_cart_fragments', 'charlies_cart_count_fragment' );
 
 /**
- * Custom excerpt length
+ * Helper: Get promo bar text
  */
-function charlies_excerpt_length($length) {
-    return 20;
+function charlies_get_promo_text() {
+	$default = 'FREE SHIPPING ON ORDERS $50+';
+	return esc_html( get_option( 'charlies_promo_text', $default ) );
 }
-add_filter('excerpt_length', 'charlies_excerpt_length');
 
 /**
- * Custom excerpt more
+ * Custom image sizes
  */
-function charlies_excerpt_more($more) {
-    return '...';
+function charlies_add_image_sizes() {
+	add_image_size( 'charlies-product-card', 400, 400, true );
+	add_image_size( 'charlies-product-large', 800, 800, true );
 }
-add_filter('excerpt_more', 'charlies_excerpt_more');
+add_action( 'after_setup_theme', 'charlies_add_image_sizes' );
 
 /**
- * Add WooCommerce support
+ * Fallback menu for when no menu is set
  */
-function charlies_add_woocommerce_support() {
-    add_theme_support('woocommerce');
-    add_theme_support('wc-product-gallery-zoom');
-    add_theme_support('wc-product-gallery-lightbox');
-    add_theme_support('wc-product-gallery-slider');
+function charlies_fallback_menu() {
+	if ( class_exists( 'WooCommerce' ) ) {
+		echo '<ul class="primary-menu">';
+		echo '<li><a href="' . esc_url( wc_get_page_permalink( 'shop' ) ) . '">' . esc_html__( 'Shop', 'charlies-theme' ) . '</a></li>';
+		echo '</ul>';
+	}
 }
-add_action('after_setup_theme', 'charlies_add_woocommerce_support');
-
-/**
- * Remove add to cart buttons from shop page products
- */
-function charlies_remove_add_to_cart_buttons() {
-    remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
-}
-add_action('init', 'charlies_remove_add_to_cart_buttons');
-

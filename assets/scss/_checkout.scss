@@ -1,0 +1,485 @@
+// ==========================================================================
+// Checkout Styles - Charlie's Theme
+// Matching dipski.co dark theme
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// --------------------------------------------------------------------------
+// Checkout Page Layout
+// --------------------------------------------------------------------------
+
+.woocommerce-checkout {
+	.woocommerce {
+		padding: $spacing-8 0 $spacing-16;
+	}
+}
+
+.woocommerce-checkout-review-order-table-container {
+	position: sticky;
+	top: calc(#{$header-height} + #{$promo-bar-height} + #{$spacing-4});
+}
+
+// --------------------------------------------------------------------------
+// Checkout Form
+// --------------------------------------------------------------------------
+
+.checkout.woocommerce-checkout {
+	display: grid;
+	gap: $spacing-8;
+
+	@include lg {
+		grid-template-columns: 1fr 400px;
+		align-items: start;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Billing & Shipping Details
+// --------------------------------------------------------------------------
+
+.woocommerce-billing-fields,
+.woocommerce-shipping-fields,
+.woocommerce-additional-fields {
+	h3 {
+		font-size: $font-size-xl;
+		font-weight: $font-weight-semibold;
+		margin-bottom: $spacing-6;
+		padding-bottom: $spacing-4;
+		border-bottom: 1px solid $color-border;
+	}
+}
+
+.woocommerce-billing-fields__field-wrapper,
+.woocommerce-shipping-fields__field-wrapper,
+.woocommerce-additional-fields__field-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $spacing-4;
+
+	.form-row {
+		margin-bottom: 0;
+
+		&.form-row-first,
+		&.form-row-last {
+			width: 100%;
+
+			@include sm {
+				width: calc(50% - #{$spacing-2});
+			}
+		}
+
+		&.form-row-wide {
+			width: 100%;
+		}
+	}
+}
+
+// Ship to different address checkbox
+#ship-to-different-address {
+	@include card;
+	padding: $spacing-4;
+	margin-top: $spacing-6;
+	margin-bottom: $spacing-6;
+
+	label {
+		display: flex;
+		align-items: center;
+		gap: $spacing-3;
+		cursor: pointer;
+		font-weight: $font-weight-semibold;
+	}
+}
+
+// Order notes
+.woocommerce-additional-fields {
+	margin-top: $spacing-6;
+
+	textarea {
+		min-height: 100px;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Order Review
+// --------------------------------------------------------------------------
+
+#order_review_heading {
+	font-size: $font-size-xl;
+	font-weight: $font-weight-semibold;
+	margin-bottom: $spacing-6;
+	padding-bottom: $spacing-4;
+	border-bottom: 1px solid $color-border;
+}
+
+.woocommerce-checkout-review-order {
+	@include card;
+	padding: $spacing-6;
+}
+
+// Order table
+table.woocommerce-checkout-review-order-table {
+	width: 100%;
+	margin-bottom: $spacing-6;
+
+	thead {
+		th {
+			padding: $spacing-3 0;
+			font-size: $font-size-sm;
+			font-weight: $font-weight-semibold;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			color: $color-muted;
+			border-bottom: 1px solid $color-border;
+
+			&.product-total {
+				text-align: right;
+			}
+		}
+	}
+
+	tbody {
+		.cart_item {
+			td {
+				padding: $spacing-4 0;
+				border-bottom: 1px solid $color-border;
+
+				&.product-name {
+					font-weight: $font-weight-medium;
+
+					.product-quantity {
+						color: $color-muted;
+					}
+				}
+
+				&.product-total {
+					text-align: right;
+					font-weight: $font-weight-semibold;
+				}
+			}
+		}
+	}
+
+	tfoot {
+		tr {
+			th,
+			td {
+				padding: $spacing-3 0;
+				border-bottom: 1px solid $color-border;
+			}
+
+			th {
+				text-align: left;
+				font-weight: $font-weight-normal;
+				color: $color-muted;
+			}
+
+			td {
+				text-align: right;
+			}
+
+			&.order-total {
+				th,
+				td {
+					border-bottom: none;
+					padding-top: $spacing-4;
+					font-weight: $font-weight-bold;
+					font-size: $font-size-lg;
+					color: $color-white;
+				}
+
+				td {
+					color: $color-accent;
+				}
+			}
+		}
+
+		.shipping {
+			ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+
+			li {
+				margin-bottom: $spacing-2;
+
+				&:last-child {
+					margin-bottom: 0;
+				}
+
+				label {
+					display: flex;
+					align-items: center;
+					gap: $spacing-2;
+					cursor: pointer;
+				}
+			}
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Payment Methods
+// --------------------------------------------------------------------------
+
+#payment {
+	background: transparent;
+	border-radius: 0;
+
+	.wc_payment_methods {
+		list-style: none;
+		padding: 0;
+		margin: 0 0 $spacing-6;
+		border: 1px solid $color-border;
+		border-radius: $border-radius;
+		overflow: hidden;
+
+		.wc_payment_method {
+			border-bottom: 1px solid $color-border;
+
+			&:last-child {
+				border-bottom: none;
+			}
+
+			> label {
+				display: flex;
+				align-items: center;
+				gap: $spacing-3;
+				padding: $spacing-4;
+				cursor: pointer;
+				font-weight: $font-weight-semibold;
+				transition: background-color $transition-fast;
+
+				&:hover {
+					background-color: rgba($color-white, 0.05);
+				}
+
+				img {
+					height: 24px;
+					width: auto;
+				}
+			}
+
+			> input[type="radio"] {
+				margin-left: $spacing-4;
+			}
+
+			.payment_box {
+				padding: $spacing-4;
+				padding-top: 0;
+				background-color: rgba($color-white, 0.02);
+
+				p {
+					font-size: $font-size-sm;
+					color: $color-muted;
+					margin: 0;
+				}
+
+				fieldset {
+					border: none;
+					padding: 0;
+					margin: 0;
+				}
+			}
+		}
+	}
+
+	.place-order {
+		padding: 0;
+
+		.woocommerce-terms-and-conditions-wrapper {
+			margin-bottom: $spacing-4;
+
+			.woocommerce-privacy-policy-text {
+				font-size: $font-size-sm;
+				color: $color-muted;
+
+				a {
+					color: $color-accent;
+
+					&:hover {
+						text-decoration: underline;
+					}
+				}
+			}
+
+			.woocommerce-form__label-for-checkbox {
+				font-size: $font-size-sm;
+			}
+		}
+	}
+
+	#place_order {
+		@include button-primary;
+		width: 100%;
+		padding: $spacing-4;
+		font-size: $font-size-base;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Login / Coupon Toggles
+// --------------------------------------------------------------------------
+
+.woocommerce-form-login-toggle,
+.woocommerce-form-coupon-toggle {
+	@include card;
+	padding: $spacing-4;
+	margin-bottom: $spacing-6;
+
+	.woocommerce-info {
+		margin: 0;
+		padding: 0;
+		background: none;
+		border: none;
+		color: $color-muted;
+
+		a.showlogin,
+		a.showcoupon {
+			color: $color-accent;
+			font-weight: $font-weight-semibold;
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+	}
+}
+
+.woocommerce-form-login,
+.woocommerce-form-coupon {
+	@include card;
+	padding: $spacing-6;
+	margin-bottom: $spacing-6;
+
+	p {
+		margin-bottom: $spacing-4;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.form-row {
+		margin-bottom: $spacing-4;
+	}
+
+	button.button {
+		@include button-primary;
+	}
+
+	.lost_password {
+		font-size: $font-size-sm;
+
+		a {
+			color: $color-accent;
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Order Received / Thank You Page
+// --------------------------------------------------------------------------
+
+.woocommerce-order {
+	padding: $spacing-8 0 $spacing-16;
+}
+
+.woocommerce-order-received {
+	.woocommerce-notice--success {
+		@include card;
+		padding: $spacing-6;
+		text-align: center;
+		margin-bottom: $spacing-8;
+		border-left: 4px solid #22c55e;
+
+		&::before {
+			content: '✓';
+			display: block;
+			width: 60px;
+			height: 60px;
+			margin: 0 auto $spacing-4;
+			background-color: #22c55e;
+			color: $color-white;
+			border-radius: 50%;
+			font-size: $font-size-2xl;
+			line-height: 60px;
+		}
+	}
+
+	.woocommerce-order-overview {
+		@include card;
+		display: grid;
+		gap: $spacing-4;
+		padding: $spacing-6;
+		margin-bottom: $spacing-8;
+		list-style: none;
+
+		@include sm {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@include md {
+			grid-template-columns: repeat(4, 1fr);
+		}
+
+		li {
+			strong {
+				display: block;
+				margin-top: $spacing-2;
+				font-size: $font-size-lg;
+				color: $color-white;
+			}
+		}
+	}
+
+	.woocommerce-order-details,
+	.woocommerce-customer-details {
+		@include card;
+		padding: $spacing-6;
+		margin-bottom: $spacing-6;
+
+		h2 {
+			font-size: $font-size-lg;
+			margin-bottom: $spacing-4;
+			padding-bottom: $spacing-4;
+			border-bottom: 1px solid $color-border;
+		}
+
+		table {
+			width: 100%;
+
+			th,
+			td {
+				padding: $spacing-3 0;
+				border-bottom: 1px solid $color-border;
+			}
+
+			th {
+				text-align: left;
+				font-weight: $font-weight-normal;
+				color: $color-muted;
+			}
+
+			tfoot tr:last-child {
+				th,
+				td {
+					border-bottom: none;
+					font-weight: $font-weight-bold;
+				}
+			}
+		}
+
+		address {
+			font-style: normal;
+			line-height: $line-height-relaxed;
+			color: $color-muted;
+		}
+	}
+}

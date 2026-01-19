@@ -1,0 +1,17 @@
+{
+  "name": "charlies-theme",
+  "version": "1.0.0",
+  "description": "Dark, minimal WooCommerce theme for Charlie's",
+  "scripts": {
+    "build": "sass assets/scss/main.scss assets/css/main.css --style=compressed --no-source-map",
+    "watch": "sass assets/scss/main.scss assets/css/main.css --watch",
+    "dev": "sass assets/scss/main.scss assets/css/main.css --style=expanded --source-map"
+  },
+  "devDependencies": {
+    "sass": "^1.69.0"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "> 1%"
+  ]
+}

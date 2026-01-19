@@ -1,95 +1,151 @@
 /**
- * Simple WooCommerce Cart Integration
- * Clean and minimal functionality
+ * Charlie's Theme - Cart JavaScript
+ * AJAX cart functionality for WooCommerce
+ *
+ * @package CharliesTheme
  */
 
-(function($) {
-    'use strict';
+const charliesCart = {
+	/**
+	 * Initialize cart functionality
+	 */
+	init() {
+		this.bindAddToCart();
+		this.bindQuantityButtons();
+		this.bindRemoveItem();
+	},
 
-    // Update cart count on page load
-    updateCartCount();
+	/**
+	 * AJAX add to cart
+	 */
+	bindAddToCart() {
+		document.addEventListener('click', async (e) => {
+			const btn = e.target.closest('.ajax-add-to-cart');
+			if (!btn) return;
 
-    // Handle add to cart buttons
-    $(document).on('click', '.charlies-add-to-cart', function(e) {
-        e.preventDefault();
+			e.preventDefault();
 
-        const $button = $(this);
-        const productId = $button.data('product-id');
-        const quantity = $button.data('quantity') || 1;
+			const productId = btn.dataset.productId;
+			const quantity = btn.dataset.quantity || 1;
 
-        // Show loading state
-        $button.addClass('loading').text('Adding...');
+			btn.classList.add('loading');
+			btn.disabled = true;
 
-        // Add to cart via AJAX
-        $.ajax({
-            url: charlies_config.ajax_url,
-            type: 'POST',
-            data: {
-                action: 'charlie_add_to_cart',
-                product_id: productId,
-                quantity: quantity,
-                nonce: charlies_config.nonce
-            },
-            success: function(response) {
-                if (response.success) {
-                    // Update cart count
-                    updateCartCount();
+			try {
+				const response = await this.addToCart(productId, quantity);
+				if (response.success) {
+					this.updateCartCount(response.cart_count);
+					btn.classList.add('added');
+					setTimeout(() => btn.classList.remove('added'), 2000);
+				}
+			} catch (error) {
+				console.error('Add to cart error:', error);
+			} finally {
+				btn.classList.remove('loading');
+				btn.disabled = false;
+			}
+		});
+	},
 
-                    // Show success message
-                    showNotification('Product added to cart', 'success');
+	/**
+	 * Add product to cart via AJAX
+	 */
+	async addToCart(productId, quantity = 1) {
+		const formData = new FormData();
+		formData.append('action', 'woocommerce_ajax_add_to_cart');
+		formData.append('product_id', productId);
+		formData.append('quantity', quantity);
 
-                    // Reset button
-                    $button.removeClass('loading').text('Add to Cart');
-                } else {
-                    showNotification('Failed to add product to cart', 'error');
-                    $button.removeClass('loading').text('Add to Cart');
-                }
-            },
-            error: function() {
-                showNotification('An error occurred', 'error');
-                $button.removeClass('loading').text('Add to Cart');
-            }
-        });
-    });
+		const response = await fetch(charliesAjax.url, {
+			method: 'POST',
+			body: formData,
+			credentials: 'same-origin'
+		});
 
-    // Update cart count
-    function updateCartCount() {
-        if (!charlies_config.woocommerce.is_active) return;
+		return response.json();
+	},
 
-        $.ajax({
-            url: charlies_config.ajax_url,
-            type: 'POST',
-            data: {
-                action: 'charlie_get_cart',
-                nonce: charlies_config.nonce
-            },
-            success: function(response) {
-                if (response.success) {
-                    $('.charlies-cart-count').text(response.data.count);
-                    $('.charlies-cart-total').text(response.data.total);
-                }
-            }
-        });
-    }
+	/**
+	 * Quantity increment/decrement buttons
+	 */
+	bindQuantityButtons() {
+		document.addEventListener('click', (e) => {
+			const btn = e.target.closest('.qty-btn');
+			if (!btn) return;
 
-    // Simple notification system
-    function showNotification(message, type) {
-        const notification = $(`
-            <div class="charlies-notification charlies-notification-${type}">
-                ${message}
-            </div>
-        `);
+			const input = btn.parentElement.querySelector('input[type="number"]');
+			if (!input) return;
 
-        $('body').append(notification);
+			const min = parseInt(input.min) || 1;
+			const max = parseInt(input.max) || 999;
+			let value = parseInt(input.value) || 1;
 
-        setTimeout(() => {
-            notification.addClass('show');
-        }, 100);
+			if (btn.classList.contains('qty-minus')) {
+				value = Math.max(min, value - 1);
+			} else if (btn.classList.contains('qty-plus')) {
+				value = Math.min(max, value + 1);
+			}
 
-        setTimeout(() => {
-            notification.removeClass('show');
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
+			input.value = value;
+			input.dispatchEvent(new Event('change', { bubbles: true }));
+		});
+	},
 
-})(jQuery);
+	/**
+	 * Remove item from cart
+	 */
+	bindRemoveItem() {
+		document.addEventListener('click', async (e) => {
+			const btn = e.target.closest('.remove-cart-item');
+			if (!btn) return;
+
+			e.preventDefault();
+
+			const cartKey = btn.dataset.cartKey;
+			if (!cartKey) return;
+
+			btn.closest('.cart-item')?.classList.add('removing');
+
+			try {
+				const formData = new FormData();
+				formData.append('action', 'charlies_remove_cart_item');
+				formData.append('cart_key', cartKey);
+				formData.append('nonce', charliesAjax.nonce);
+
+				const response = await fetch(charliesAjax.url, {
+					method: 'POST',
+					body: formData,
+					credentials: 'same-origin'
+				});
+
+				const data = await response.json();
+				if (data.success) {
+					location.reload();
+				}
+			} catch (error) {
+				console.error('Remove from cart error:', error);
+			}
+		});
+	},
+
+	/**
+	 * Update cart count in header
+	 */
+	updateCartCount(count) {
+		const counters = document.querySelectorAll('.charlies-cart-count');
+		counters.forEach(counter => {
+			counter.textContent = count;
+			counter.classList.toggle('has-items', count > 0);
+		});
+
+		// Trigger bump animation
+		if (window.charliesCartAnimation) {
+			window.charliesCartAnimation.bump();
+		}
+	}
+};
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+	charliesCart.init();
+});

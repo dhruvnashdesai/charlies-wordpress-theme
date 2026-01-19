@@ -1,0 +1,400 @@
+// ==========================================================================
+// Product Styles - Charlie's Theme
+// Product grid and cards matching dipski.co
+// ==========================================================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// --------------------------------------------------------------------------
+// Shop Page Layout
+// --------------------------------------------------------------------------
+
+.shop-page {
+	padding: $spacing-8 0 $spacing-16;
+}
+
+.shop-header {
+	text-align: center;
+	margin-bottom: $spacing-8;
+}
+
+.shop-title {
+	font-size: $font-size-3xl;
+	font-weight: $font-weight-semibold;
+	margin-bottom: $spacing-2;
+
+	@include md {
+		font-size: $font-size-4xl;
+	}
+}
+
+.shop-description {
+	color: $color-muted;
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+.shop-toolbar {
+	@include flex-between;
+	flex-wrap: wrap;
+	gap: $spacing-4;
+	margin-bottom: $spacing-6;
+	padding-bottom: $spacing-4;
+	border-bottom: 1px solid $color-border;
+
+	.woocommerce-result-count {
+		font-size: $font-size-sm;
+		color: $color-muted;
+		margin: 0;
+	}
+
+	.woocommerce-ordering {
+		margin: 0;
+
+		select {
+			background-color: $color-bg-card;
+			border: 1px solid $color-border;
+			border-radius: $border-radius-sm;
+			color: $color-white;
+			padding: $spacing-2 $spacing-8 $spacing-2 $spacing-3;
+			font-size: $font-size-sm;
+			appearance: none;
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+			background-repeat: no-repeat;
+			background-position: right $spacing-3 center;
+			cursor: pointer;
+
+			&:focus {
+				outline: none;
+				border-color: $color-accent;
+			}
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Product Grid
+// --------------------------------------------------------------------------
+
+.product-grid {
+	display: grid;
+	gap: $spacing-4;
+	grid-template-columns: repeat(2, 1fr);
+
+	@include sm {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	@include md {
+		grid-template-columns: repeat(4, 1fr);
+	}
+
+	@include lg {
+		grid-template-columns: repeat(4, 1fr);
+	}
+
+	@include xl {
+		grid-template-columns: repeat(5, 1fr);
+		gap: $spacing-5;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Product Card
+// --------------------------------------------------------------------------
+
+.product-card {
+	@include card;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	transition: transform $transition-base, box-shadow $transition-base;
+
+	&:hover {
+		transform: translateY(-4px);
+		box-shadow: $shadow-lg;
+	}
+
+	&__link {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	&__image {
+		position: relative;
+		aspect-ratio: 1 / 1;
+		overflow: hidden;
+		background-color: $color-bg-card;
+
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			transition: transform $transition-slow;
+		}
+	}
+
+	&:hover &__image img {
+		transform: scale(1.05);
+	}
+
+	&__badge {
+		position: absolute;
+		top: $spacing-3;
+		left: $spacing-3;
+		padding: $spacing-1 $spacing-2;
+		background-color: $color-accent;
+		color: $color-white;
+		font-size: $font-size-xs;
+		font-weight: $font-weight-semibold;
+		text-transform: uppercase;
+		border-radius: $border-radius-sm;
+		z-index: 1;
+	}
+
+	&__content {
+		padding: $spacing-4;
+		padding-bottom: $spacing-16; // Space for button
+		text-align: center;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+	}
+
+	&__title {
+		font-size: 14px;
+		font-weight: $font-weight-semibold;
+		color: $color-white;
+		margin-bottom: $spacing-2;
+		@include line-clamp(2);
+	}
+
+	&__price {
+		font-size: 14px;
+		color: $color-white;
+
+		del {
+			color: $color-muted;
+			font-weight: $font-weight-normal;
+			margin-right: $spacing-2;
+		}
+
+		ins {
+			text-decoration: none;
+			color: $color-accent;
+			font-weight: $font-weight-bold;
+		}
+
+		// WooCommerce price structure
+		.woocommerce-Price-amount {
+			font-weight: $font-weight-semibold;
+		}
+	}
+
+	&__btn {
+		@include button-primary;
+		position: absolute;
+		bottom: 20px;
+		left: $spacing-4;
+		right: $spacing-4;
+		font-size: 14px;
+		padding: $spacing-3 $spacing-4;
+
+		&.loading {
+			opacity: 0.7;
+			pointer-events: none;
+
+			&::after {
+				content: '';
+				display: inline-block;
+				width: 14px;
+				height: 14px;
+				margin-left: $spacing-2;
+				border: 2px solid transparent;
+				border-top-color: currentColor;
+				border-radius: 50%;
+				animation: spin 0.6s linear infinite;
+			}
+		}
+
+		&.added {
+			background-color: #22c55e;
+
+			&::after {
+				content: '\2713';
+				margin-left: $spacing-2;
+			}
+		}
+	}
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+// --------------------------------------------------------------------------
+// Out of Stock State
+// --------------------------------------------------------------------------
+
+.product-card--out-of-stock {
+	.product-card__image img {
+		filter: blur(2px);
+		opacity: 0.6;
+	}
+
+	.product-card__btn {
+		background-color: $color-border;
+		cursor: not-allowed;
+
+		&:hover {
+			background-color: $color-border;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// WooCommerce Overrides
+// --------------------------------------------------------------------------
+
+.woocommerce ul.products {
+	@extend .product-grid;
+	margin: 0;
+	padding: 0;
+
+	&::before,
+	&::after {
+		display: none;
+	}
+}
+
+.woocommerce ul.products li.product {
+	@extend .product-card;
+	float: none;
+	width: auto;
+	margin: 0;
+	padding: 0;
+
+	.woocommerce-loop-product__link {
+		@extend .product-card__link;
+	}
+
+	.attachment-woocommerce_thumbnail {
+		margin: 0;
+	}
+
+	.woocommerce-loop-product__title {
+		@extend .product-card__title;
+		padding: 0;
+	}
+
+	.price {
+		@extend .product-card__price;
+		margin: 0;
+	}
+
+	.onsale {
+		@extend .product-card__badge;
+		margin: 0;
+		min-width: auto;
+		min-height: auto;
+		line-height: 1;
+	}
+
+	.button {
+		@extend .product-card__btn;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Disabled Button State
+// --------------------------------------------------------------------------
+
+.product-card__btn--disabled {
+	background-color: $color-border;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+// --------------------------------------------------------------------------
+// Shop Pagination
+// --------------------------------------------------------------------------
+
+.shop-pagination {
+	margin-top: $spacing-10;
+	display: flex;
+	justify-content: center;
+}
+
+.woocommerce-pagination {
+	ul {
+		display: flex;
+		align-items: center;
+		gap: $spacing-2;
+		margin: 0;
+		padding: 0;
+	}
+
+	li {
+		list-style: none;
+	}
+
+	a,
+	span {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 40px;
+		height: 40px;
+		padding: 0 $spacing-3;
+		font-size: $font-size-sm;
+		font-weight: $font-weight-medium;
+		color: $color-white;
+		background-color: $color-bg-card;
+		border: 1px solid $color-border;
+		border-radius: $border-radius-sm;
+		transition: all $transition-fast;
+	}
+
+	a:hover {
+		border-color: $color-accent;
+		color: $color-accent;
+	}
+
+	span.current {
+		background-color: $color-accent;
+		border-color: $color-accent;
+		color: $color-white;
+	}
+
+	.prev,
+	.next {
+		font-size: $font-size-lg;
+	}
+}
+
+// --------------------------------------------------------------------------
+// No Products Found
+// --------------------------------------------------------------------------
+
+.woocommerce-info {
+	@include card;
+	padding: $spacing-8;
+	text-align: center;
+	color: $color-muted;
+
+	a {
+		color: $color-accent;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+}
