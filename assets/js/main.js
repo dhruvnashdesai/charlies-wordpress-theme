@@ -13,6 +13,7 @@ const charliesTheme = {
 		this.initBackToTop();
 		this.initScrollAnimations();
 		this.initSmoothScroll();
+		this.initFaqAccordion();
 	},
 
 	/**
@@ -132,6 +133,38 @@ const charliesTheme = {
 					e.preventDefault();
 					target.scrollIntoView({ behavior: 'smooth' });
 				}
+			});
+		});
+	},
+
+	/**
+	 * FAQ Accordion
+	 */
+	initFaqAccordion() {
+		const faqItems = document.querySelectorAll('.faq-item');
+
+		faqItems.forEach(item => {
+			const question = item.querySelector('.faq-item__question');
+			if (!question) return;
+
+			question.addEventListener('click', () => {
+				const isOpen = item.classList.contains('is-open');
+				const expanded = question.getAttribute('aria-expanded') === 'true';
+
+				// Close all other items
+				faqItems.forEach(otherItem => {
+					if (otherItem !== item) {
+						otherItem.classList.remove('is-open');
+						const otherQuestion = otherItem.querySelector('.faq-item__question');
+						if (otherQuestion) {
+							otherQuestion.setAttribute('aria-expanded', 'false');
+						}
+					}
+				});
+
+				// Toggle current item
+				item.classList.toggle('is-open', !isOpen);
+				question.setAttribute('aria-expanded', !expanded);
 			});
 		});
 	}

@@ -1,13 +1,61 @@
 // ==========================================================================
 // Homepage Styles - Charlie's Theme
-// Matching dipski.co homepage design
+// Matching dipski.co landing page structure
 // ==========================================================================
 
 @use 'variables' as *;
 @use 'mixins' as *;
 
 // --------------------------------------------------------------------------
-// Trust Badges Section
+// Hero Banner
+// --------------------------------------------------------------------------
+
+.hero-banner {
+	padding: $spacing-12 0;
+	text-align: center;
+	background-color: $color-bg;
+
+	@include md {
+		padding: $spacing-16 0;
+	}
+
+	&__content {
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	&__title {
+		font-size: clamp(2rem, 8vw, 4rem);
+		font-weight: $font-weight-bold;
+		line-height: 1.1;
+		margin-bottom: $spacing-4;
+		text-transform: uppercase;
+		letter-spacing: -0.02em;
+	}
+
+	&__subtitle {
+		font-size: $font-size-lg;
+		color: $color-muted;
+		margin-bottom: $spacing-6;
+
+		@include md {
+			font-size: $font-size-xl;
+		}
+	}
+
+	&__cta {
+		margin-top: $spacing-8;
+	}
+
+	// Trust badges inside hero
+	.trust-badges {
+		padding: $spacing-6 0;
+		justify-content: center;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Trust Badges
 // --------------------------------------------------------------------------
 
 .trust-badges {
@@ -21,7 +69,6 @@
 		gap: $spacing-3;
 
 		@include md {
-			justify-content: flex-start;
 			gap: $spacing-4;
 		}
 	}
@@ -62,7 +109,7 @@
 }
 
 // --------------------------------------------------------------------------
-// Brand Marquee Section
+// Brand Marquee
 // --------------------------------------------------------------------------
 
 .brand-marquee {
@@ -71,7 +118,6 @@
 	overflow: hidden;
 	position: relative;
 
-	// Edge fade masks
 	&::before,
 	&::after {
 		content: '';
@@ -164,25 +210,24 @@
 	}
 }
 
-// Pause on hover
 .brand-marquee:hover .brand-marquee__inner {
 	animation-play-state: paused;
 }
 
 // --------------------------------------------------------------------------
-// Newest Drops Section
+// Product Sections
 // --------------------------------------------------------------------------
 
-.newest-drops {
+.product-section {
 	background-color: $color-bg;
 
-	&__cta {
-		margin-top: $spacing-10;
+	&--alt {
+		// Alternate background if needed
 	}
 }
 
 // --------------------------------------------------------------------------
-// Why Choose Section
+// Why Choose / Benefits Section
 // --------------------------------------------------------------------------
 
 .why-choose {
@@ -242,5 +287,220 @@
 		font-size: $font-size-sm;
 		color: $color-muted;
 		margin: 0;
+	}
+}
+
+// --------------------------------------------------------------------------
+// Info / Educational Section
+// --------------------------------------------------------------------------
+
+.info-section {
+	background-color: $color-bg;
+
+	&__content {
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	&__title {
+		font-size: $font-size-2xl;
+		font-weight: $font-weight-semibold;
+		margin-bottom: $spacing-8;
+
+		@include md {
+			font-size: $font-size-3xl;
+		}
+	}
+}
+
+.info-block {
+	margin-bottom: $spacing-8;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	h3 {
+		font-size: $font-size-lg;
+		font-weight: $font-weight-semibold;
+		margin-bottom: $spacing-3;
+		color: $color-white;
+	}
+
+	p {
+		font-size: $font-size-base;
+		color: $color-muted;
+		line-height: $line-height-relaxed;
+		margin: 0;
+	}
+}
+
+// --------------------------------------------------------------------------
+// FAQ Accordion
+// --------------------------------------------------------------------------
+
+.faq-section {
+	background-color: $color-bg;
+}
+
+.faq-accordion {
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+.faq-item {
+	border-bottom: 1px solid $color-border;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	&__question {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		padding: $spacing-5 0;
+		background: none;
+		border: none;
+		color: $color-white;
+		font-size: $font-size-base;
+		font-weight: $font-weight-semibold;
+		text-align: left;
+		cursor: pointer;
+		transition: color $transition-fast;
+
+		@include md {
+			font-size: $font-size-lg;
+		}
+
+		&:hover {
+			color: $color-accent;
+		}
+
+		svg {
+			flex-shrink: 0;
+			margin-left: $spacing-4;
+			transition: transform $transition-base;
+		}
+
+		&[aria-expanded="true"] {
+			color: $color-accent;
+
+			svg {
+				transform: rotate(180deg);
+			}
+		}
+	}
+
+	&__answer {
+		display: none;
+		padding-bottom: $spacing-5;
+
+		p {
+			color: $color-muted;
+			line-height: $line-height-relaxed;
+			margin: 0;
+		}
+	}
+
+	&.is-open &__answer {
+		display: block;
+	}
+}
+
+// --------------------------------------------------------------------------
+// CTA Banner
+// --------------------------------------------------------------------------
+
+.cta-banner {
+	padding: $spacing-12 0;
+	background-color: $color-bg-card;
+	text-align: center;
+
+	@include md {
+		padding: $spacing-16 0;
+	}
+
+	&__content {
+		max-width: 600px;
+		margin: 0 auto;
+	}
+
+	&__title {
+		font-size: $font-size-2xl;
+		font-weight: $font-weight-semibold;
+		margin-bottom: $spacing-6;
+
+		@include md {
+			font-size: $font-size-3xl;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Newsletter Section
+// --------------------------------------------------------------------------
+
+.newsletter-section {
+	background-color: $color-bg;
+	text-align: center;
+
+	&__content {
+		max-width: 500px;
+		margin: 0 auto;
+	}
+
+	&__title {
+		font-size: $font-size-2xl;
+		font-weight: $font-weight-semibold;
+		margin-bottom: $spacing-3;
+
+		@include md {
+			font-size: $font-size-3xl;
+		}
+	}
+
+	&__text {
+		font-size: $font-size-base;
+		color: $color-muted;
+		margin-bottom: $spacing-6;
+	}
+}
+
+.newsletter-form {
+	&__field {
+		display: flex;
+		flex-direction: column;
+		gap: $spacing-3;
+
+		@include sm {
+			flex-direction: row;
+		}
+
+		input[type="email"] {
+			flex: 1;
+			padding: $spacing-4;
+			background-color: $color-bg-card;
+			border: 1px solid $color-border;
+			border-radius: $border-radius;
+			color: $color-white;
+			font-size: $font-size-base;
+
+			&:focus {
+				outline: none;
+				border-color: $color-accent;
+			}
+
+			&::placeholder {
+				color: $color-muted;
+			}
+		}
+
+		.btn {
+			@include sm {
+				flex-shrink: 0;
+			}
+		}
 	}
 }
