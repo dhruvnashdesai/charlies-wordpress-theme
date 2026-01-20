@@ -147,3 +147,81 @@ function charlies_fallback_menu() {
 		echo '</ul>';
 	}
 }
+
+/**
+ * AJAX Handler: Filter Products
+ */
+function charlies_filter_products() {
+	check_ajax_referer( 'charlies_nonce', 'nonce' );
+
+	$product_type    = isset( $_POST['product_type'] ) ? sanitize_text_field( $_POST['product_type'] ) : '';
+	$brand           = isset( $_POST['brand'] ) ? sanitize_text_field( $_POST['brand'] ) : '';
+	$brand_taxonomy  = isset( $_POST['brand_taxonomy'] ) ? sanitize_text_field( $_POST['brand_taxonomy'] ) : 'product_cat';
+
+	// Build query args
+	$args = array(
+		'post_type'      => 'product',
+		'post_status'    => 'publish',
+		'posts_per_page' => 12,
+		'tax_query'      => array(
+			'relation' => 'AND',
+		),
+	);
+
+	// Add product type filter (parent category)
+	if ( ! empty( $product_type ) ) {
+		$args['tax_query'][] = array(
+			'taxonomy' => 'product_cat',
+			'field'    => 'slug',
+			'terms'    => $product_type,
+		);
+	}
+
+	// Add brand filter
+	if ( ! empty( $brand ) ) {
+		$args['tax_query'][] = array(
+			'taxonomy' => $brand_taxonomy,
+			'field'    => 'slug',
+			'terms'    => $brand,
+		);
+	}
+
+	$products = new WP_Query( $args );
+
+	ob_start();
+	?>
+	<div class="shop-toolbar">
+		<p class="woocommerce-result-count">
+			<?php
+			printf(
+				/* translators: %d: product count */
+				_n( 'Showing %d result', 'Showing all %d results', $products->found_posts, 'charlies-theme' ),
+				$products->found_posts
+			);
+			?>
+		</p>
+	</div>
+
+	<?php if ( $products->have_posts() ) : ?>
+		<ul class="products columns-4">
+			<?php
+			while ( $products->have_posts() ) :
+				$products->the_post();
+				global $product;
+				wc_get_template_part( 'content', 'product' );
+			endwhile;
+			?>
+		</ul>
+	<?php else : ?>
+		<p class="woocommerce-info"><?php esc_html_e( 'No products found matching your selection.', 'charlies-theme' ); ?></p>
+	<?php endif; ?>
+
+	<?php
+	wp_reset_postdata();
+
+	$html = ob_get_clean();
+
+	wp_send_json_success( array( 'html' => $html ) );
+}
+add_action( 'wp_ajax_charlies_filter_products', 'charlies_filter_products' );
+add_action( 'wp_ajax_nopriv_charlies_filter_products', 'charlies_filter_products' );

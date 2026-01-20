@@ -14,6 +14,7 @@ const charliesTheme = {
 		this.initScrollAnimations();
 		this.initSmoothScroll();
 		this.initFaqAccordion();
+		this.initShopFilters();
 	},
 
 	/**
@@ -166,6 +167,94 @@ const charliesTheme = {
 				item.classList.toggle('is-open', !isOpen);
 				question.setAttribute('aria-expanded', !expanded);
 			});
+		});
+	},
+
+	/**
+	 * Shop AJAX Filters
+	 */
+	initShopFilters() {
+		const filtersContainer = document.querySelector('.shop-filters');
+		const productsContainer = document.getElementById('shop-products');
+
+		if (!filtersContainer || !productsContainer) return;
+
+		// Current filter state
+		const filters = {
+			type: '',
+			brand: ''
+		};
+
+		// Get brand taxonomy from data attribute
+		const brandTaxonomy = filtersContainer.dataset.brandTaxonomy || 'product_cat';
+
+		// Handle pill clicks
+		filtersContainer.addEventListener('click', (e) => {
+			const pill = e.target.closest('.filter-pills__item');
+			if (!pill) return;
+
+			const filterType = pill.dataset.filter;
+			const filterValue = pill.dataset.value;
+
+			// Update filter state
+			filters[filterType] = filterValue;
+
+			// Update active states
+			const pillGroup = pill.closest('.filter-pills');
+			pillGroup.querySelectorAll('.filter-pills__item').forEach(p => {
+				p.classList.remove('filter-pills__item--active');
+			});
+			pill.classList.add('filter-pills__item--active');
+
+			// Fetch filtered products
+			this.fetchProducts(filters, brandTaxonomy, productsContainer);
+		});
+	},
+
+	/**
+	 * Fetch products via AJAX
+	 */
+	fetchProducts(filters, brandTaxonomy, container) {
+		// Show loading state
+		container.classList.add('is-loading');
+
+		// Build form data
+		const formData = new FormData();
+		formData.append('action', 'charlies_filter_products');
+		formData.append('nonce', charliesAjax.nonce);
+		formData.append('product_type', filters.type);
+		formData.append('brand', filters.brand);
+		formData.append('brand_taxonomy', brandTaxonomy);
+
+		fetch(charliesAjax.url, {
+			method: 'POST',
+			body: formData
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.success) {
+				container.innerHTML = data.data.html;
+
+				// Update URL without page reload
+				const url = new URL(window.location);
+				if (filters.type) {
+					url.searchParams.set('product_type', filters.type);
+				} else {
+					url.searchParams.delete('product_type');
+				}
+				if (filters.brand) {
+					url.searchParams.set('brand', filters.brand);
+				} else {
+					url.searchParams.delete('brand');
+				}
+				window.history.pushState({}, '', url);
+			}
+		})
+		.catch(error => {
+			console.error('Filter error:', error);
+		})
+		.finally(() => {
+			container.classList.remove('is-loading');
 		});
 	}
 };
