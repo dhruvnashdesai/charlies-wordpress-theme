@@ -24,6 +24,8 @@ get_header();
 			</header>
 		<?php endif; ?>
 
+		<?php get_template_part( 'template-parts/category-pills' ); ?>
+
 		<?php
 		/**
 		 * Hook: woocommerce_before_shop_loop.
