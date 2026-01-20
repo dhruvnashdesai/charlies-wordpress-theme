@@ -34,13 +34,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="site-header__inner">
 				<!-- Logo -->
 				<div class="site-header__logo">
-					<?php if ( has_custom_logo() ) : ?>
-						<?php the_custom_logo(); ?>
-					<?php else : ?>
-						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="site-logo">
-							<?php bloginfo( 'name' ); ?>
-						</a>
-					<?php endif; ?>
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="site-logo">
+						<img src="<?php echo esc_url( CHARLIES_THEME_URI . '/assets/images/charlies_logo.png' ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" class="site-logo__image">
+					</a>
 				</div>
 
 				<!-- Primary Navigation -->

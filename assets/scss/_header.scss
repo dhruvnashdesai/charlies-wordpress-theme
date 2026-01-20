@@ -45,23 +45,18 @@
 	&__logo {
 		flex-shrink: 0;
 
-		.site-logo,
-		.custom-logo-link {
+		.site-logo {
 			display: block;
-			font-size: $font-size-xl;
-			font-weight: $font-weight-bold;
-			text-transform: uppercase;
-			letter-spacing: 0.1em;
-			color: $color-white;
-
-			&:hover {
-				color: $color-white;
-			}
 		}
 
-		.custom-logo {
-			height: 40px;
+		.site-logo__image {
+			height: 32px;
 			width: auto;
+			display: block;
+
+			@include md {
+				height: 40px;
+			}
 		}
 	}
 
