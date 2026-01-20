@@ -11,21 +11,44 @@
 // --------------------------------------------------------------------------
 
 .hero-banner {
-	padding: $spacing-12 0;
-	text-align: center;
+	padding: $spacing-10 0;
 	background-color: $color-bg;
 
 	@include md {
+		padding: $spacing-12 0;
+	}
+
+	@include lg {
 		padding: $spacing-16 0;
 	}
 
+	&__grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: $spacing-8;
+		align-items: center;
+
+		@include md {
+			grid-template-columns: 1fr 1fr;
+			gap: $spacing-10;
+		}
+
+		@include lg {
+			grid-template-columns: 55% 45%;
+			gap: $spacing-12;
+		}
+	}
+
 	&__content {
-		max-width: 800px;
-		margin: 0 auto;
+		text-align: center;
+
+		@include md {
+			text-align: left;
+		}
 	}
 
 	&__title {
-		font-size: clamp(2rem, 8vw, 4rem);
+		font-size: clamp(2rem, 6vw, 3.5rem);
 		font-weight: $font-weight-bold;
 		line-height: 1.1;
 		margin-bottom: $spacing-4;
@@ -37,6 +60,7 @@
 		font-size: $font-size-lg;
 		color: $color-muted;
 		margin-bottom: $spacing-6;
+		line-height: $line-height-relaxed;
 
 		@include md {
 			font-size: $font-size-xl;
@@ -44,13 +68,35 @@
 	}
 
 	&__cta {
-		margin-top: $spacing-8;
+		margin-bottom: $spacing-6;
 	}
 
-	// Trust badges inside hero
+	&__image {
+		order: -1;
+
+		@include md {
+			order: 0;
+		}
+
+		img {
+			width: 100%;
+			height: auto;
+			border-radius: $border-radius-lg;
+			display: block;
+		}
+	}
+
+	// Trust badges inside hero - left aligned on desktop
 	.trust-badges {
-		padding: $spacing-6 0;
-		justify-content: center;
+		padding: $spacing-4 0 0;
+
+		&__list {
+			justify-content: center;
+
+			@include md {
+				justify-content: flex-start;
+			}
+		}
 	}
 }
 

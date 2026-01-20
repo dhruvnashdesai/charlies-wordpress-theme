@@ -14,17 +14,25 @@ get_header();
 	<!-- Section 1: Hero Banner -->
 	<section class="hero-banner">
 		<div class="container">
-			<div class="hero-banner__content">
-				<h1 class="hero-banner__title"><?php echo esc_html( get_option( 'charlies_hero_title', '$10 A TIN. LIMITED TIME.' ) ); ?></h1>
-				<p class="hero-banner__subtitle"><?php echo esc_html( get_option( 'charlies_hero_subtitle', 'Premium nicotine pouches at unbeatable prices.' ) ); ?></p>
+			<div class="hero-banner__grid">
+				<!-- Left: Text, Button, Badges -->
+				<div class="hero-banner__content">
+					<h1 class="hero-banner__title"><?php echo esc_html( get_option( 'charlies_hero_title', '$10 A TIN. LIMITED TIME.' ) ); ?></h1>
+					<p class="hero-banner__subtitle"><?php echo esc_html( get_option( 'charlies_hero_subtitle', 'Premium nicotine pouches at unbeatable prices.' ) ); ?></p>
 
-				<?php get_template_part( 'template-parts/trust-badges' ); ?>
+					<?php if ( class_exists( 'WooCommerce' ) ) : ?>
+						<a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="btn btn-primary btn-lg hero-banner__cta">
+							<?php esc_html_e( 'Shop Now', 'charlies-theme' ); ?>
+						</a>
+					<?php endif; ?>
 
-				<?php if ( class_exists( 'WooCommerce' ) ) : ?>
-					<a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="btn btn-primary btn-lg hero-banner__cta">
-						<?php esc_html_e( 'Shop Now', 'charlies-theme' ); ?>
-					</a>
-				<?php endif; ?>
+					<?php get_template_part( 'template-parts/trust-badges' ); ?>
+				</div>
+
+				<!-- Right: Image -->
+				<div class="hero-banner__image">
+					<img src="<?php echo esc_url( CHARLIES_THEME_URI . '/assets/images/try-this.webp' ); ?>" alt="<?php esc_attr_e( 'Premium Nicotine Pouches', 'charlies-theme' ); ?>" loading="eager">
+				</div>
 			</div>
 		</div>
 	</section>
