@@ -1,33 +1,68 @@
 // ==========================================================================
 // Cart Styles - Charlie's Theme
-// Matching dipski.co dark theme
+// Dark theme, two-column sticky layout (Baymard-aligned)
 // ==========================================================================
 
 @use 'variables' as *;
 @use 'mixins' as *;
 
 // --------------------------------------------------------------------------
-// Cart Page Layout
+// Page Layout
 // --------------------------------------------------------------------------
+// Two columns on desktop: line items (left) + sticky order summary (right).
+// Cross-sells drop full-width under the line items. We dissolve the
+// `.cart-collaterals` wrapper with `display: contents` at `lg` so the totals
+// card and cross-sells become direct grid items and can be placed
+// independently — the totals sit top-right and stay sticky while the long
+// line-item list scrolls.
 
 .woocommerce-cart {
 	.woocommerce {
 		padding: $spacing-8 0 $spacing-16;
+
+		@include lg {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) 360px;
+			grid-template-areas:
+				'notices notices'
+				'items   summary'
+				'cross   summary';
+			column-gap: $spacing-10;
+			row-gap: $spacing-8;
+			align-items: start;
+		}
+	}
+
+	.entry-title,
+	.wp-block-post-title,
+	h1.page-title {
+		font-family: $font-family-base;
+		font-size: $font-size-3xl;
+		font-weight: $font-weight-bold;
+		margin-bottom: $spacing-8;
+	}
+
+	@include lg {
+		.woocommerce-notices-wrapper {
+			grid-area: notices;
+		}
 	}
 }
 
 // --------------------------------------------------------------------------
-// Cart Table
+// Line Items
 // --------------------------------------------------------------------------
 
 .woocommerce-cart-form {
-	margin-bottom: $spacing-8;
+	grid-area: items;
+	margin-bottom: 0;
 }
 
 table.shop_table.cart {
 	width: 100%;
 	border-collapse: collapse;
 	background-color: $color-bg-card;
+	border: $border-width solid $color-border;
 	border-radius: $border-radius;
 	overflow: hidden;
 
@@ -39,26 +74,14 @@ table.shop_table.cart {
 		}
 
 		th {
-			padding: $spacing-4;
+			padding: $spacing-4 $spacing-5;
 			text-align: left;
-			font-size: $font-size-sm;
+			font-size: $font-size-xs;
 			font-weight: $font-weight-semibold;
 			text-transform: uppercase;
-			letter-spacing: 0.05em;
+			letter-spacing: 0.06em;
 			color: $color-muted;
 			border-bottom: 1px solid $color-border;
-
-			&.product-remove {
-				width: 50px;
-			}
-
-			&.product-thumbnail {
-				width: 100px;
-			}
-
-			&.product-quantity {
-				width: 120px;
-			}
 		}
 	}
 
@@ -85,8 +108,9 @@ table.shop_table.cart {
 
 			@include md {
 				display: table-cell;
-				padding: $spacing-4;
+				padding: $spacing-5;
 				vertical-align: middle;
+				border-bottom: 1px solid $color-border;
 			}
 
 			&::before {
@@ -95,11 +119,18 @@ table.shop_table.cart {
 				margin-right: auto;
 				text-transform: uppercase;
 				font-size: $font-size-xs;
+				letter-spacing: 0.04em;
 				color: $color-muted;
 
 				@include md {
 					display: none;
 				}
+			}
+		}
+
+		tr:last-child td {
+			@include md {
+				border-bottom: none;
 			}
 		}
 
@@ -109,21 +140,28 @@ table.shop_table.cart {
 
 			@include md {
 				order: unset;
+				width: 44px;
+				text-align: center;
 			}
 
 			a.remove {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				width: 30px;
-				height: 30px;
+				@include flex-center;
+				width: 32px;
+				height: 32px;
+				margin: 0 0 0 auto;
+				border-radius: $border-radius-full;
 				color: $color-muted;
 				font-size: $font-size-xl;
 				line-height: 1;
-				transition: color $transition-fast;
+				transition: color $transition-fast, background-color $transition-fast;
+
+				@include md {
+					margin: 0 auto;
+				}
 
 				&:hover {
-					color: #ef4444;
+					color: $color-accent;
+					background-color: rgba($color-accent, 0.12);
 				}
 			}
 		}
@@ -134,6 +172,7 @@ table.shop_table.cart {
 
 			@include md {
 				order: unset;
+				width: 110px;
 			}
 
 			a {
@@ -141,10 +180,11 @@ table.shop_table.cart {
 			}
 
 			img {
-				width: 80px;
-				height: 80px;
+				width: 88px;
+				height: 88px;
 				object-fit: cover;
 				border-radius: $border-radius-sm;
+				border: 1px solid rgba($color-white, 0.1);
 			}
 		}
 
@@ -160,30 +200,33 @@ table.shop_table.cart {
 			a {
 				font-weight: $font-weight-semibold;
 				color: $color-white;
+				transition: color $transition-fast;
 
 				&:hover {
 					color: $color-accent;
 				}
 			}
 
-			.variation {
+			// Variation / strength meta — always visible, muted.
+			.variation,
+			.wc-item-meta {
 				display: block;
 				margin-top: $spacing-1;
 				font-size: $font-size-sm;
 				color: $color-muted;
+				list-style: none;
+				padding: 0;
 
 				dt,
-				dd {
+				dd,
+				li {
 					display: inline;
 					margin: 0;
+					font-weight: $font-weight-normal;
 				}
 
-				dt {
-					font-weight: $font-weight-normal;
-
-					&::after {
-						content: ': ';
-					}
+				dt::after {
+					content: ' ';
 				}
 
 				p {
@@ -192,7 +235,6 @@ table.shop_table.cart {
 			}
 		}
 
-		// Price
 		.product-price {
 			order: 3;
 
@@ -201,34 +243,41 @@ table.shop_table.cart {
 			}
 
 			.woocommerce-Price-amount {
-				font-weight: $font-weight-semibold;
+				font-weight: $font-weight-medium;
+				color: $color-text;
 			}
 		}
 
-		// Quantity
+		// Quantity stepper
 		.product-quantity {
 			order: 5;
 
 			@include md {
 				order: unset;
+				width: 130px;
 			}
 
 			.quantity {
-				display: flex;
+				display: inline-flex;
 				align-items: center;
 				background-color: $color-bg;
 				border: 1px solid $color-border;
 				border-radius: $border-radius-sm;
+				overflow: hidden;
 
 				input {
-					width: 50px;
-					height: 40px;
+					width: 56px;
+					height: 44px;
 					text-align: center;
 					background: transparent;
 					border: none;
 					color: $color-white;
-					font-weight: $font-weight-medium;
+					font-weight: $font-weight-semibold;
 					-moz-appearance: textfield;
+
+					&:focus {
+						outline: none;
+					}
 
 					&::-webkit-outer-spin-button,
 					&::-webkit-inner-spin-button {
@@ -238,33 +287,29 @@ table.shop_table.cart {
 			}
 		}
 
-		// Subtotal
 		.product-subtotal {
 			order: 6;
 
 			@include md {
 				order: unset;
+				text-align: right;
 			}
 
 			.woocommerce-Price-amount {
 				font-weight: $font-weight-bold;
-				color: $color-accent;
+				color: $color-white;
 			}
 		}
 	}
 
-	// Actions row
+	// Actions row (coupon + update)
 	.actions {
 		display: flex;
 		flex-wrap: wrap;
-		gap: $spacing-4;
-		padding: $spacing-4;
-		background-color: $color-bg;
-
-		@include md {
-			display: table-cell;
-			padding: $spacing-4;
-		}
+		align-items: center;
+		gap: $spacing-3;
+		padding: $spacing-5;
+		background-color: rgba($color-white, 0.02);
 
 		.coupon {
 			display: flex;
@@ -275,11 +320,12 @@ table.shop_table.cart {
 				@include visually-hidden;
 			}
 
-			input[type="text"] {
+			input[type='text'] {
 				flex: 1;
-				min-width: 150px;
-				padding: $spacing-2 $spacing-3;
-				background-color: $color-bg-card;
+				min-width: 140px;
+				height: 44px;
+				padding: 0 $spacing-4;
+				background-color: $color-bg;
 				border: 1px solid $color-border;
 				border-radius: $border-radius-sm;
 				color: $color-white;
@@ -287,25 +333,41 @@ table.shop_table.cart {
 				&:focus {
 					outline: none;
 					border-color: $color-accent;
+					box-shadow: 0 0 0 2px rgba($color-accent, 0.25);
 				}
 
 				&::placeholder {
-					color: $color-muted;
+					color: rgba($color-white, 0.4);
 				}
 			}
 
 			button {
 				@include button-outline;
-				padding: $spacing-2 $spacing-4;
+				height: 44px;
+				padding: 0 $spacing-5;
 			}
 		}
 
-		button[name="update_cart"] {
-			@include button-outline;
+		// Update cart — demoted to a tertiary text action.
+		button[name='update_cart'] {
 			margin-left: auto;
+			padding: $spacing-2 $spacing-3;
+			background: none;
+			border: none;
+			color: $color-muted;
+			font-size: $font-size-sm;
+			font-weight: $font-weight-semibold;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			cursor: pointer;
+			transition: color $transition-fast;
+
+			&:hover:not(:disabled) {
+				color: $color-white;
+			}
 
 			&:disabled {
-				opacity: 0.5;
+				opacity: 0.4;
 				cursor: not-allowed;
 			}
 		}
@@ -313,93 +375,148 @@ table.shop_table.cart {
 }
 
 // --------------------------------------------------------------------------
-// Cart Collaterals (Totals)
+// Cart Collaterals — sidebar (totals) + cross-sells
 // --------------------------------------------------------------------------
 
 .cart-collaterals {
-	@include md {
-		display: flex;
-		justify-content: flex-end;
-	}
+	// Mobile: surface the totals (and CTA) above the cross-sells.
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-10;
+	margin-top: $spacing-8;
 
 	.cart_totals {
-		@include card;
-		padding: $spacing-6;
+		order: 1;
+	}
+
+	.cross-sells {
+		order: 2;
+	}
+
+	@include lg {
+		display: contents;
+		margin-top: 0;
+	}
+}
+
+.cart_totals {
+	@include card;
+	grid-area: summary;
+	padding: $spacing-6;
+	width: 100%;
+
+	@include lg {
+		position: sticky;
+		top: calc(#{$header-height} + #{$promo-bar-height} + #{$spacing-4});
+	}
+
+	> h2 {
+		font-size: $font-size-lg;
+		font-weight: $font-weight-semibold;
+		margin-bottom: $spacing-5;
+		padding-bottom: $spacing-4;
+		border-bottom: 1px solid $color-border;
+	}
+
+	table {
 		width: 100%;
+		margin-bottom: $spacing-5;
 
-		@include md {
-			max-width: 400px;
-		}
+		tr {
+			th,
+			td {
+				padding: $spacing-3 0;
+				border-bottom: 1px solid $color-border;
+				font-size: $font-size-sm;
+			}
 
-		> h2 {
-			font-size: $font-size-lg;
-			font-weight: $font-weight-semibold;
-			margin-bottom: $spacing-4;
-			padding-bottom: $spacing-4;
-			border-bottom: 1px solid $color-border;
-		}
+			th {
+				text-align: left;
+				font-weight: $font-weight-normal;
+				color: $color-muted;
+			}
 
-		table {
-			width: 100%;
-			margin-bottom: $spacing-6;
+			td {
+				text-align: right;
+				color: $color-text;
+			}
 
-			tr {
+			// Order total — the dominant number on the card.
+			&.order-total {
 				th,
 				td {
-					padding: $spacing-3 0;
-					border-bottom: 1px solid $color-border;
+					border-bottom: none;
+					padding-top: $spacing-5;
 				}
 
 				th {
-					text-align: left;
-					font-weight: $font-weight-normal;
-					color: $color-muted;
+					font-size: $font-size-base;
+					font-weight: $font-weight-semibold;
+					color: $color-white;
 				}
 
 				td {
-					text-align: right;
-				}
+					font-size: $font-size-2xl;
+					font-weight: $font-weight-bold;
+					color: $color-accent;
 
-				&.order-total {
-					th,
-					td {
-						border-bottom: none;
-						padding-top: $spacing-4;
-						font-weight: $font-weight-bold;
-						font-size: $font-size-lg;
-					}
-
-					td {
+					.woocommerce-Price-amount {
 						color: $color-accent;
 					}
 				}
 			}
+		}
 
-			.woocommerce-shipping-destination {
-				font-size: $font-size-sm;
-				color: $color-muted;
-			}
+		.woocommerce-shipping-destination {
+			font-size: $font-size-sm;
+			color: $color-muted;
+		}
 
-			.shipping-calculator-button {
-				font-size: $font-size-sm;
-				color: $color-accent;
+		.shipping-calculator-button {
+			color: $color-accent;
+			font-weight: $font-weight-medium;
 
-				&:hover {
-					text-decoration: underline;
-				}
+			&:hover {
+				text-decoration: underline;
 			}
 		}
 	}
 
 	.wc-proceed-to-checkout {
+		padding: 0;
+
 		a.checkout-button {
 			@include button-primary;
-			display: block;
+			display: flex;
 			width: 100%;
-			text-align: center;
 			padding: $spacing-4;
 			font-size: $font-size-base;
 		}
+
+		// Lightweight trust cue under the primary CTA.
+		&::after {
+			content: '🔒  Secure checkout';
+			display: block;
+			margin-top: $spacing-3;
+			text-align: center;
+			font-size: $font-size-xs;
+			letter-spacing: 0.03em;
+			color: $color-muted;
+		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Cross-sells (drop below line items on desktop)
+// --------------------------------------------------------------------------
+
+.cross-sells {
+	grid-area: cross;
+
+	> h2 {
+		font-size: $font-size-xl;
+		font-weight: $font-weight-semibold;
+		margin-bottom: $spacing-6;
 	}
 }
 
@@ -409,7 +526,9 @@ table.shop_table.cart {
 
 .cart-empty {
 	text-align: center;
-	padding: $spacing-12 0;
+	padding: $spacing-12 0 $spacing-6;
+	font-size: $font-size-lg;
+	color: $color-text;
 
 	&::before {
 		content: '🛒';
@@ -420,7 +539,8 @@ table.shop_table.cart {
 }
 
 .return-to-shop {
-	margin-top: $spacing-6;
+	text-align: center;
+	padding-bottom: $spacing-12;
 
 	a {
 		@include button-primary;
@@ -461,7 +581,7 @@ table.shop_table.cart {
 			font-size: $font-size-lg;
 
 			&:hover {
-				color: #ef4444;
+				color: $color-accent;
 			}
 		}
 
