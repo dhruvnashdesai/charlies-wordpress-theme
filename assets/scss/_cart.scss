@@ -71,271 +71,208 @@
 	margin-bottom: 0;
 }
 
+// The cart table is taken OUT of native table layout and rebuilt with CSS
+// grid: the header row and every item row use ONE shared column template, so
+// the headers always sit exactly above their values. (WooCommerce's responsive
+// table CSS kept overriding table-layout and breaking column alignment.)
 table.shop_table.cart {
 	width: 100%;
-	border-collapse: collapse;
 	background-color: $color-bg-card;
 	border: $border-width solid $color-border;
 	border-radius: $border-radius;
 	overflow: hidden;
 
-	// Fixed layout makes every column take its header width, so the body
-	// cells line up under the headers instead of sizing independently.
-	@include md {
-		table-layout: fixed;
+	// Flatten the native table so grid governs the columns.
+	&,
+	thead,
+	tbody,
+	tr,
+	th,
+	td {
+		display: block;
 	}
 
-	// Remove column hidden for now while we sort out the line-item spacing.
+	th,
+	td {
+		padding: 0;
+		border: none;
+	}
+
+	// Remove (×) column hidden for now.
 	.product-remove {
 		display: none;
 	}
 
+	// Header row — desktop only.
 	thead {
 		display: none;
 
 		@include md {
-			display: table-header-group;
+			display: block;
+		}
+
+		tr {
+			border-bottom: 1px solid $color-border;
 		}
 
 		th {
-			padding: $spacing-4;
-			text-align: left;
 			font-size: $font-size-xs;
 			font-weight: $font-weight-semibold;
 			text-transform: uppercase;
 			letter-spacing: 0.06em;
 			color: $color-muted;
-			border-bottom: 1px solid $color-border;
 
-			// Column widths (govern the whole fixed-layout table); product-name
-			// takes the remaining space. Header alignment matches its values.
-			&.product-remove { width: 56px; }
-			&.product-thumbnail { width: 108px; }
-			&.product-price { width: 92px; }
-			&.product-quantity { width: 112px; }
 			&.product-subtotal {
-				width: 108px;
 				text-align: right;
 			}
 		}
 	}
 
-	tbody {
-		tr {
-			display: block;
-			padding: $spacing-4;
-			border-bottom: 1px solid $color-border;
+	// Item rows. Mobile: thumbnail (left) + stacked details (right).
+	tbody tr.cart_item {
+		display: grid;
+		grid-template-columns: 56px minmax(0, 1fr);
+		column-gap: $spacing-4;
+		row-gap: $spacing-1;
+		align-items: center;
+		padding: $spacing-4 $spacing-5;
+		border-bottom: 1px solid $color-border;
 
-			@include md {
-				display: table-row;
-				padding: 0;
-			}
-
-			&:last-child {
-				border-bottom: none;
-			}
+		&:last-child {
+			border-bottom: none;
 		}
+	}
 
-		td {
-			display: flex;
+	// Desktop: header row + item rows share the SAME 5-column template, which
+	// is what guarantees headers line up over their columns.
+	@include md {
+		thead tr,
+		tbody tr.cart_item {
+			display: grid;
+			grid-template-columns: 72px minmax(0, 1fr) 110px 130px 110px;
+			column-gap: $spacing-4;
+			row-gap: 0;
 			align-items: center;
-			padding: $spacing-2 0;
+			padding: $spacing-4 $spacing-5;
+		}
+	}
+
+	// Thumbnail — spans the stacked details on mobile, single cell on desktop.
+	.product-thumbnail {
+		grid-row: 1 / -1;
+		align-self: start;
+
+		@include md {
+			grid-row: auto;
+			align-self: center;
+		}
+
+		img {
+			width: 56px;
+			height: 56px;
+			object-fit: cover;
+			border-radius: $border-radius-sm;
+			border: 1px solid rgba($color-white, 0.1);
 
 			@include md {
-				display: table-cell;
-				padding: $spacing-4;
-				vertical-align: middle;
-				border-bottom: 1px solid $color-border;
+				width: 72px;
+				height: 72px;
 			}
+		}
+	}
 
-			&::before {
-				content: attr(data-title);
-				font-weight: $font-weight-semibold;
-				margin-right: auto;
-				text-transform: uppercase;
-				font-size: $font-size-xs;
-				letter-spacing: 0.04em;
-				color: $color-muted;
+	.product-name {
+		a {
+			font-weight: $font-weight-semibold;
+			color: $color-white;
+			transition: color $transition-fast;
 
-				@include md {
-					display: none;
-				}
+			&:hover {
+				color: $color-accent;
 			}
 		}
 
-		tr:last-child td {
-			@include md {
-				border-bottom: none;
+		// Variation / strength meta — always visible, muted.
+		.variation,
+		.wc-item-meta {
+			margin: $spacing-1 0 0;
+			padding: 0;
+			font-size: $font-size-sm;
+			color: $color-muted;
+			list-style: none;
+
+			dt,
+			dd,
+			li {
+				display: inline;
+				margin: 0;
+				font-weight: $font-weight-normal;
+			}
+
+			p {
+				margin: 0;
 			}
 		}
+	}
 
-		// Remove button
-		.product-remove {
-			order: 4;
+	.product-price {
+		.woocommerce-Price-amount {
+			font-weight: $font-weight-medium;
+			color: $color-text;
+		}
+	}
 
-			@include md {
-				order: unset;
-				padding-left: $spacing-2;
-				padding-right: $spacing-2;
+	.product-quantity {
+		.quantity {
+			display: inline-flex;
+			align-items: center;
+			background-color: $color-bg;
+			border: 1px solid $color-border;
+			border-radius: $border-radius-sm;
+			overflow: hidden;
+
+			input {
+				width: 48px;
+				height: 40px;
 				text-align: center;
-			}
-
-			a.remove {
-				@include flex-center;
-				width: 32px;
-				height: 32px;
-				margin: 0 0 0 auto;
-				border-radius: $border-radius-full;
-				color: $color-muted;
-				font-size: $font-size-xl;
-				line-height: 1;
-				transition: color $transition-fast, background-color $transition-fast;
-
-				@include md {
-					margin: 0 auto;
-				}
-
-				&:hover {
-					color: $color-accent;
-					background-color: rgba($color-accent, 0.12);
-				}
-			}
-		}
-
-		// Thumbnail
-		.product-thumbnail {
-			order: 1;
-
-			@include md {
-				order: unset;
-				padding-left: $spacing-2;
-				padding-right: $spacing-2;
-			}
-
-			a {
-				display: block;
-			}
-
-			img {
-				width: 88px;
-				height: 88px;
-				object-fit: cover;
-				border-radius: $border-radius-sm;
-				border: 1px solid rgba($color-white, 0.1);
-			}
-		}
-
-		// Product name
-		.product-name {
-			order: 2;
-			flex: 1;
-
-			@include md {
-				order: unset;
-			}
-
-			a {
+				background: transparent;
+				border: none;
+				color: $color-white;
 				font-weight: $font-weight-semibold;
-				color: $color-white;
-				transition: color $transition-fast;
+				-moz-appearance: textfield;
 
-				&:hover {
-					color: $color-accent;
-				}
-			}
-
-			// Variation / strength meta — always visible, muted.
-			.variation,
-			.wc-item-meta {
-				display: block;
-				margin-top: $spacing-1;
-				font-size: $font-size-sm;
-				color: $color-muted;
-				list-style: none;
-				padding: 0;
-
-				dt,
-				dd,
-				li {
-					display: inline;
-					margin: 0;
-					font-weight: $font-weight-normal;
+				&:focus {
+					outline: none;
 				}
 
-				dt::after {
-					content: ' ';
-				}
-
-				p {
-					margin: 0;
+				&::-webkit-outer-spin-button,
+				&::-webkit-inner-spin-button {
+					-webkit-appearance: none;
 				}
 			}
 		}
+	}
 
-		.product-price {
-			order: 3;
+	.product-subtotal {
+		font-weight: $font-weight-bold;
+		color: $color-white;
 
-			@include md {
-				order: unset;
-			}
-
-			.woocommerce-Price-amount {
-				font-weight: $font-weight-medium;
-				color: $color-text;
-			}
+		@include md {
+			text-align: right;
 		}
+	}
 
-		// Quantity stepper
-		.product-quantity {
-			order: 5;
-
-			@include md {
-				order: unset;
-				width: 130px;
-			}
-
-			.quantity {
-				display: inline-flex;
-				align-items: center;
-				background-color: $color-bg;
-				border: 1px solid $color-border;
-				border-radius: $border-radius-sm;
-				overflow: hidden;
-
-				input {
-					width: 56px;
-					height: 44px;
-					text-align: center;
-					background: transparent;
-					border: none;
-					color: $color-white;
-					font-weight: $font-weight-semibold;
-					-moz-appearance: textfield;
-
-					&:focus {
-						outline: none;
-					}
-
-					&::-webkit-outer-spin-button,
-					&::-webkit-inner-spin-button {
-						-webkit-appearance: none;
-					}
-				}
-			}
-		}
-
-		.product-subtotal {
-			order: 6;
-
-			@include md {
-				order: unset;
-				text-align: right;
-			}
-
-			.woocommerce-Price-amount {
-				font-weight: $font-weight-bold;
-				color: $color-white;
-			}
+	// Mobile: label the price / quantity / subtotal cells (no header row there).
+	@media (max-width: #{$breakpoint-md - 1px}) {
+		.product-price::before,
+		.product-quantity::before,
+		.product-subtotal::before {
+			content: attr(data-title) ': ';
+			margin-right: $spacing-2;
+			font-size: $font-size-xs;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			color: $color-muted;
 		}
 	}
 
