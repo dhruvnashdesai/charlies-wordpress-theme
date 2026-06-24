@@ -21,14 +21,13 @@
 	top: calc(#{$header-height} + #{$promo-bar-height} + #{$spacing-4});
 }
 
-// WooCommerce's loading overlay (jquery.blockUI) defaults to a solid white
-// fill — on the dark theme it washes the order review + payment sections white
-// during the AJAX refresh. Recolor it to a subtle dark dim. blockUI sets these
-// as inline styles, so `!important` is required to override them.
+// WooCommerce's loading overlay (jquery.blockUI) flashes a white dim over the
+// order review + payment during the AJAX refresh — just visual noise on a dark
+// theme. Hide it; the AJAX is quick and the form still blocks itself on actual
+// order submission. blockUI sets inline styles, so `!important` is required.
 .woocommerce-checkout {
 	.blockUI.blockOverlay {
-		background-color: $color-bg !important;
-		opacity: 0.5 !important;
+		display: none !important;
 	}
 }
 
