@@ -338,20 +338,39 @@ table.woocommerce-checkout-review-order-table {
 			}
 
 			.payment_box {
-				padding: $spacing-4;
-				padding-top: 0;
+				padding: $spacing-5 $spacing-4 $spacing-4;
 				background-color: rgba($color-white, 0.02);
 
-				p {
+				// Gateway description ("Pay with your credit card.")
+				> p:first-child {
 					font-size: $font-size-sm;
 					color: $color-muted;
-					margin: 0;
+					margin: 0 0 $spacing-5;
 				}
 
 				fieldset {
 					border: none;
 					padding: 0;
 					margin: 0;
+				}
+
+				// Card fields (Cardknox): space the rows and lift each input
+				// off its label.
+				p,
+				.form-row {
+					margin: 0 0 $spacing-4;
+
+					&:last-child {
+						margin-bottom: 0;
+					}
+				}
+
+				label {
+					display: block;
+					margin-bottom: $spacing-2;
+					font-size: $font-size-sm;
+					font-weight: $font-weight-medium;
+					color: $color-white;
 				}
 			}
 		}
