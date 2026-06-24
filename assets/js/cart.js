@@ -13,6 +13,39 @@ const charliesCart = {
 		this.bindAddToCart();
 		this.bindQuantityButtons();
 		this.bindRemoveItem();
+		this.bindCartAutoUpdate();
+	},
+
+	/**
+	 * Auto-update the classic cart when a quantity changes, so the manual
+	 * "Update cart" button isn't needed. Progressive enhancement: a class hides
+	 * the button via CSS, so without JS the button still works as a fallback.
+	 */
+	bindCartAutoUpdate() {
+		const form = document.querySelector('.woocommerce-cart-form');
+		if (!form) return;
+
+		const updateBtn = form.querySelector('button[name="update_cart"]');
+		if (!updateBtn) return;
+
+		// Signals to CSS that JS auto-update is active (hides the manual button).
+		form.classList.add('js-cart-autoupdate');
+
+		let timer;
+		form.addEventListener('input', (e) => {
+			if (!e.target.classList.contains('qty')) return;
+
+			clearTimeout(timer);
+			timer = setTimeout(() => {
+				updateBtn.disabled = false;
+				form.classList.add('is-updating');
+				if (typeof form.requestSubmit === 'function') {
+					form.requestSubmit(updateBtn);
+				} else {
+					updateBtn.click();
+				}
+			}, 800);
+		});
 	},
 
 	/**
