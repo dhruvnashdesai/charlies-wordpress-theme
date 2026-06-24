@@ -117,10 +117,19 @@
 	}
 }
 
-// Marketing / consent checkbox rows (e.g. the email opt-in) — nudge down off
-// the field above so they don't crowd it.
-#customer_details .form-row:has(input[type='checkbox']) {
-	margin-top: $spacing-3;
+// MailPoet email opt-in checkbox — it renders as a bare <label> (no .form-row
+// wrapper), so target it directly. Space it off the email field above and lay
+// the box + text out with flex so the text wraps neatly beside the checkbox.
+label[data-automation-id='woo-commerce-subscription-opt-in'] {
+	display: flex;
+	align-items: flex-start;
+	gap: $spacing-2;
+	margin-top: $spacing-5;
+
+	input {
+		flex-shrink: 0;
+		margin-top: 2px;
+	}
 }
 
 // Ship to different address checkbox
