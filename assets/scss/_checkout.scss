@@ -150,7 +150,9 @@
 	font-size: $font-size-xl;
 	font-weight: $font-weight-semibold;
 	margin-bottom: $spacing-3;
-	padding-bottom: $spacing-3;
+	// Match the billing/shipping headings' padding-bottom so the underline
+	// lines up with "Billing details" across the two columns.
+	padding-bottom: $spacing-4;
 	border-bottom: 1px solid $color-border;
 }
 
