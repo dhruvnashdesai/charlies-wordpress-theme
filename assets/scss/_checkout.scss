@@ -45,6 +45,10 @@
 	// column. Billing spans the left column; heading + order stack on the right.
 	@include lg {
 		grid-template-columns: 1fr 400px;
+		// Row 1 hugs the "Your order" heading; row 2 absorbs the extra height
+		// from the taller billing column BELOW the order card (align-items:start
+		// keeps the card pinned to the top of row 2) instead of as a gap above.
+		grid-template-rows: min-content 1fr;
 		grid-template-areas:
 			'details review-heading'
 			'details review';
