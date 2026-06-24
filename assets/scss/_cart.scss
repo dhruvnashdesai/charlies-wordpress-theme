@@ -16,9 +16,31 @@
 // independently — the totals sit top-right and stay sticky while the long
 // line-item list scrolls.
 
+// Constrain + inset the page header and cart content to a shared container so
+// the title and the cart columns line up (the theme's <main> has no width
+// container of its own). Extra top space drops the title down off the nav.
+.woocommerce-cart,
+.woocommerce-checkout {
+	.entry-header {
+		@include container;
+		padding-top: $spacing-10;
+	}
+
+	.entry-content {
+		@include container;
+	}
+
+	.entry-title {
+		font-family: $font-family-base;
+		font-size: $font-size-3xl;
+		font-weight: $font-weight-bold;
+		margin: 0 0 $spacing-6;
+	}
+}
+
 .woocommerce-cart {
 	.woocommerce {
-		padding: $spacing-8 0 $spacing-16;
+		padding: $spacing-2 0 $spacing-16;
 
 		@include lg {
 			display: grid;
@@ -31,15 +53,6 @@
 			row-gap: $spacing-8;
 			align-items: start;
 		}
-	}
-
-	.entry-title,
-	.wp-block-post-title,
-	h1.page-title {
-		font-family: $font-family-base;
-		font-size: $font-size-3xl;
-		font-weight: $font-weight-bold;
-		margin-bottom: $spacing-8;
 	}
 
 	@include lg {
@@ -82,6 +95,11 @@ table.shop_table.cart {
 			letter-spacing: 0.06em;
 			color: $color-muted;
 			border-bottom: 1px solid $color-border;
+
+			// Align each header to its column's values.
+			&.product-subtotal {
+				text-align: right;
+			}
 		}
 	}
 
@@ -302,55 +320,15 @@ table.shop_table.cart {
 		}
 	}
 
-	// Actions row (coupon + update)
+	// Actions row — coupon now lives in its own block (see .cart-coupon);
+	// only the demoted "Update cart" text action remains here.
 	.actions {
 		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: $spacing-3;
-		padding: $spacing-5;
+		justify-content: flex-end;
+		padding: $spacing-4 $spacing-5;
 		background-color: rgba($color-white, 0.02);
 
-		.coupon {
-			display: flex;
-			flex: 1;
-			gap: $spacing-2;
-
-			label {
-				@include visually-hidden;
-			}
-
-			input[type='text'] {
-				flex: 1;
-				min-width: 140px;
-				height: 44px;
-				padding: 0 $spacing-4;
-				background-color: $color-bg;
-				border: 1px solid $color-border;
-				border-radius: $border-radius-sm;
-				color: $color-white;
-
-				&:focus {
-					outline: none;
-					border-color: $color-accent;
-					box-shadow: 0 0 0 2px rgba($color-accent, 0.25);
-				}
-
-				&::placeholder {
-					color: rgba($color-white, 0.4);
-				}
-			}
-
-			button {
-				@include button-outline;
-				height: 44px;
-				padding: 0 $spacing-5;
-			}
-		}
-
-		// Update cart — demoted to a tertiary text action.
 		button[name='update_cart'] {
-			margin-left: auto;
 			padding: $spacing-2 $spacing-3;
 			background: none;
 			border: none;
@@ -371,6 +349,57 @@ table.shop_table.cart {
 				cursor: not-allowed;
 			}
 		}
+	}
+}
+
+// --------------------------------------------------------------------------
+// Coupon — its own block under the line items (theme cart.php override)
+// --------------------------------------------------------------------------
+
+.cart-coupon {
+	@include card;
+	margin-top: $spacing-6;
+	padding: $spacing-5 $spacing-6;
+
+	&__label {
+		display: block;
+		margin-bottom: $spacing-3;
+		font-size: $font-size-sm;
+		font-weight: $font-weight-semibold;
+		color: $color-white;
+	}
+
+	&__form {
+		display: flex;
+		gap: $spacing-3;
+	}
+
+	input[type='text'] {
+		flex: 1;
+		min-width: 0;
+		height: 44px;
+		padding: 0 $spacing-4;
+		background-color: $color-bg;
+		border: 1px solid $color-border;
+		border-radius: $border-radius-sm;
+		color: $color-white;
+
+		&:focus {
+			outline: none;
+			border-color: $color-accent;
+			box-shadow: 0 0 0 2px rgba($color-accent, 0.25);
+		}
+
+		&::placeholder {
+			color: rgba($color-white, 0.4);
+		}
+	}
+
+	button {
+		@include button-outline;
+		flex-shrink: 0;
+		height: 44px;
+		padding: 0 $spacing-5;
 	}
 }
 
