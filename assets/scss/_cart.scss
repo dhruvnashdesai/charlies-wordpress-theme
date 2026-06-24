@@ -85,6 +85,11 @@ table.shop_table.cart {
 		table-layout: fixed;
 	}
 
+	// Remove column hidden for now while we sort out the line-item spacing.
+	.product-remove {
+		display: none;
+	}
+
 	thead {
 		display: none;
 
