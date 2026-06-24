@@ -387,17 +387,18 @@ table.shop_table.cart {
 	}
 }
 
-// Auto-update (JS): hide the manual "Update cart" button and dim the cart
-// while a quantity change is being submitted. Without JS the button stays
-// visible as a fallback (see cart.js bindCartAutoUpdate).
+// Auto-update (JS): hide the manual "Update cart" button. Without JS the
+// button stays visible as a fallback (see cart.js bindCartAutoUpdate).
 .woocommerce-cart-form.js-cart-autoupdate button[name='update_cart'] {
 	display: none;
 }
 
-.woocommerce-cart-form.is-updating {
-	opacity: 0.55;
+// While an AJAX cart update is in flight, gently fade the cart in place
+// (the form is updated without a page reload, so no white flash).
+.woocommerce.is-updating {
+	opacity: 0.6;
 	pointer-events: none;
-	transition: opacity $transition-fast;
+	transition: opacity $transition-base;
 }
 
 // --------------------------------------------------------------------------

@@ -17,9 +17,10 @@ const charliesCart = {
 	},
 
 	/**
-	 * Auto-update the classic cart when a quantity changes, so the manual
-	 * "Update cart" button isn't needed. Progressive enhancement: a class hides
-	 * the button via CSS, so without JS the button still works as a fallback.
+	 * Auto-update the classic cart when a quantity changes, and run cart-form
+	 * submits (quantity + coupon) via AJAX so there's no full-page reload /
+	 * white flash. Progressive enhancement: a class hides the manual "Update
+	 * cart" button via CSS, so without JS the button still works as a fallback.
 	 */
 	bindCartAutoUpdate() {
 		const form = document.querySelector('.woocommerce-cart-form');
@@ -31,21 +32,70 @@ const charliesCart = {
 		// Signals to CSS that JS auto-update is active (hides the manual button).
 		form.classList.add('js-cart-autoupdate');
 
+		// Intercept submits (quantity update + coupon apply) → AJAX, no reload.
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			this.updateCart(form, e.submitter);
+		});
+
+		// Auto-submit shortly after a quantity changes.
 		let timer;
 		form.addEventListener('input', (e) => {
 			if (!e.target.classList.contains('qty')) return;
-
 			clearTimeout(timer);
 			timer = setTimeout(() => {
 				updateBtn.disabled = false;
-				form.classList.add('is-updating');
 				if (typeof form.requestSubmit === 'function') {
 					form.requestSubmit(updateBtn);
 				} else {
 					updateBtn.click();
 				}
-			}, 800);
+			}, 700);
 		});
+	},
+
+	/**
+	 * Submit the cart form via AJAX and swap the updated cart HTML in place.
+	 */
+	async updateCart(form, submitter) {
+		const wrapper = document.querySelector('.woocommerce');
+		if (!wrapper) return;
+
+		const data = new FormData(form);
+		if (submitter && submitter.name) {
+			data.append(submitter.name, submitter.value || '');
+		} else {
+			data.append('update_cart', 'Update cart');
+		}
+
+		wrapper.classList.add('is-updating');
+
+		try {
+			const res = await fetch(form.action, {
+				method: 'POST',
+				body: data,
+				credentials: 'same-origin',
+				headers: { 'X-Requested-With': 'XMLHttpRequest' }
+			});
+			const html = await res.text();
+			const fresh = new DOMParser()
+				.parseFromString(html, 'text/html')
+				.querySelector('.woocommerce');
+
+			if (!fresh) {
+				location.reload();
+				return;
+			}
+
+			wrapper.innerHTML = fresh.innerHTML;
+			this.bindCartAutoUpdate(); // re-bind to the fresh form
+			document.body.dispatchEvent(new Event('wc_fragment_refresh'));
+		} catch (error) {
+			console.error('Cart update failed, reloading:', error);
+			location.reload();
+		} finally {
+			wrapper.classList.remove('is-updating');
+		}
 	},
 
 	/**
