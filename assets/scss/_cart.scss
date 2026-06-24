@@ -99,8 +99,39 @@ table.shop_table.cart {
 	}
 
 	// Remove (×) column hidden for now.
+	// Remove control. DOM order puts this cell first; we render it as a
+	// trailing control so it never shifts the thumbnail/name/price columns.
+	// Mobile: pinned to the row's top-right corner (out of grid flow).
+	// Desktop: moved to the narrow trailing grid column via `order` (see the
+	// shared grid template below).
 	.product-remove {
-		display: none;
+		position: absolute;
+		top: $spacing-3;
+		right: $spacing-4;
+
+		@include md {
+			position: static;
+			order: 1; // push the DOM-first cell to the last grid slot
+		}
+
+		a.remove {
+			@include flex-center;
+			width: 24px;
+			height: 24px;
+			margin: 0 auto;
+			border-radius: $border-radius-full;
+			color: $color-muted;
+			font-size: $font-size-lg;
+			font-weight: $font-weight-normal;
+			line-height: 1;
+			text-decoration: none;
+			transition: color $transition-fast, background-color $transition-fast;
+
+			&:hover {
+				color: $color-accent;
+				background-color: rgba($color-white, 0.08);
+			}
+		}
 	}
 
 	// Header row — desktop only.
@@ -140,6 +171,7 @@ table.shop_table.cart {
 
 	// Item rows. Mobile: thumbnail (left) + stacked details (right).
 	tbody tr.cart_item {
+		position: relative; // anchor the mobile remove (×) button
 		display: grid;
 		grid-template-columns: 56px minmax(0, 1fr);
 		column-gap: $spacing-4;
@@ -159,7 +191,7 @@ table.shop_table.cart {
 		thead tr,
 		tbody tr.cart_item {
 			display: grid;
-			grid-template-columns: 72px minmax(0, 1fr) 110px 130px 110px;
+			grid-template-columns: 72px minmax(0, 1fr) 110px 130px 110px 32px;
 			column-gap: $spacing-4;
 			row-gap: 0;
 			align-items: center;
@@ -282,6 +314,11 @@ table.shop_table.cart {
 
 	// Mobile: label the price / quantity / subtotal cells (no header row there).
 	@media (max-width: #{$breakpoint-md - 1px}) {
+		// Keep the name clear of the corner remove (×) button.
+		.product-name {
+			padding-right: $spacing-6;
+		}
+
 		.product-price::before,
 		.product-quantity::before,
 		.product-subtotal::before {
