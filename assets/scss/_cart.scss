@@ -122,6 +122,16 @@ table.shop_table.cart {
 			letter-spacing: 0.06em;
 			color: $color-muted;
 
+			// <th> defaults to centered — set alignment to match each column.
+			&.product-name {
+				text-align: left;
+			}
+
+			&.product-price,
+			&.product-quantity {
+				text-align: center;
+			}
+
 			&.product-subtotal {
 				text-align: right;
 			}
@@ -216,6 +226,10 @@ table.shop_table.cart {
 	}
 
 	.product-price {
+		@include md {
+			text-align: center;
+		}
+
 		.woocommerce-Price-amount {
 			font-weight: $font-weight-medium;
 			color: $color-text;
@@ -223,6 +237,10 @@ table.shop_table.cart {
 	}
 
 	.product-quantity {
+		@include md {
+			text-align: center;
+		}
+
 		.quantity {
 			display: inline-flex;
 			align-items: center;
