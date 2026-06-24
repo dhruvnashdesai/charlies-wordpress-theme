@@ -29,9 +29,36 @@
 	display: grid;
 	gap: $spacing-8;
 
+	// The form's three children (billing details, "Your order" heading, order
+	// table) must be placed explicitly — otherwise they auto-flow and the order
+	// table lands bottom-left under the billing form instead of in the right
+	// column. Billing spans the left column; heading + order stack on the right.
 	@include lg {
 		grid-template-columns: 1fr 400px;
+		grid-template-areas:
+			'details review-heading'
+			'details review';
 		align-items: start;
+		column-gap: $spacing-10;
+		row-gap: 0;
+	}
+
+	#customer_details {
+		@include lg {
+			grid-area: details;
+		}
+	}
+
+	#order_review_heading {
+		@include lg {
+			grid-area: review-heading;
+		}
+	}
+
+	#order_review {
+		@include lg {
+			grid-area: review;
+		}
 	}
 }
 
