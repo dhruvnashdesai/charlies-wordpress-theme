@@ -294,15 +294,76 @@ table.shop_table.cart {
 		}
 	}
 
-	// Actions row — coupon now lives in its own block (see .cart-coupon);
-	// only the demoted "Update cart" text action remains here.
+	// Actions row — coupon on the left (pill input + round arrow "apply"
+	// button), with the demoted "Update cart" text pushed to the right.
 	.actions {
 		display: flex;
-		justify-content: flex-end;
-		padding: $spacing-4 $spacing-5;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: $spacing-3;
+		padding: $spacing-5;
 		background-color: rgba($color-white, 0.02);
 
+		.coupon {
+			display: flex;
+			align-items: center;
+			gap: $spacing-2;
+
+			label {
+				@include visually-hidden;
+			}
+
+			input[type='text'] {
+				width: 200px;
+				max-width: 100%;
+				height: 44px;
+				padding: 0 $spacing-5;
+				background-color: $color-bg;
+				border: 1px solid $color-border;
+				border-radius: $border-radius-full;
+				color: $color-white;
+
+				&:focus {
+					outline: none;
+					border-color: $color-accent;
+					box-shadow: 0 0 0 2px rgba($color-accent, 0.25);
+				}
+
+				&::placeholder {
+					color: rgba($color-white, 0.4);
+				}
+			}
+
+			// "Apply coupon" → a round arrow (enter) button. The label text is
+			// hidden visually (font-size: 0) but kept for the accessible name.
+			button[name='apply_coupon'] {
+				@include flex-center;
+				flex-shrink: 0;
+				width: 44px;
+				height: 44px;
+				padding: 0;
+				border: none;
+				border-radius: $border-radius-full;
+				background-color: $color-accent;
+				color: $color-white;
+				font-size: 0;
+				cursor: pointer;
+				transition: background-color $transition-fast;
+
+				&::after {
+					content: '→';
+					font-size: $font-size-xl;
+					line-height: 1;
+				}
+
+				&:hover {
+					background-color: $color-accent-hover;
+				}
+			}
+		}
+
 		button[name='update_cart'] {
+			margin-left: auto;
 			padding: $spacing-2 $spacing-3;
 			background: none;
 			border: none;
@@ -323,57 +384,6 @@ table.shop_table.cart {
 				cursor: not-allowed;
 			}
 		}
-	}
-}
-
-// --------------------------------------------------------------------------
-// Coupon — its own block under the line items (theme cart.php override)
-// --------------------------------------------------------------------------
-
-.cart-coupon {
-	@include card;
-	margin-top: $spacing-6;
-	padding: $spacing-5 $spacing-6;
-
-	&__label {
-		display: block;
-		margin-bottom: $spacing-3;
-		font-size: $font-size-sm;
-		font-weight: $font-weight-semibold;
-		color: $color-white;
-	}
-
-	&__form {
-		display: flex;
-		gap: $spacing-3;
-	}
-
-	input[type='text'] {
-		flex: 1;
-		min-width: 0;
-		height: 44px;
-		padding: 0 $spacing-4;
-		background-color: $color-bg;
-		border: 1px solid $color-border;
-		border-radius: $border-radius-sm;
-		color: $color-white;
-
-		&:focus {
-			outline: none;
-			border-color: $color-accent;
-			box-shadow: 0 0 0 2px rgba($color-accent, 0.25);
-		}
-
-		&::placeholder {
-			color: rgba($color-white, 0.4);
-		}
-	}
-
-	button {
-		@include button-outline;
-		flex-shrink: 0;
-		height: 44px;
-		padding: 0 $spacing-5;
 	}
 }
 
