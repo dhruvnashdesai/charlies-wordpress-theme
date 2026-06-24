@@ -71,7 +71,7 @@ function charlies_enqueue_assets() {
 		'charlies-main',
 		CHARLIES_THEME_URI . '/assets/css/main.css',
 		array( 'charlies-google-fonts' ),
-		CHARLIES_THEME_VERSION
+		filemtime( CHARLIES_THEME_DIR . '/assets/css/main.css' )
 	);
 
 	// Main JavaScript
@@ -79,7 +79,7 @@ function charlies_enqueue_assets() {
 		'charlies-main',
 		CHARLIES_THEME_URI . '/assets/js/main.js',
 		array(),
-		CHARLIES_THEME_VERSION,
+		filemtime( CHARLIES_THEME_DIR . '/assets/js/main.js' ),
 		true
 	);
 
@@ -95,7 +95,7 @@ function charlies_enqueue_assets() {
 			'charlies-cart',
 			CHARLIES_THEME_URI . '/assets/js/cart.js',
 			array( 'charlies-main' ),
-			CHARLIES_THEME_VERSION,
+			filemtime( CHARLIES_THEME_DIR . '/assets/js/cart.js' ),
 			true
 		);
 	}
