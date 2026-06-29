@@ -149,17 +149,22 @@ function charlies_friendly_shipping_labels( $rates ) {
 				break;
 
 			case 'woocommerce_eshipper':
-				// Pull the transit estimate out of e.g. "UPS-Standard (1 day)".
-				$eta = '';
+				// Stash the transit estimate from e.g. "UPS-Standard (1 day)" as
+				// hidden rate meta (underscore key = kept off the order/email),
+				// then set the clean name. The ETA is rendered as a small subline
+				// by the full-label filter below. Read the label BEFORE relabeling.
 				if ( preg_match( '/\((\d+)\s*day/i', $rate->get_label(), $m ) ) {
-					$n   = (int) $m[1];
-					$eta = sprintf(
-						/* translators: %d: number of business days */
-						_n( ' · arrives in ~%d business day', ' · arrives in ~%d business days', $n, 'charlies-theme' ),
-						$n
+					$n = (int) $m[1];
+					$rate->add_meta_data(
+						'_charlies_eta',
+						sprintf(
+							/* translators: %d: number of business days */
+							_n( 'Arrives in ~%d business day', 'Arrives in ~%d business days', $n, 'charlies-theme' ),
+							$n
+						)
 					);
 				}
-				$rate->set_label( __( 'Standard Shipping', 'charlies-theme' ) . $eta );
+				$rate->set_label( __( 'Standard Shipping', 'charlies-theme' ) );
 				break;
 
 			// case 'flashbird':
@@ -170,6 +175,24 @@ function charlies_friendly_shipping_labels( $rates ) {
 	return $rates;
 }
 add_filter( 'woocommerce_package_rates', 'charlies_friendly_shipping_labels', 90 );
+
+/**
+ * WooCommerce: render the delivery ETA as a small subline under the rate name.
+ *
+ * Pairs with the relabeling above — the ETA is stashed in hidden `_charlies_eta`
+ * meta (so it never leaks onto the order or confirmation email) and surfaced here
+ * as a styled `.ship-rate__eta` element, giving a clean two-line method:
+ *   Standard Shipping: $16.28
+ *   Arrives in ~1 business day
+ */
+function charlies_shipping_eta_subline( $label, $method ) {
+	$meta = $method->get_meta_data();
+	if ( ! empty( $meta['_charlies_eta'] ) ) {
+		$label .= '<small class="ship-rate__eta">' . esc_html( $meta['_charlies_eta'] ) . '</small>';
+	}
+	return $label;
+}
+add_filter( 'woocommerce_cart_shipping_method_full_label', 'charlies_shipping_eta_subline', 10, 2 );
 
 /**
  * WooCommerce: Label the shipping row "Shipping" (not the plugin's "Shipment").
