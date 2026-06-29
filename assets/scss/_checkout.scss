@@ -385,6 +385,22 @@ table.woocommerce-checkout-review-order-table {
 					font-weight: $font-weight-medium;
 					color: $color-white;
 				}
+
+				// The Cardknox card-number and CVV are white-background iframes
+				// (Cardknox's own dark-on-white styling). The expiry, however, is a
+				// plain input — so the dark theme's "white text" rule made it white
+				// on its white field, i.e. invisible. Force dark text so all three
+				// card fields read the same.
+				#cardknox-card-expiry {
+					background-color: $color-white;
+					color: #1a1a1a;
+					-webkit-text-fill-color: #1a1a1a;
+
+					&::placeholder {
+						color: #9aa0a6;
+						-webkit-text-fill-color: #9aa0a6;
+					}
+				}
 			}
 		}
 	}
