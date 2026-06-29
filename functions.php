@@ -204,6 +204,44 @@ function charlies_shipping_package_name() {
 add_filter( 'woocommerce_shipping_package_name', 'charlies_shipping_package_name' );
 
 /**
+ * WooCommerce: show tracking on the customer's order (My Account → View order,
+ * the order-received page, and order emails).
+ *
+ * The inventory platform writes `_tracking_number` / `_tracking_url` /
+ * `_shipping_carrier` / `_shipping_service` to the order meta on label buy, so
+ * we just render them — no tracking plugin needed.
+ */
+function charlies_render_order_tracking( $order ) {
+	if ( ! $order instanceof WC_Order ) {
+		$order = wc_get_order( $order );
+	}
+	if ( ! $order ) {
+		return;
+	}
+	$number = $order->get_meta( '_tracking_number' );
+	if ( ! $number ) {
+		return;
+	}
+	$url     = $order->get_meta( '_tracking_url' );
+	$carrier = trim( $order->get_meta( '_shipping_carrier' ) . ' ' . $order->get_meta( '_shipping_service' ) );
+
+	echo '<section class="charlies-order-tracking woocommerce-order-tracking" style="margin:1.5em 0;">';
+	echo '<h2 style="margin-bottom:.5em;">' . esc_html__( 'Tracking', 'charlies-theme' ) . '</h2>';
+	echo '<p style="margin:0;">';
+	if ( $carrier ) {
+		echo esc_html( $carrier ) . ' &mdash; ';
+	}
+	echo esc_html__( 'Tracking number:', 'charlies-theme' ) . ' ';
+	if ( $url ) {
+		echo '<a href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $number ) . '</a>';
+	} else {
+		echo '<strong>' . esc_html( $number ) . '</strong>';
+	}
+	echo '</p></section>';
+}
+add_action( 'woocommerce_order_details_after_order_table', 'charlies_render_order_tracking', 15 );
+
+/**
  * WooCommerce: Customize add to cart fragments for AJAX
  */
 function charlies_cart_count_fragment( $fragments ) {
