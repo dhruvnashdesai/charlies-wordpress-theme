@@ -216,7 +216,7 @@ add_filter( 'woocommerce_add_to_cart_fragments', 'charlies_cart_count_fragment' 
  * Helper: Get promo bar text
  */
 function charlies_get_promo_text() {
-	$default = 'FREE SHIPPING ON ORDERS $50+';
+	$default = 'FREE SHIPPING ON ORDERS $120+';
 	return esc_html( get_option( 'charlies_promo_text', $default ) );
 }
 
