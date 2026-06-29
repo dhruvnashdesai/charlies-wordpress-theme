@@ -132,6 +132,55 @@ function charlies_hide_paid_rates_when_free_available( $rates ) {
 add_filter( 'woocommerce_package_rates', 'charlies_hide_paid_rates_when_free_available', 100 );
 
 /**
+ * WooCommerce: Customer-friendly, speed-first shipping labels.
+ *
+ * The eShipper plugin emits raw carrier strings like "UPS-Standard (1 day)".
+ * Customers pick on speed, not carrier — so we relabel to a benefit-first label
+ * with a delivery estimate. The warehouse still ships UPS via eShipper; the
+ * carrier name just stays out of the customer's way. When the regional courier
+ * (Flashbird) starts contributing rates, give it a "Same-Day" style label here
+ * (fill in its method_id once its WooCommerce method is on the zone).
+ */
+function charlies_friendly_shipping_labels( $rates ) {
+	foreach ( $rates as $rate ) {
+		switch ( $rate->get_method_id() ) {
+			case 'free_shipping':
+				$rate->set_label( __( 'Free Shipping', 'charlies-theme' ) );
+				break;
+
+			case 'woocommerce_eshipper':
+				// Pull the transit estimate out of e.g. "UPS-Standard (1 day)".
+				$eta = '';
+				if ( preg_match( '/\((\d+)\s*day/i', $rate->get_label(), $m ) ) {
+					$n   = (int) $m[1];
+					$eta = sprintf(
+						/* translators: %d: number of business days */
+						_n( ' · arrives in ~%d business day', ' · arrives in ~%d business days', $n, 'charlies-theme' ),
+						$n
+					);
+				}
+				$rate->set_label( __( 'Standard Shipping', 'charlies-theme' ) . $eta );
+				break;
+
+			// case 'flashbird':
+			//	$rate->set_label( __( 'Same-Day Delivery', 'charlies-theme' ) );
+			//	break;
+		}
+	}
+	return $rates;
+}
+add_filter( 'woocommerce_package_rates', 'charlies_friendly_shipping_labels', 90 );
+
+/**
+ * WooCommerce: Label the shipping row "Shipping" (not the plugin's "Shipment").
+ * Single-package store, so a plain constant name is fine.
+ */
+function charlies_shipping_package_name() {
+	return __( 'Shipping', 'charlies-theme' );
+}
+add_filter( 'woocommerce_shipping_package_name', 'charlies_shipping_package_name' );
+
+/**
  * WooCommerce: Customize add to cart fragments for AJAX
  */
 function charlies_cart_count_fragment( $fragments ) {
