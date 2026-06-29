@@ -112,6 +112,26 @@ function charlies_woocommerce_setup() {
 add_action( 'init', 'charlies_woocommerce_setup' );
 
 /**
+ * WooCommerce: When an order qualifies for free shipping, hide the paid rates.
+ *
+ * The Canada zone carries both the eShipper (paid UPS) method and a Free Shipping
+ * method (min order $120). Once the cart crosses the threshold WooCommerce would
+ * show both — so we strip everything except the free rate(s) and the customer
+ * just sees "Free Shipping". The warehouse still buys a real UPS label via
+ * eShipper on the inventory side; the customer simply isn't charged.
+ */
+function charlies_hide_paid_rates_when_free_available( $rates ) {
+	$free = array();
+	foreach ( $rates as $rate_id => $rate ) {
+		if ( 'free_shipping' === $rate->method_id ) {
+			$free[ $rate_id ] = $rate;
+		}
+	}
+	return ! empty( $free ) ? $free : $rates;
+}
+add_filter( 'woocommerce_package_rates', 'charlies_hide_paid_rates_when_free_available', 100 );
+
+/**
  * WooCommerce: Customize add to cart fragments for AJAX
  */
 function charlies_cart_count_fragment( $fragments ) {
