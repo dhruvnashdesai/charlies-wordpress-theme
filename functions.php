@@ -242,6 +242,51 @@ function charlies_render_order_tracking( $order ) {
 add_action( 'woocommerce_order_details_after_order_table', 'charlies_render_order_tracking', 15 );
 
 /**
+ * WooCommerce: per-line quantity discounts for cigarettes ("sticks").
+ *
+ * All products in the `sticks` product category share a tiered per-carton price
+ * based on the quantity of that single line item. Tiers are absolute prices:
+ *
+ *   1–4  → $50   |   5–19 → $45   |   20–39 → $40   |   40+ → $35
+ *
+ * Enforced here at cart-calculation time so it applies no matter how the item is
+ * added (the headless storefront hands off to /cart/?add-to-cart=ID&quantity=N).
+ * The frontend PDP renders a matching "Quantity Discounts" table for display —
+ * keep STICK_PRICE_TIERS (lib/woo/sticks.ts) in sync if these change.
+ */
+function charlies_sticks_tier_price( $qty ) {
+	// Highest threshold first; falls through to the base price.
+	$tiers = array(
+		array( 40, 35.0 ),
+		array( 20, 40.0 ),
+		array( 5, 45.0 ),
+	);
+	foreach ( $tiers as $tier ) {
+		if ( $qty >= $tier[0] ) {
+			return $tier[1];
+		}
+	}
+	return 50.0;
+}
+
+function charlies_apply_sticks_quantity_pricing( $cart ) {
+	if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+		return;
+	}
+	foreach ( $cart->get_cart() as $item ) {
+		// product_id is always the top-level product (parent for variations), so
+		// category membership resolves correctly for any product type.
+		if ( ! has_term( 'sticks', 'product_cat', $item['product_id'] ) ) {
+			continue;
+		}
+		// Absolute per-carton price for the whole line — idempotent, so it's safe
+		// even though this hook can fire several times per request.
+		$item['data']->set_price( charlies_sticks_tier_price( $item['quantity'] ) );
+	}
+}
+add_action( 'woocommerce_before_calculate_totals', 'charlies_apply_sticks_quantity_pricing', 20 );
+
+/**
  * WooCommerce: Customize add to cart fragments for AJAX
  */
 function charlies_cart_count_fragment( $fragments ) {
