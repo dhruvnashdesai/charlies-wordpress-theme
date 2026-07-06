@@ -321,6 +321,12 @@ table.woocommerce-checkout-review-order-table {
 		overflow: hidden;
 
 		.wc_payment_method {
+			// The radio is a *sibling* before the label in Woo's markup, so on
+			// its own it stacks above the block-level label. Grid puts them on
+			// one row (radio | label) with the payment box spanning below.
+			display: grid;
+			grid-template-columns: auto 1fr;
+			align-items: center;
 			border-bottom: 1px solid $color-border;
 
 			&:last-child {
@@ -331,7 +337,7 @@ table.woocommerce-checkout-review-order-table {
 				display: flex;
 				align-items: center;
 				gap: $spacing-3;
-				padding: $spacing-4;
+				padding: $spacing-4 $spacing-4 $spacing-4 $spacing-3;
 				cursor: pointer;
 				font-weight: $font-weight-semibold;
 				transition: background-color $transition-fast;
@@ -347,7 +353,11 @@ table.woocommerce-checkout-review-order-table {
 			}
 
 			> input[type="radio"] {
-				margin-left: $spacing-4;
+				margin: 0 0 0 $spacing-4;
+			}
+
+			.payment_box {
+				grid-column: 1 / -1;
 			}
 
 			.payment_box {
