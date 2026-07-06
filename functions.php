@@ -287,6 +287,22 @@ function charlies_apply_sticks_quantity_pricing( $cart ) {
 add_action( 'woocommerce_before_calculate_totals', 'charlies_apply_sticks_quantity_pricing', 20 );
 
 /**
+ * WooCommerce: register the Interac e-Transfer offline gateway.
+ *
+ * The class file is required lazily inside the filter (which WooCommerce
+ * applies once its own WC_Payment_Gateway abstract exists), so the theme
+ * stays safe to load even if WooCommerce is deactivated.
+ */
+function charlies_register_etransfer_gateway( $gateways ) {
+	if ( class_exists( 'WC_Payment_Gateway' ) ) {
+		require_once CHARLIES_THEME_DIR . '/inc/class-charlies-gateway-etransfer.php';
+		$gateways[] = 'Charlies_Gateway_ETransfer';
+	}
+	return $gateways;
+}
+add_filter( 'woocommerce_payment_gateways', 'charlies_register_etransfer_gateway' );
+
+/**
  * WooCommerce: Customize add to cart fragments for AJAX
  */
 function charlies_cart_count_fragment( $fragments ) {
