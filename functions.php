@@ -13,6 +13,10 @@ define( 'CHARLIES_THEME_VERSION', '1.0.0' );
 define( 'CHARLIES_THEME_DIR', get_template_directory() );
 define( 'CHARLIES_THEME_URI', get_template_directory_uri() );
 
+// Loyalty checkout handoff: verify the storefront's signed `loyalty-id` cookie
+// and stamp the customer identity onto order meta for the inventory platform.
+require_once CHARLIES_THEME_DIR . '/inc/loyalty-handoff.php';
+
 /**
  * Theme Setup
  */
