@@ -34,7 +34,72 @@ function charlies_loyalty_secret() {
 		return (string) LOYALTY_HANDOFF_SECRET;
 	}
 	$env = getenv( 'LOYALTY_HANDOFF_SECRET' );
-	return $env ? (string) $env : '';
+	if ( $env ) {
+		return (string) $env;
+	}
+	// Fallback for hosts without wp-config/SFTP access: an option set from
+	// wp-admin (Settings -> Loyalty Handoff). Constant/env take precedence.
+	$opt = get_option( 'charlies_loyalty_handoff_secret', '' );
+	return $opt ? (string) $opt : '';
+}
+
+/**
+ * wp-admin settings page (Settings -> Loyalty Handoff) to store the shared
+ * secret as an option, for hosts where wp-config.php isn't editable.
+ */
+function charlies_loyalty_register_settings() {
+	register_setting(
+		'charlies_loyalty',
+		'charlies_loyalty_handoff_secret',
+		array(
+			'type'              => 'string',
+			'sanitize_callback' => 'sanitize_text_field',
+			'default'           => '',
+		)
+	);
+}
+add_action( 'admin_init', 'charlies_loyalty_register_settings' );
+
+function charlies_loyalty_add_settings_page() {
+	add_options_page(
+		'Loyalty Handoff',
+		'Loyalty Handoff',
+		'manage_options',
+		'charlies-loyalty',
+		'charlies_loyalty_render_settings_page'
+	);
+}
+add_action( 'admin_menu', 'charlies_loyalty_add_settings_page' );
+
+function charlies_loyalty_render_settings_page() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	$overridden = ( defined( 'LOYALTY_HANDOFF_SECRET' ) && LOYALTY_HANDOFF_SECRET ) || getenv( 'LOYALTY_HANDOFF_SECRET' );
+	?>
+	<div class="wrap">
+		<h1>Loyalty Handoff Secret</h1>
+		<p>Shared HMAC secret used to verify the storefront's signed <code>loyalty-id</code> cookie at checkout. It must match the storefront's <code>LOYALTY_HANDOFF_SECRET</code> value exactly.</p>
+		<?php if ( $overridden ) : ?>
+			<p><strong>Note:</strong> A secret is already defined via wp-config or an environment variable, which takes precedence over the value below.</p>
+		<?php endif; ?>
+		<form method="post" action="options.php">
+			<?php settings_fields( 'charlies_loyalty' ); ?>
+			<table class="form-table">
+				<tr>
+					<th scope="row"><label for="charlies_loyalty_handoff_secret">Secret</label></th>
+					<td>
+						<input type="password" id="charlies_loyalty_handoff_secret"
+							name="charlies_loyalty_handoff_secret"
+							value="<?php echo esc_attr( get_option( 'charlies_loyalty_handoff_secret', '' ) ); ?>"
+							class="regular-text" autocomplete="off" />
+					</td>
+				</tr>
+			</table>
+			<?php submit_button(); ?>
+		</form>
+	</div>
+	<?php
 }
 
 /**
