@@ -17,6 +17,10 @@ define( 'CHARLIES_THEME_URI', get_template_directory_uri() );
 // and stamp the customer identity onto order meta for the inventory platform.
 require_once CHARLIES_THEME_DIR . '/inc/loyalty-handoff.php';
 
+// Ambassador referral handoff: copy the storefront's `charlies_ref` cookie onto
+// order meta (`_ambassador_ref`) so the inventory platform can credit commission.
+require_once CHARLIES_THEME_DIR . '/inc/ambassador-handoff.php';
+
 /**
  * Theme Setup
  */
