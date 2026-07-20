@@ -127,17 +127,12 @@ add_action(
 	.woocommerce-account-fields p:last-child {
 		margin-bottom: 0;
 	}
+	/* Keep the theme's own checkbox layout (flex + gap + checkbox margin) so this
+	   matches the sibling "Ship to a different address?" row exactly; only bold
+	   the label to match that row's heading weight. */
 	.woocommerce-account-fields .create-account label {
-		display: flex;
-		align-items: center;
-		gap: 0.5em;
 		font-weight: 600;
 		margin: 0;
-	}
-	.woocommerce-account-fields .create-account label input[type="checkbox"] {
-		float: none;
-		margin: 0;
-		flex: 0 0 auto;
 	}
 </style>
 		<?php
