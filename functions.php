@@ -25,6 +25,10 @@ require_once CHARLIES_THEME_DIR . '/inc/ambassador-handoff.php';
 // claim the loyalty points their order earned.
 require_once CHARLIES_THEME_DIR . '/inc/account-prompt.php';
 
+// Checkout account bridge: the Woo "create an account" checkbox also provisions
+// a matching storefront (Supabase) account with the same email + password.
+require_once CHARLIES_THEME_DIR . '/inc/account-bridge.php';
+
 /**
  * Theme Setup
  */
