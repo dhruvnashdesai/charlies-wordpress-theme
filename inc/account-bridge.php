@@ -116,22 +116,24 @@ add_action(
 		}
 		?>
 <style id="charlies-account-fields-style">
+	/* Mirror the sibling "Ship to a different address?" box (#ship-to-different-address)
+	   exactly — same padding, border width and radius — so the two checkboxes line
+	   up horizontally. Only the colour differs (pink to make it pop). */
 	.woocommerce-account-fields {
 		margin-top: 1.75em;
-		padding: 1.1em 1.35em;
+		padding: 1rem;
 		background: rgba(237, 32, 123, 0.14);
-		border: 1px solid rgba(237, 32, 123, 0.65);
-		border-radius: 12px;
+		border: 2px solid rgba(237, 32, 123, 0.65);
+		border-radius: 10px;
 	}
 	.woocommerce-account-fields .create-account,
 	.woocommerce-account-fields p:last-child {
 		margin-bottom: 0;
 	}
-	/* Keep the theme's own checkbox layout (flex + gap + checkbox margin) so this
-	   matches the sibling "Ship to a different address?" row exactly; only bold
-	   the label to match that row's heading weight. */
 	.woocommerce-account-fields .create-account label {
+		display: flex;
 		align-items: center;
+		gap: 0.75rem;
 		font-weight: 600;
 		margin: 0;
 	}
