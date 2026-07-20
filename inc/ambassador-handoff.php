@@ -41,5 +41,30 @@ function charlies_attach_ambassador_ref( $order ) {
 		return;
 	}
 	$order->update_meta_data( '_ambassador_ref', $code );
+	// Also drop a note so it shows in the order timeline, not just meta.
+	$order->add_order_note( sprintf( 'Referred by ambassador: %s', $code ) );
 }
 add_action( 'woocommerce_checkout_create_order', 'charlies_attach_ambassador_ref', 20, 1 );
+
+/**
+ * Show the ambassador referral code on the admin order edit screen.
+ *
+ * The code is stored as hidden (underscore-prefixed) order meta, so it doesn't
+ * display by default. This renders it in the order details panel. The ambassador's
+ * name lives in the inventory platform (Supabase), not WordPress — staff look the
+ * code up there; the code alone uniquely identifies the ambassador. Works on both
+ * the classic and HPOS order edit screens (shared hook).
+ *
+ * @param WC_Order $order The order being viewed.
+ * @return void
+ */
+function charlies_render_ambassador_ref_admin( $order ) {
+	$code = $order->get_meta( '_ambassador_ref' );
+	if ( empty( $code ) ) {
+		return;
+	}
+	echo '<p class="form-field form-field-wide"><strong>' .
+		esc_html__( 'Ambassador referral', 'charlies-theme' ) . ':</strong> ' .
+		'<code>' . esc_html( $code ) . '</code></p>';
+}
+add_action( 'woocommerce_admin_order_data_after_billing_address', 'charlies_render_ambassador_ref_admin', 10, 1 );
