@@ -131,6 +131,7 @@ add_action(
 	   matches the sibling "Ship to a different address?" row exactly; only bold
 	   the label to match that row's heading weight. */
 	.woocommerce-account-fields .create-account label {
+		align-items: center;
 		font-weight: 600;
 		margin: 0;
 	}
