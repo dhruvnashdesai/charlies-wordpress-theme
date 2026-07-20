@@ -106,6 +106,35 @@ function charlies_provision_storefront_account( $email, $password, $name ) {
 	}
 }
 
+// Make the "Create an account?" block stand out on the checkout — a pink card,
+// separated from the marketing opt-in above it.
+add_action(
+	'wp_head',
+	function () {
+		if ( ! function_exists( 'is_checkout' ) || ! is_checkout() ) {
+			return;
+		}
+		?>
+<style id="charlies-account-fields-style">
+	.woocommerce-account-fields {
+		margin-top: 1.75em;
+		padding: 1.1em 1.35em;
+		background: rgba(237, 32, 123, 0.14);
+		border: 1px solid rgba(237, 32, 123, 0.65);
+		border-radius: 12px;
+	}
+	.woocommerce-account-fields .create-account,
+	.woocommerce-account-fields p:last-child {
+		margin-bottom: 0;
+	}
+	.woocommerce-account-fields .create-account label {
+		font-weight: 600;
+	}
+</style>
+		<?php
+	}
+);
+
 // When Woo creates the account at checkout, mirror it to the storefront.
 add_action(
 	'woocommerce_created_customer',
