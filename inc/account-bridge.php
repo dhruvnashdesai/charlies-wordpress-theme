@@ -128,7 +128,16 @@ add_action(
 		margin-bottom: 0;
 	}
 	.woocommerce-account-fields .create-account label {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
 		font-weight: 600;
+		margin: 0;
+	}
+	.woocommerce-account-fields .create-account label input[type="checkbox"] {
+		float: none;
+		margin: 0;
+		flex: 0 0 auto;
 	}
 </style>
 		<?php
