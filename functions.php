@@ -21,6 +21,10 @@ require_once CHARLIES_THEME_DIR . '/inc/loyalty-handoff.php';
 // order meta (`_ambassador_ref`) so the inventory platform can credit commission.
 require_once CHARLIES_THEME_DIR . '/inc/ambassador-handoff.php';
 
+// Post-purchase prompt: invite the customer to create a storefront account and
+// claim the loyalty points their order earned.
+require_once CHARLIES_THEME_DIR . '/inc/account-prompt.php';
+
 /**
  * Theme Setup
  */
