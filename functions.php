@@ -29,6 +29,10 @@ require_once CHARLIES_THEME_DIR . '/inc/account-prompt.php';
 // a matching storefront (Supabase) account with the same email + password.
 require_once CHARLIES_THEME_DIR . '/inc/account-bridge.php';
 
+// Checkout performance: defer transactional emails so a slow SMTP send doesn't
+// block the "Place order" request.
+require_once CHARLIES_THEME_DIR . '/inc/checkout-performance.php';
+
 /**
  * Theme Setup
  */
