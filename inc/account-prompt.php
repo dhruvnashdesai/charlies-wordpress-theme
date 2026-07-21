@@ -50,13 +50,6 @@ function charlies_account_prompt( $order_id ) {
 	// Estimate points (storefront awards ~1 point per dollar of item subtotal).
 	$points = (int) floor( (float) $order->get_subtotal() );
 
-	$signup = charlies_storefront_url() . '/en/signup?' . http_build_query(
-		array(
-			'email' => $email,
-			'next'  => '/en/rewards',
-		)
-	);
-
 	$headline = $points > 0
 		? sprintf(
 			/* translators: %s: estimated loyalty points */
@@ -65,15 +58,36 @@ function charlies_account_prompt( $order_id ) {
 		)
 		: esc_html__( 'Start earning points on your orders.', 'charlies-theme' );
 
+	// If this order created (or belongs to) an account, invite them to log in
+	// rather than create one. Otherwise offer account creation.
+	$has_account = $order->get_user_id() > 0;
+	if ( $has_account ) {
+		$cta_url  = charlies_storefront_url() . '/en/login?' . http_build_query(
+			array(
+				'email' => $email,
+				'next'  => '/en/rewards',
+			)
+		);
+		$cta_body  = esc_html__( 'Your account is ready. Log in to see your points, track this order, and check out faster next time.', 'charlies-theme' );
+		$cta_label = esc_html__( 'Go to my account', 'charlies-theme' );
+	} else {
+		$cta_url  = charlies_storefront_url() . '/en/signup?' . http_build_query(
+			array(
+				'email' => $email,
+				'next'  => '/en/rewards',
+			)
+		);
+		$cta_body  = esc_html__( 'Create your Charlie\'s account to claim your points, track this order, and check out faster next time.', 'charlies-theme' );
+		$cta_label = esc_html__( 'Create my account', 'charlies-theme' );
+	}
+
 	?>
 	<div class="charlies-account-prompt" style="margin:2em 0;padding:1.25em 1.5em;border:1px solid #ED207B;border-radius:12px;background:#fff0f7;">
 		<p style="margin:0 0 .35em;font-size:1.1em;font-weight:600;color:#111;"><?php echo wp_kses_post( $headline ); ?></p>
-		<p style="margin:0 0 1em;color:#444;">
-			<?php esc_html_e( 'Create your Charlie\'s account to claim your points, track this order, and check out faster next time.', 'charlies-theme' ); ?>
-		</p>
-		<a href="<?php echo esc_url( $signup ); ?>"
+		<p style="margin:0 0 1em;color:#444;"><?php echo esc_html( $cta_body ); ?></p>
+		<a href="<?php echo esc_url( $cta_url ); ?>"
 			style="display:inline-block;padding:.7em 1.4em;background:#ED207B;color:#fff;font-weight:600;border-radius:8px;text-decoration:none;">
-			<?php esc_html_e( 'Create my account', 'charlies-theme' ); ?>
+			<?php echo esc_html( $cta_label ); ?>
 		</a>
 	</div>
 	<?php

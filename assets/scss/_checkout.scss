@@ -31,6 +31,40 @@
 	}
 }
 
+// ...but on ACTUAL order submission WooCommerce adds `.processing` to the form.
+// Show a clear full-screen loading state then, so clicking "Place order" gives
+// immediate feedback instead of appearing to do nothing while the order posts.
+form.checkout.processing {
+	&::before {
+		content: '';
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.6);
+		z-index: 9998;
+	}
+
+	&::after {
+		content: '';
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		width: 46px;
+		height: 46px;
+		margin: -23px 0 0 -23px;
+		border: 3px solid rgba(237, 32, 123, 0.25);
+		border-top-color: $color-accent;
+		border-radius: 50%;
+		animation: charlies-checkout-spin 0.8s linear infinite;
+		z-index: 9999;
+	}
+}
+
+@keyframes charlies-checkout-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 // --------------------------------------------------------------------------
 // Checkout Form
 // --------------------------------------------------------------------------
