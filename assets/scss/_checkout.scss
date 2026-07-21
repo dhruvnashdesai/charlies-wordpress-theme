@@ -105,6 +105,10 @@
 		&.form-row-first,
 		&.form-row-last {
 			width: 100%;
+			// The flex `gap` handles spacing here, so drop the two-column
+			// margins from _forms.scss that otherwise offset the last field.
+			margin-left: 0;
+			margin-right: 0;
 
 			@include sm {
 				width: calc(50% - #{$spacing-2});

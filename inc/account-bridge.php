@@ -118,20 +118,25 @@ add_action(
 <style id="charlies-account-fields-style">
 	/* Mirror the sibling "Ship to a different address?" box (#ship-to-different-address)
 	   exactly — same padding, border width and radius — so the two checkboxes line
-	   up horizontally. Only the colour differs (pink to make it pop). */
+	   up horizontally. Only the colour differs (pink to make it pop). A flex column
+	   spaces the checkbox row from the password field (shown when ticked). */
 	.woocommerce-account-fields {
 		margin-top: 1.75em;
 		padding: 1rem;
 		background: rgba(237, 32, 123, 0.14);
 		border: 2px solid rgba(237, 32, 123, 0.65);
 		border-radius: 10px;
-	}
-	.woocommerce-account-fields .create-account,
-	.woocommerce-account-fields p:last-child {
-		margin-bottom: 0;
-	}
-	.woocommerce-account-fields .create-account label {
 		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+	}
+	.woocommerce-account-fields > p,
+	.woocommerce-account-fields > .create-account,
+	.woocommerce-account-fields .form-row {
+		margin: 0;
+	}
+	/* Scope to the checkbox label only (has this class) — not the password label. */
+	.woocommerce-account-fields .woocommerce-form__label-for-checkbox {
 		align-items: center;
 		gap: 0.75rem;
 		font-weight: 600;
